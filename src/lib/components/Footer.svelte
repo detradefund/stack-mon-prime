@@ -23,6 +23,10 @@
       comingSoon: true
     },
     {
+      name: 'App',
+      url: 'https://app.detrade.fund'
+    },
+    {
       name: 'Website',
       url: 'https://detrade.fund'
     }
