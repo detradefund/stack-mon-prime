@@ -1,3 +1,9 @@
 pymongo
 python-dotenv
-# Ajoutez ici toutes les autres dépendances que votre script utilise 
+web3
+# Autres dépendances potentiellement nécessaires pour votre script
+requests
+eth-account
+eth-typing
+eth-utils
+# Ajoutez ici toutes les autres dépendances nécessaires pour balance_pusher.py
