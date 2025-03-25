@@ -3,6 +3,7 @@ name: Update Balance
 on:
   schedule:
     - cron: '*/10 * * * *'
+  workflow_dispatch:  # Permet l'exécution manuelle
 
 jobs:
   update-balance:
