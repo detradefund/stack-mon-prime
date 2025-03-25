@@ -4,7 +4,6 @@ from datetime import datetime
 from dotenv import load_dotenv
 from pymongo import MongoClient
 from balance_aggregator import BalanceAggregator
-from apscheduler.schedulers.blocking import BlockingScheduler
 
 # Add parent directory to PYTHONPATH and load environment variables
 root_path = str(Path(__file__).parent.parent)
@@ -64,21 +63,7 @@ def main():
     
     pusher = BalancePusher()
     try:
-        # Créer le scheduler
-        scheduler = BlockingScheduler()
-        
-        # Ajouter la tâche à exécuter toutes les 10 minutes
-        scheduler.add_job(
-            pusher.push_balance_data,
-            'interval',
-            minutes=10,
-            args=[test_address]
-        )
-        
-        print("Starting scheduler. Press Ctrl+C to exit.")
-        scheduler.start()
-    except (KeyboardInterrupt, SystemExit):
-        print("Stopping scheduler...")
+        pusher.push_balance_data(test_address)
     finally:
         pusher.close()
 
