@@ -5,8 +5,9 @@ on:
     branches:
       - main
   schedule:
-    - cron: '*/10 * * * *'
-  workflow_dispatch:  # Permet l'exécution manuelle
+    # À 0, 15, 30, 45 minutes de chaque heure
+    - cron: '0,15,30,45 * * * *'
+  workflow_dispatch:  # Garde l'exécution manuelle
 
 jobs:
   update-balance:
