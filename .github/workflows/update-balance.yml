@@ -21,16 +21,18 @@ jobs:
         with:
           python-version: '3.x'
           
-      - name: Install dependencies
-        run: |
-          cd detrade-core-usdc
-          pip install -r requirements.txt
-          
-      - name: Run balance updater
+      - name: Install dependencies and run script
         env:
           MONGO_URI: ${{ secrets.MONGO_URI }}
           DATABASE_NAME_1: ${{ secrets.DATABASE_NAME_1 }}
           COLLECTION_NAME: ${{ secrets.COLLECTION_NAME }}
           DEFAULT_USER_ADDRESS: ${{ secrets.DEFAULT_USER_ADDRESS }}
+          ARBITRUM_RPC: ${{ secrets.ARBITRUM_RPC }}
+          OPTIMISM_RPC: ${{ secrets.OPTIMISM_RPC }}
+          BASE_RPC: ${{ secrets.BASE_RPC }}
+          ETHEREUM_RPC: ${{ secrets.ETHEREUM_RPC }}
+          SCROLL_RPC: ${{ secrets.SCROLL_RPC }}
         working-directory: ./detrade-core-usdc
-        run: python builder/balance_pusher.py 
+        run: |
+          pip install -r requirements.txt
+          python builder/balance_pusher.py 
