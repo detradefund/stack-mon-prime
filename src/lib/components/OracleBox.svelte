@@ -106,7 +106,7 @@
   <div class="container">
     <div class="info-box">
       <div class="info-header">
-        <h3>Oracle Documents</h3>
+        <h3>DeTrade Core USDC</h3>
       </div>
       <div class="info-content" on:scroll={handleScroll}>
         {#if loading && initialLoad}
@@ -125,7 +125,8 @@
                   <div class="left-content">
                     <span class="timestamp">{new Date(doc.timestamp).toLocaleString()}</span>
                     <p class="nav-info">
-                      NAV: <span class="nav-value">{doc.nav?.usdc ?? 'N/A'} {doc.nav?.usdc ? 'USDC' : ''}</span>
+                      <span class="nav-label">NAV: </span>
+                      <span class="nav-value">{doc.nav?.usdc ?? 'N/A'} {doc.nav?.usdc ? 'USDC' : ''}</span>
                     </p>
                   </div>
                   <a 
@@ -342,11 +343,74 @@
     }
 
     .info-content {
-      max-height: 265px;
+      max-height: 400px;
     }
 
     .document-item {
-      padding: 0.75rem;
+      padding: 1rem;
+      text-align: center;
+      background: rgba(255, 255, 255, 0.03);
+    }
+
+    .document-header {
+      flex-direction: column;
+      gap: 0.5rem;
+    }
+
+    .left-content {
+      align-items: center;
+      gap: 0.4rem;
+      width: 100%;
+    }
+
+    .timestamp {
+      font-size: 0.8rem;
+      color: #64748b;
+      order: 2;
+    }
+
+    .nav-info {
+      font-size: 1rem;
+      order: 1;
+    }
+
+    .nav-info::before {
+      content: 'NAV: ';
+      display: none;
+    }
+
+    .nav-value {
+      font-size: 1.1rem;
+      display: block;
+      margin-top: 0.25rem;
+    }
+
+    .time-ago {
+      font-size: 0.8rem;
+      padding: 0.25rem;
+      width: 100%;
+      justify-content: center;
+      margin-top: 0.25rem;
+      opacity: 0.8;
+    }
+
+    .time-ago:hover {
+      opacity: 1;
+    }
+
+    .nav-label {
+      display: none;
+    }
+
+    .info-header {
+      display: flex;
+      justify-content: center;
+      margin-bottom: 1.5rem;
+    }
+
+    .info-header h3 {
+      font-size: 1.25rem;
+      text-align: center;
     }
   }
 

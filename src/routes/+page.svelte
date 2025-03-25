@@ -153,10 +153,12 @@
   @media (max-width: 768px) {
     .box-container {
       margin-top: 120px;
+      margin-bottom: 200px;
     }
 
     .content {
       padding: 0 1rem;
+      min-height: calc(100vh - 200px);
     }
 
     h1 {

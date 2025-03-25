@@ -1,5 +1,5 @@
 <script lang="ts">
-  export let title: string = "Service Oracle";
+  export let title: string = "Overview";
 </script>
 
 <div class="wrapper">
@@ -75,7 +75,24 @@
     }
 
     .info-box {
-      padding: 1rem;
+      padding: 1.5rem;
+      text-align: center;
+    }
+
+    .info-header {
+      display: flex;
+      justify-content: center;
+    }
+
+    .info-content {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+    }
+
+    .info-content p {
+      max-width: 90%;
+      margin: 0 auto;
     }
   }
 
