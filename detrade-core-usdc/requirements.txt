@@ -1,6 +1,7 @@
 pymongo
 python-dotenv
 web3
+apscheduler
 # Autres dépendances potentiellement nécessaires pour votre script
 requests
 eth-account
