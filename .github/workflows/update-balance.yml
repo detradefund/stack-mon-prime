@@ -1,6 +1,9 @@
 name: Update Balance
 
 on:
+  push:  # Ajout du trigger sur push
+    branches:
+      - main
   schedule:
     - cron: '*/10 * * * *'
   workflow_dispatch:  # Permet l'exécution manuelle
@@ -8,6 +11,8 @@ on:
 jobs:
   update-balance:
     runs-on: ubuntu-latest
+    permissions:
+      contents: read
     steps:
       - uses: actions/checkout@v2
       
