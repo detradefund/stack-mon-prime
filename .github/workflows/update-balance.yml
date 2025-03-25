@@ -32,4 +32,5 @@ jobs:
           DATABASE_NAME_1: ${{ secrets.DATABASE_NAME_1 }}
           COLLECTION_NAME: ${{ secrets.COLLECTION_NAME }}
           DEFAULT_USER_ADDRESS: ${{ secrets.DEFAULT_USER_ADDRESS }}
-        run: python detrade-core-usdc/builder/balance_pusher.py 
+        working-directory: ./detrade-core-usdc
+        run: python builder/balance_pusher.py 
