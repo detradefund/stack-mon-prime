@@ -1,10 +1,4 @@
 pymongo
 python-dotenv
-web3
-apscheduler
-# Autres dépendances potentiellement nécessaires pour votre script
+web3>=6.0.0
 requests
-eth-account
-eth-typing
-eth-utils
-# Ajoutez ici toutes les autres dépendances nécessaires pour balance_pusher.py

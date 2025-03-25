@@ -11,6 +11,7 @@ on:
 jobs:
   update-balance:
     runs-on: ubuntu-latest
+    timeout-minutes: 10  # Ajoute un timeout
     permissions:
       contents: read
     steps:
@@ -19,7 +20,8 @@ jobs:
       - name: Set up Python
         uses: actions/setup-python@v2
         with:
-          python-version: '3.x'
+          python-version: '3.10'  # Version spécifique plus stable
+          cache: 'pip'  # Active le cache pip
           
       - name: Install dependencies and run script
         env:
@@ -34,5 +36,6 @@ jobs:
           SCROLL_RPC: ${{ secrets.SCROLL_RPC }}
         working-directory: ./detrade-core-usdc
         run: |
-          pip install -r requirements.txt
+          python -m pip install --upgrade pip
+          pip install -r requirements.txt --no-cache-dir
           python builder/balance_pusher.py 
