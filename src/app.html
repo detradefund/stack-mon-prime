@@ -1,0 +1,36 @@
+<!doctype html>
+<html lang="en">
+	<head>
+		<meta charset="utf-8" />
+		<link rel="icon" href="%sveltekit.assets%/logo-detrade.png" />
+		<meta name="viewport" content="width=device-width, initial-scale=1" />
+		<style>
+			:root {
+				/* Couleurs principales */
+				--color-accent: #4da8ff;
+				--color-accent-hover: #5db9ff;
+
+				/* Couleurs de fond */
+				--color-background: #0a0e1a;
+				--color-background-semi: rgba(10, 14, 26, 0.6);
+				--color-background-hover: rgba(10, 14, 26, 0.8);
+
+				/* Couleurs de texte */
+				--color-text: #ffffff;
+				--color-text-secondary: #89a6c8;
+
+				/* Couleurs d'état */
+				--color-error: #ff6b6b;
+			}
+
+			body {
+				background: var(--color-background);
+				color: var(--color-text);
+			}
+		</style>
+		%sveltekit.head%
+	</head>
+	<body data-sveltekit-preload-data="hover">
+		<div style="display: contents">%sveltekit.body%</div>
+	</body>
+</html>

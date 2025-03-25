@@ -1,0 +1,29 @@
+name: Update Balance
+
+on:
+  schedule:
+    - cron: '*/10 * * * *'
+
+jobs:
+  update-balance:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v2
+      
+      - name: Set up Python
+        uses: actions/setup-python@v2
+        with:
+          python-version: '3.x'
+          
+      - name: Install dependencies
+        run: |
+          cd detrade-core-usdc
+          pip install -r requirements.txt
+          
+      - name: Run balance updater
+        env:
+          MONGO_URI: ${{ secrets.MONGO_URI }}
+          DATABASE_NAME_1: ${{ secrets.DATABASE_NAME_1 }}
+          COLLECTION_NAME: ${{ secrets.COLLECTION_NAME }}
+          DEFAULT_USER_ADDRESS: ${{ secrets.DEFAULT_USER_ADDRESS }}
+        run: python detrade-core-usdc/builder/balance_pusher.py 

@@ -1,0 +1,3 @@
+pymongo
+python-dotenv
+# Ajoutez ici toutes les autres dépendances que votre script utilise 

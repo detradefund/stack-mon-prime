@@ -1,0 +1,105 @@
+import os
+from dotenv import load_dotenv
+
+# Load environment variables from .env
+load_dotenv()
+
+RPC_URLS = {
+    "ethereum": os.getenv('ETHEREUM_RPC'),
+    "base": os.getenv('BASE_RPC'),
+}
+
+CHAIN_IDS = {
+    "ethereum": "1",
+    "base": "8453"
+}
+
+# Configuration complète des tokens et protocoles par réseau
+NETWORK_TOKENS = {
+    "ethereum": {
+        "sUSDS": {
+            "address": "0xa3931d71877C0E7a3148CB7Eb4463524FEc27fbD",
+            "decimals": 18,
+            "name": "Savings USDS",
+            "symbol": "sUSDS",
+            "protocol": "sky",
+            "underlying": {
+                "USDS": {
+                    "address": "0xdC035D45d973E3EC169d2276DDab16f1e407384F",
+                    "decimals": 18,
+                    "name": "USDS",
+                    "symbol": "USDS"
+                }
+            }
+        },
+        "USDC": {
+            "address": "0xA0b86991c6218b36c1d19D4a2e9Eb0cE3606eB48",
+            "decimals": 6,
+            "name": "USD Coin",
+            "symbol": "USDC"
+        },
+        "PT-eUSDE-29MAY2025": {
+            "address": "0x50D2C7992b802Eef16c04FeADAB310f31866a545",
+            "decimals": 18,
+            "name": "Pendle PT Ethereal eUSDE 29MAY2025",
+            "symbol": "PT-eUSDE-29MAY2025",
+            "protocol": "pendle",
+            "market": "0x85667e484a32d884010cf16427d90049ccf46e97",
+            "underlying": {
+                "eUSDe": {
+                    "address": "0x90D2af7d622ca3141efA4DAB310f31866a5974Cc8F",
+                    "decimals": 18,
+                    "name": "Ethereal Pre-deposit Vault",
+                    "symbol": "eUSDe"
+                }
+            },
+            "expiry": "2025-05-29"
+        }
+    },
+    "base": {
+        "sUSDS": {
+            "address": "0x5875eEE11Cf8398102FdAd704C9E96607675467a",
+            "decimals": 18,
+            "name": "Savings USDS",
+            "symbol": "sUSDS",
+            "protocol": "sky",
+            "underlying": {
+                "USDS": {
+                    "address": "0x820C137fa70C8691f0e44Dc420a5e53c168921Dc",
+                    "decimals": 18,
+                    "name": "USDS",
+                    "symbol": "USDS"
+                }
+            }
+        },
+        "USDC": {
+            "address": "0x833589fCD6eDb6E08f4c7C32D4f71b54bdA02913",
+            "decimals": 6,
+            "name": "USD Coin",
+            "symbol": "USDC"
+        },
+        "PT-USR-24APR2025": {
+            "address": "0xec443e7E0e745348E500084892C89218B3ba4683",
+            "decimals": 18,
+            "name": "Pendle PT Resolv USD 24APR2025",
+            "symbol": "PT-USR-24APR2025",
+            "protocol": "pendle",
+            "market": "0xe15578523937ed7f08e8f7a1fa8a021e07025a08",
+            "underlying": {
+                "USR": {
+                    "address": "0x35E5dB674D8e93a03d814FA0ADa70731efe8a4b9",
+                    "decimals": 18,
+                    "name": "Resolve USD",
+                    "symbol": "USR"
+                }
+            },
+            "expiry": "2025-04-24"
+        },
+        "DTUSDC": {
+            "address": "0x8092cA384D44260ea4feaf7457B629B8DC6f88F0",
+            "decimals": 18,
+            "name": "DeTrade Core USDC",
+            "symbol": "DTUSDC"
+        }
+    }
+}
