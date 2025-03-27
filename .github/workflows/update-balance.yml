@@ -5,8 +5,8 @@ on:
     branches:
       - main
   schedule:
-    # À 0, 15, 30, 45 minutes de chaque heure
-    - cron: '0,15,30,45 * * * *'
+    # À 0 et 30 minutes de chaque heure
+    - cron: '0,30 * * * *'
   workflow_dispatch:  # Garde l'exécution manuelle
 
 jobs:

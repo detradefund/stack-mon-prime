@@ -40,14 +40,16 @@ class BalanceAggregator:
         protocols_value = Decimal('0')  # Ajout d'un compteur spécifique pour les protocoles
         
         # Add Sky positions
-        for network, tokens in sky_positions["sky"].items():
+        for network, tokens in sky_positions["sky"]["sky"].items():
             for token, data in tokens.items():
                 try:
+                    if data is None:
+                        continue
                     if 'value' in data and 'USDC' in data['value']:
                         usdc_value = Decimal(data['value']['USDC']['amount']) / Decimal(10**6)
-                        protocols_value += usdc_value
-                        positions_in_usdc[f"sky.{network}.{token}"] = f"{usdc_value:.6f}"
-                        print(f"Added Sky position {network}.{token}: {usdc_value:.6f} USDC")
+                        if usdc_value > 0:
+                            protocols_value += usdc_value
+                            positions_in_usdc[f"sky.{network}.{token}"] = f"{usdc_value:.6f}"
                 except (KeyError, TypeError) as e:
                     print(f"Warning: Could not process Sky position for {network}.{token}: {e}")
                     continue
@@ -56,31 +58,60 @@ class BalanceAggregator:
         for network, tokens in pendle_positions["pendle"].items():
             for token, data in tokens.items():
                 try:
+                    if data is None or not isinstance(data, dict):
+                        continue
                     if 'value' in data and 'USDC' in data['value']:
                         usdc_value = Decimal(data['value']['USDC']['amount']) / Decimal(10**6)
-                        protocols_value += usdc_value
-                        positions_in_usdc[f"pendle.{network}.{token}"] = f"{usdc_value:.6f}"
-                        print(f"Added Pendle position {network}.{token}: {usdc_value:.6f} USDC")
+                        if usdc_value > 0:
+                            protocols_value += usdc_value
+                            positions_in_usdc[f"pendle.{network}.{token}"] = f"{usdc_value:.6f}"
                 except (KeyError, TypeError) as e:
                     print(f"Warning: Could not process Pendle position for {network}.{token}: {e}")
                     continue
 
         # Add spot balances
         spot_balances_in_usdc = {}
-        total_spot_value = Decimal(spot_balances["summary"]["total_usdc_value"])
-        total_usdc_value += total_spot_value
-
+        total_spot_value = Decimal('0')  # Initialiser le total des spots
         for network, tokens in spot_balances["stablecoins"].items():
             for token, data in tokens.items():
                 if token == "USDC":
                     value = Decimal(data["amount"]) / Decimal(10**data["decimals"])
                 else:
                     value = Decimal(data["value"]["USDC"]["amount"]) / Decimal(10**6)
-                spot_balances_in_usdc[f"spot.{network}.{token}"] = f"{value:.6f}"
+                if value > 0:  # N'ajouter que si la valeur est > 0
+                    spot_balances_in_usdc[f"spot.{network}.{token}"] = f"{value:.6f}"
+                    total_spot_value += value  # Ajouter au total des spots
+
+        # Clean up details to remove zero balances
+        cleaned_sky = {}  # Plus de niveau "sky" du tout
+        for network, tokens in sky_positions["sky"]["sky"].items():
+            cleaned_sky[network] = {}
+            for token, data in tokens.items():
+                if data is None:
+                    continue
+                if Decimal(data['value']['USDC']['amount']) > 0:
+                    cleaned_sky[network][token] = data
+
+        cleaned_pendle = {}  # Plus de niveau "pendle" du tout
+        for network, tokens in pendle_positions["pendle"].items():
+            cleaned_pendle[network] = {}
+            for token, data in tokens.items():
+                if data is None:
+                    continue
+                if Decimal(data['value']['USDC']['amount']) > 0:
+                    cleaned_pendle[network][token] = data
+
+        cleaned_spot = {}
+        for network, tokens in spot_balances["stablecoins"].items():
+            cleaned_spot[network] = {}
+            for token, data in tokens.items():
+                value = Decimal(data["amount"]) if token == "USDC" else Decimal(data["value"]["USDC"]["amount"])
+                if value > 0:
+                    cleaned_spot[network][token] = data
 
         # Get total supply and calculate share price
         total_supply = Decimal(self.supply_reader.get_total_supply()) / Decimal(10**18)
-        total_value = protocols_value + total_spot_value
+        total_value = protocols_value + total_spot_value  # Utiliser total_spot_value au lieu de total_usdc_value
         share_price = total_value / total_supply if total_supply > 0 else Decimal('0')
         
         result = {
@@ -94,14 +125,14 @@ class BalanceAggregator:
             "summary": {
                 "total_value": f"{total_value:.6f}",
                 "protocols_value": f"{protocols_value:.6f}",
-                "spot_value": f"{total_spot_value:.6f}"
+                "spot_value": f"{total_spot_value:.6f}"  # Utiliser total_spot_value
             },
             "positions_in_usdc": positions_in_usdc,
             "spot_balances_in_usdc": spot_balances_in_usdc,
             "details": {
-                "sky": sky_positions,
-                "pendle": pendle_positions,
-                "spot": spot_balances["stablecoins"]
+                "sky": cleaned_sky,    # Sera directement {network: {token: data}}
+                "pendle": cleaned_pendle,  # Sera directement {network: {token: data}}
+                "spot": cleaned_spot
             }
         }
         

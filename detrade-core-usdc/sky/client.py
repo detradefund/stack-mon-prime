@@ -27,16 +27,24 @@ class SkyClient(BaseProtocolClient):
         )
 
     def get_positions(self, address: str) -> dict:
-        return {
-            'ethereum': {
-                'sUSDS': self._get_ethereum_position(address)
-            },
-            'base': {
-                'sUSDS': self._get_base_position(address)
-            }
-        }
+        eth_position = self._get_ethereum_position(address)
+        base_position = self._get_base_position(address)
+        
+        result = {"sky": {}}
+        
+        # N'ajouter le réseau que si la position existe
+        if eth_position is not None:
+            result["sky"]["ethereum"] = {"sUSDS": eth_position}
+        if base_position is not None:
+            result["sky"]["base"] = {"sUSDS": base_position}
+            
+        return result
 
     def _get_ethereum_position(self, address: str) -> dict:
+        balance = self.eth_contract.functions.balanceOf(address).call()
+        if balance == 0:  # Si balance est 0, retourner None au lieu d'un dict vide
+            return None
+            
         checksum_address = Web3.to_checksum_address(address)
         staked = self.eth_contract.functions.balanceOf(checksum_address).call()
         usds_value = self.eth_contract.functions.convertToAssets(staked).call()
@@ -56,6 +64,10 @@ class SkyClient(BaseProtocolClient):
         }
 
     def _get_base_position(self, address: str) -> dict:
+        balance = self.base_contract.functions.balanceOf(address).call()
+        if balance == 0:  # Si balance est 0, retourner None au lieu d'un dict vide
+            return None
+            
         try:
             checksum_address = Web3.to_checksum_address(address)
             staked = self.base_contract.functions.balanceOf(checksum_address).call()
