@@ -15,6 +15,8 @@
   <meta property="og:image" content="https://oracle.detrade.fund/detrade-logo-text.webp" />
   <meta property="og:url" content="https://oracle.detrade.fund" />
   <meta property="og:type" content="website" />
+  <meta property="og:image:width" content="1200" />
+  <meta property="og:image:height" content="630" />
 </svelte:head>
 
 <main>
