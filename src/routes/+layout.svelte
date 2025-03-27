@@ -59,7 +59,7 @@
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin="">
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=Roboto+Mono:wght@400;500&display=swap" rel="stylesheet">
-  <title>DeTrade - Your On-Chain Investment Fund</title>
+  <title>Oracle – DeTrade</title>
   <meta name="description" content="Maximize your returns with a secure, transparent, and decentralized vault solution, while maintaining full control over your assets">
 </svelte:head>
 

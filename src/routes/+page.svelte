@@ -8,11 +8,12 @@
 </script>
 
 <svelte:head>
-  <title>DeTrade</title>
-  <meta property="og:title" content="DeTrade" />
-  <meta property="og:description" content="DeTrade Platform" />
-  <meta property="og:image" content="https://detrade.fund/og-logo.png" />
-  <meta property="og:url" content="https://detrade.fund" />
+  <title>Oracle – DeTrade</title>
+  <meta name="description" content="Our oracle service ensures transparent valuation events for our vaults, updated every 30 minutes." />
+  <meta property="og:title" content="Oracle – DeTrade" />
+  <meta property="og:description" content="Our oracle service ensures transparent valuation events for our vaults, updated every 30 minutes" />
+  <meta property="og:image" content="https://oracle.detrade.fund/detrade-logo-text.webp" />
+  <meta property="og:url" content="https://oracle.detrade.fund" />
   <meta property="og:type" content="website" />
 </svelte:head>
 
