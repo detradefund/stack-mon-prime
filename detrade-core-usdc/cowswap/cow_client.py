@@ -15,20 +15,9 @@ from config.networks import NETWORK_TOKENS  # Import correct
 load_dotenv()
 DEFAULT_USER_ADDRESS = os.getenv('DEFAULT_USER_ADDRESS')
 
-def get_quote(network, sell_token_symbol, buy_token_symbol, amount):
+def get_quote(network, sell_token, buy_token, amount):
     """Get raw quote from CoW Swap API"""
     api_network = "mainnet" if network == "ethereum" else network
-    
-    # Get token addresses with support for underlying tokens
-    if sell_token_symbol == "USDS":
-        sell_token = NETWORK_TOKENS[network]["sUSDS"]["underlying"]["USDS"]["address"]
-    else:
-        sell_token = NETWORK_TOKENS[network][sell_token_symbol]["address"]
-        
-    buy_token = NETWORK_TOKENS[network][buy_token_symbol]["address"]
-    
-    # S'assurer que amount est une chaîne
-    amount = str(amount)
     
     api_url = f"https://api.cow.fi/{api_network}/api/v1/quote"
     
@@ -43,9 +32,9 @@ def get_quote(network, sell_token_symbol, buy_token_symbol, amount):
         "sellTokenBalance": "erc20",
         "buyTokenBalance": "erc20",
         "kind": "sell",
-        "sellAmountBeforeFee": amount
+        "sellAmountBeforeFee": str(amount)  # Conversion explicite en string
     }
-
+    
     response = requests.post(api_url, json=params)
     return response.json() if response.ok else response.text
 
@@ -56,8 +45,8 @@ if __name__ == "__main__":
     
     quote = get_quote(
         network="base",
-        sell_token_symbol="USDS",
-        buy_token_symbol="USDC",
+        sell_token=NETWORK_TOKENS["base"]["USDS"]["address"],
+        buy_token=NETWORK_TOKENS["base"]["USDC"]["address"],
         amount=amount
     )
     

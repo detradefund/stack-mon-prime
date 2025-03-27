@@ -12,108 +12,97 @@ sys.path.append(root_path)
 from sky.balance_manager import BalanceManager as SkyBalanceManager
 from pendle.balance_manager import PendleBalanceManager
 from dtusdc.supply_reader import SupplyReader
+from balance.usdc_balance_manager import StablecoinBalanceManager
 
 class BalanceAggregator:
-    """Aggregates balances from different protocols"""
+    """Aggregates balances from different protocols and spot positions"""
     
     def __init__(self):
         self.sky_manager = SkyBalanceManager()
         self.pendle_manager = PendleBalanceManager()
         self.supply_reader = SupplyReader()
+        self.stablecoin_manager = StablecoinBalanceManager()
         
     def get_total_usdc_value(self, address: str) -> Dict[str, Any]:
         # Get current UTC timestamp
-        timestamp = datetime.now(timezone.utc).strftime('%Y-%m-%d %H:%M:%S UTC')
+        timestamp = datetime.now(timezone.utc).strftime("%Y-%m-%d %H:%M:%S UTC")
+        
+        # Get protocol positions
+        sky_positions = self.sky_manager.get_balances(address)
+        pendle_positions = self.pendle_manager.get_balances(address)
+        
+        # Get spot balances
+        spot_balances = self.stablecoin_manager.get_balances(address)
+        
+        # Calculate total USDC value from protocols
+        total_usdc_value = Decimal('0')
+        positions_in_usdc = {}
+        protocols_value = Decimal('0')  # Ajout d'un compteur spécifique pour les protocoles
+        
+        # Add Sky positions
+        for network, tokens in sky_positions["sky"].items():
+            for token, data in tokens.items():
+                try:
+                    if 'value' in data and 'USDC' in data['value']:
+                        usdc_value = Decimal(data['value']['USDC']['amount']) / Decimal(10**6)
+                        protocols_value += usdc_value
+                        positions_in_usdc[f"sky.{network}.{token}"] = f"{usdc_value:.6f}"
+                        print(f"Added Sky position {network}.{token}: {usdc_value:.6f} USDC")
+                except (KeyError, TypeError) as e:
+                    print(f"Warning: Could not process Sky position for {network}.{token}: {e}")
+                    continue
+
+        # Add Pendle positions
+        for network, tokens in pendle_positions["pendle"].items():
+            for token, data in tokens.items():
+                try:
+                    if 'value' in data and 'USDC' in data['value']:
+                        usdc_value = Decimal(data['value']['USDC']['amount']) / Decimal(10**6)
+                        protocols_value += usdc_value
+                        positions_in_usdc[f"pendle.{network}.{token}"] = f"{usdc_value:.6f}"
+                        print(f"Added Pendle position {network}.{token}: {usdc_value:.6f} USDC")
+                except (KeyError, TypeError) as e:
+                    print(f"Warning: Could not process Pendle position for {network}.{token}: {e}")
+                    continue
+
+        # Add spot balances
+        spot_balances_in_usdc = {}
+        total_spot_value = Decimal(spot_balances["summary"]["total_usdc_value"])
+        total_usdc_value += total_spot_value
+
+        for network, tokens in spot_balances["stablecoins"].items():
+            for token, data in tokens.items():
+                if token == "USDC":
+                    value = Decimal(data["amount"]) / Decimal(10**data["decimals"])
+                else:
+                    value = Decimal(data["value"]["USDC"]["amount"]) / Decimal(10**6)
+                spot_balances_in_usdc[f"spot.{network}.{token}"] = f"{value:.6f}"
+
+        # Get total supply and calculate share price
+        total_supply = Decimal(self.supply_reader.get_total_supply()) / Decimal(10**18)
+        total_value = protocols_value + total_spot_value
+        share_price = total_value / total_supply if total_supply > 0 else Decimal('0')
         
         result = {
             "timestamp": timestamp,
-            "nav": {  # Net Asset Value
-                "usdc": "0",
-                "usdc_wei": "0"
-            },
-            "positions_in_usdc": {},
-            "details": {}
-        }
-        
-        # Get Sky balances
-        print("\n=== Fetching Sky positions ===")
-        sky_balances = self.sky_manager.get_balances(address)
-        
-        # Calculate totals
-        sky_usdc_total = Decimal('0')
-        sky_summary = {}
-        
-        print("\nSky Positions Breakdown:")
-        print("------------------------")
-        for network, tokens in sky_balances.get('sky', {}).items():
-            network_total = Decimal('0')
-            for token_symbol, token_data in tokens.items():
-                usdc_value = Decimal(token_data['value']['USDC']['amount'])
-                network_total += usdc_value
-                sky_usdc_total += usdc_value
-                if usdc_value > 0:
-                    position_key = f"sky.{network}.{token_symbol}"
-                    sky_summary[position_key] = f"{usdc_value/Decimal('1000000'):.6f}"
-                    print(f"  {network:10} | {token_symbol:15} | {usdc_value/Decimal('1000000'):,.2f} USDC")
-            if network_total > 0:
-                print(f"  {network:10} Total: {network_total/Decimal('1000000'):,.2f} USDC")
-                print("  " + "-" * 45)
-        
-        print(f"\nSky Total: {sky_usdc_total/Decimal('1000000'):,.2f} USDC")
-        
-        # Get Pendle balances
-        print("\n=== Fetching Pendle positions ===")
-        pendle_balances = self.pendle_manager.get_balances(address)
-        
-        pendle_usdc_total = Decimal('0')
-        pendle_summary = {}
-        
-        print("\nPendle Positions Breakdown:")
-        print("--------------------------")
-        for network, tokens in pendle_balances.get('pendle', {}).items():
-            network_total = Decimal('0')
-            for token_symbol, token_data in tokens.items():
-                usdc_value = Decimal(token_data['value']['USDC']['amount'])
-                network_total += usdc_value
-                pendle_usdc_total += usdc_value
-                if usdc_value > 0:
-                    position_key = f"pendle.{network}.{token_symbol}"
-                    pendle_summary[position_key] = f"{usdc_value/Decimal('1000000'):.6f}"
-                    print(f"  {network:10} | {token_symbol:15} | {usdc_value/Decimal('1000000'):,.2f} USDC")
-            if network_total > 0:
-                print(f"  {network:10} Total: {network_total/Decimal('1000000'):,.2f} USDC")
-                print("  " + "-" * 45)
-        
-        print(f"\nPendle Total: {pendle_usdc_total/Decimal('1000000'):,.2f} USDC")
-        
-        print("\n=== Computing totals ===")
-        total_usdc_wei = sky_usdc_total + pendle_usdc_total
-        total_usdc = total_usdc_wei / Decimal('1000000')
-        print(f"Total Value: {total_usdc:,.2f} USDC")
-        
-        # Calculate share price (silently)
-        total_supply = Decimal(self.supply_reader.get_total_supply())
-        formatted_supply = self.supply_reader.format_total_supply()
-        
-        if total_supply > 0:
-            # total_supply is in 10^18
-            # total_usdc_wei is in 10^6
-            adjusted_usdc = total_usdc_wei * Decimal('1000000000000')  # Ajout de 12 zéros
-            share_price_wei = (adjusted_usdc * Decimal('1000000')) // total_supply
-            share_price = share_price_wei / Decimal('1000000')
-            
-            result["nav"].update({
+            "nav": {
+                "usdc": f"{total_value:.6f}",
+                "usdc_wei": str(int(total_value * Decimal(10**6))),
                 "share_price": f"{share_price:.6f}",
-                "total_supply": formatted_supply
-            })
-        
-        # Build response
-        result["nav"]["usdc"] = f"{total_usdc:.6f}"
-        result["nav"]["usdc_wei"] = str(total_usdc_wei)
-        result["positions_in_usdc"] = {**sky_summary, **pendle_summary}
-        result["details"] = {
-            "sky": sky_balances["sky"],
-            "pendle": pendle_balances["pendle"]
+                "total_supply": str(total_supply)
+            },
+            "summary": {
+                "total_value": f"{total_value:.6f}",
+                "protocols_value": f"{protocols_value:.6f}",
+                "spot_value": f"{total_spot_value:.6f}"
+            },
+            "positions_in_usdc": positions_in_usdc,
+            "spot_balances_in_usdc": spot_balances_in_usdc,
+            "details": {
+                "sky": sky_positions,
+                "pendle": pendle_positions,
+                "spot": spot_balances["stablecoins"]
+            }
         }
         
         return result

@@ -54,6 +54,30 @@ NETWORK_TOKENS = {
                 }
             },
             "expiry": "2025-05-29"
+        },
+        "crvUSD": {
+            "address": "0xf939e0a03fb07f59a73314e73794be0e57ac1b4e",
+            "decimals": 18,
+            "name": "Curve.Fi USD Stablecoin",
+            "symbol": "crvUSD"
+        },
+        "GHO": {
+            "address": "0x40D16FC0246aD3160Ccc09B8D0D3A2cD28aE6C2f",
+            "decimals": 18,
+            "name": "GHO Token",
+            "symbol": "GHO"
+        },
+        "fxUSD": {
+            "address": "0x085780639CC2cACd35E474e71f4d000e2405d8f6",
+            "decimals": 18,
+            "name": "f(x) USD",
+            "symbol": "fxUSD"
+        },
+        "USR": {
+            "address": "0x66a1E37c9b0eAddca17d3662D6c05F4DECf3e110",
+            "decimals": 18,
+            "name": "Resolv USD",
+            "symbol": "USR"
         }
     },
     "base": {
