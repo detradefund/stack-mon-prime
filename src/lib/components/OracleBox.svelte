@@ -71,27 +71,46 @@
     }
   }
 
-  function getTimeAgo(timestamp: string) {
-    const date = new Date(timestamp);
-    const now = new Date();
-    const seconds = Math.floor((now.getTime() - date.getTime()) / 1000);
+  function getTimeAgo(timestamp: string | number) {
+    if (!timestamp) return 'N/A';
+    
+    try {
+      let date;
+      if (typeof timestamp === 'string' && timestamp.includes('UTC')) {
+        // Convertir le timestamp UTC en objet Date
+        const [datePart, timePart] = timestamp.split(' UTC')[0].split(' ');
+        date = new Date(`${datePart}T${timePart}Z`);
+      } else {
+        date = new Date(timestamp);
+      }
 
-    if (seconds < 60) return 'just now';
-    
-    const minutes = Math.floor(seconds / 60);
-    if (minutes < 60) return `${minutes}m ago`;
-    
-    const hours = Math.floor(minutes / 60);
-    if (hours < 24) return `${hours}h ago`;
-    
-    const days = Math.floor(hours / 24);
-    if (days < 30) return `${days}d ago`;
-    
-    const months = Math.floor(days / 30);
-    if (months < 12) return `${months}mo ago`;
-    
-    const years = Math.floor(months / 12);
-    return `${years}y ago`;
+      if (isNaN(date.getTime())) {
+        throw new Error('Invalid date');
+      }
+
+      const now = new Date();
+      const seconds = Math.floor((now.getTime() - date.getTime()) / 1000);
+
+      if (seconds < 60) return 'just now';
+      
+      const minutes = Math.floor(seconds / 60);
+      if (minutes < 60) return `${minutes}m ago`;
+      
+      const hours = Math.floor(minutes / 60);
+      if (hours < 24) return `${hours}h ago`;
+      
+      const days = Math.floor(hours / 24);
+      if (days < 30) return `${days}d ago`;
+      
+      const months = Math.floor(days / 30);
+      if (months < 12) return `${months}mo ago`;
+      
+      const years = Math.floor(months / 12);
+      return `${years}y ago`;
+    } catch (e) {
+      console.error('Date parsing error:', timestamp, e);
+      return 'Invalid date';
+    }
   }
 
   function getDocumentLink(doc: any) {
@@ -123,7 +142,34 @@
               <div class="document-item">
                 <div class="document-header">
                   <div class="left-content">
-                    <span class="timestamp">{new Date(doc.timestamp).toLocaleString()}</span>
+                    <span class="timestamp">
+                      {#if doc.timestamp}
+                        {(() => {
+                          try {
+                            // Convertir le timestamp UTC en objet Date
+                            const [datePart, timePart] = doc.timestamp.split(' UTC')[0].split(' ');
+                            const utcDate = new Date(`${datePart}T${timePart}Z`);  // Le Z à la fin indique UTC
+                            
+                            if (!isNaN(utcDate.getTime())) {
+                              return utcDate.toLocaleString(undefined, {
+                                year: 'numeric',
+                                month: 'numeric',
+                                day: 'numeric',
+                                hour: '2-digit',
+                                minute: '2-digit',
+                                second: '2-digit'
+                              });
+                            }
+                            return 'Invalid date';
+                          } catch (e) {
+                            console.error('Erreur parsing date:', e);
+                            return 'Invalid date';
+                          }
+                        })()}
+                      {:else}
+                        N/A
+                      {/if}
+                    </span>
                     <p class="nav-info">
                       <span class="nav-label">NAV: </span>
                       <span class="nav-value">{doc.nav?.usdc ?? 'N/A'} {doc.nav?.usdc ? 'USDC' : ''}</span>
