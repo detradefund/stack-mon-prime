@@ -23,7 +23,6 @@
           <div class="info-box">
             <div class="info-header">
               <h3>Document Details</h3>
-              <span class="timestamp">{new Date(data.document.timestamp).toLocaleString()}</span>
             </div>
             <div class="document-content">
               <pre>{formatJson(data.document)}</pre>
@@ -45,7 +44,6 @@
     min-height: 100vh;
     background: linear-gradient(135deg, #003366 0%, #001830 85%, #000c1a 100%);
     position: relative;
-    overflow: hidden;
     display: flex;
     flex-direction: column;
   }
@@ -112,6 +110,7 @@
 
   .box-container {
     margin-top: 80px;
+    margin-bottom: 2rem;
     position: relative;
     z-index: 2;
   }
@@ -122,7 +121,9 @@
     border-radius: 16px;
     padding: 1.5rem;
     width: 100%;
-    height: 600px;
+    min-height: 50vh;
+    max-height: 70vh;
+    height: auto;
     display: flex;
     flex-direction: column;
   }
@@ -182,6 +183,10 @@
     background: rgba(255, 255, 255, 0.15);
   }
 
+  .document-content::-webkit-scrollbar-thumb:hover {
+    background: rgba(255, 255, 255, 0.15);
+  }
+
   @keyframes pulse {
     0% {
       background: radial-gradient(circle at 50% 50%, rgba(77, 168, 255, 0.11) 0%, transparent 53.5%);
@@ -204,11 +209,17 @@
     }
 
     .box-container {
-      margin-top: 120px;
+      margin-top: 80px;
+      margin-bottom: 80px;
     }
 
     .info-box {
-      height: 500px;
+      min-height: 40vh;
+      height: calc(100vh - 300px);
+    }
+
+    .info-header {
+      justify-content: center;
     }
   }
 

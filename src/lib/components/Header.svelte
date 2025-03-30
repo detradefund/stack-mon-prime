@@ -24,7 +24,18 @@
   
     // Vérifier si nous sommes sur une route /app
     $: isAppRoute = true; // On veut toujours afficher le header maintenant
-  </script>
+  
+    // Vérifier si nous sommes sur une route oracle
+    $: isOraclePage = $page.url.pathname.includes('/oracle/');
+    
+    function handleLogoClick() {
+      if (isOraclePage) {
+        window.location.href = 'https://oracle.detrade.fund/';
+      } else {
+        window.location.href = 'https://app.detrade.fund';
+      }
+    }
+</script>
   
   {#if isAppRoute}
   <header class:scrolled={isScrolled}>
@@ -34,7 +45,7 @@
           src="/detrade-logo-text.png" 
           alt="DeTrade" 
           class="logo" 
-          on:click={() => window.location.href = 'https://app.detrade.fund'}
+          on:click={handleLogoClick}
         />
       </div>
     </div>
