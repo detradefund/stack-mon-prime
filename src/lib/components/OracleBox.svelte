@@ -243,7 +243,7 @@
 
   .info-content {
     color: #94a3b8;
-    max-height: 310px;
+    max-height: 230px;
     overflow-y: auto;
     padding-right: 0.5rem;
   }
