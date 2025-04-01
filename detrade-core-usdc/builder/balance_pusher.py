@@ -1,6 +1,6 @@
 import os
 from pathlib import Path
-from datetime import datetime
+from datetime import datetime, timezone
 from dotenv import load_dotenv
 from pymongo import MongoClient
 from balance_aggregator import BalanceAggregator
@@ -28,6 +28,16 @@ class BalancePusher:
         self.collection = self.db[collection_name]
         self.aggregator = BalanceAggregator()
 
+    def convert_large_numbers_to_strings(self, data):
+        """Recursively converts large integers to strings in a nested dictionary/list structure"""
+        if isinstance(data, dict):
+            return {k: self.convert_large_numbers_to_strings(v) for k, v in data.items()}
+        elif isinstance(data, list):
+            return [self.convert_large_numbers_to_strings(x) for x in data]
+        elif isinstance(data, int) and data > 2**53:  # 2**53 est la limite sûre pour les entiers en JavaScript
+            return str(data)
+        return data
+
     def push_balance_data(self, address: str) -> None:
         """
         Fetches current portfolio balance and stores it in MongoDB.
@@ -41,9 +51,12 @@ class BalancePusher:
             # Get current portfolio snapshot from aggregator
             balance_data = self.aggregator.get_total_usdc_value(address)
             
+            # Convert large numbers to strings
+            balance_data = self.convert_large_numbers_to_strings(balance_data)
+            
             # Add metadata for historical tracking
             balance_data['address'] = address
-            balance_data['created_at'] = datetime.utcnow()
+            balance_data['created_at'] = datetime.now(timezone.utc)
             
             # Store snapshot in database
             print("\n=== Pushing data to MongoDB ===")

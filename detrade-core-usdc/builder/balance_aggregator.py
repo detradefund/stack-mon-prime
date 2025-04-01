@@ -47,75 +47,101 @@ class BalanceAggregator:
         protocols_value = Decimal('0')  # Total value locked in DeFi protocols (vs spot holdings)
         
         # Process Sky protocol positions
-        for network, tokens in sky_positions["sky"]["sky"].items():
-            for token, data in tokens.items():
-                try:
-                    if data is None:
+        sky_has_positions = False
+        if sky_positions["sky"]["sky"]:  # Si le dictionnaire n'est pas vide
+            for network, tokens in sky_positions["sky"]["sky"].items():
+                for token, data in tokens.items():
+                    try:
+                        if data is None:
+                            continue
+                        if 'value' in data and 'USDC' in data['value']:
+                            usdc_value = Decimal(data['value']['USDC']['amount']) / Decimal(10**6)
+                            if usdc_value > 0:
+                                if not sky_has_positions:
+                                    print("\n=== Processing Sky Protocol positions ===")
+                                    print(f"Checking sUSDS balances for {address}")
+                                sky_has_positions = True
+                                protocols_value += usdc_value
+                                positions_in_usdc[f"sky.{network}.{token}"] = f"{usdc_value:.6f}"
+                    except (KeyError, TypeError) as e:
+                        print(f"Warning: Could not process Sky position for {network}.{token}: {e}")
                         continue
-                    if 'value' in data and 'USDC' in data['value']:
-                        usdc_value = Decimal(data['value']['USDC']['amount']) / Decimal(10**6)
-                        if usdc_value > 0:
-                            protocols_value += usdc_value
-                            positions_in_usdc[f"sky.{network}.{token}"] = f"{usdc_value:.6f}"
-                except (KeyError, TypeError) as e:
-                    print(f"Warning: Could not process Sky position for {network}.{token}: {e}")
-                    continue
+            if sky_has_positions:
+                print("=== Sky Protocol processing complete ===")
 
         # Process Pendle protocol positions
-        for network, tokens in pendle_positions["pendle"].items():
-            for token, data in tokens.items():
-                try:
-                    if data is None or not isinstance(data, dict):
+        pendle_has_positions = False
+        if pendle_positions:
+            print("\n=== Processing Pendle Protocol positions ===")
+            for network, tokens in pendle_positions["pendle"].items():
+                for token, data in tokens.items():
+                    try:
+                        if data is None or not isinstance(data, dict):
+                            continue
+                        if 'value' in data and 'USDC' in data['value']:
+                            usdc_value = Decimal(data['value']['USDC']['amount']) / Decimal(10**6)
+                            if usdc_value > 0:
+                                pendle_has_positions = True
+                                protocols_value += usdc_value
+                                positions_in_usdc[f"pendle.{network}.{token}"] = f"{usdc_value:.6f}"
+                    except (KeyError, TypeError) as e:
+                        print(f"Warning: Could not process Pendle position for {network}.{token}: {e}")
                         continue
-                    if 'value' in data and 'USDC' in data['value']:
-                        usdc_value = Decimal(data['value']['USDC']['amount']) / Decimal(10**6)
+            print("=== Pendle Protocol processing complete ===")
+
+        # Process Convex protocol positions
+        convex_has_positions = False
+        if convex_positions:
+            print("\n=== Processing Convex Protocol positions ===")
+            cleaned_convex = {}
+            for network, tokens in convex_positions.get("convex", {}).items():
+                cleaned_convex[network] = {}
+                for token, data in tokens.items():
+                    try:
+                        if data is None:
+                            continue
+                        # Calculate total value of underlying tokens
+                        usdc_value = Decimal('0')
+                        
+                        # Sum up underlying token values
+                        for _, token_data in data['lp_tokens'].items():
+                            if token_data.get('decimals') == 6:  # If USDC
+                                usdc_value += Decimal(token_data['amount']) / Decimal(10**6)
+                            elif 'value' in token_data and 'USDC' in token_data['value']:
+                                usdc_value += Decimal(token_data['value']['USDC']['amount']) / Decimal(10**6)
+                        
+                        # Add rewards value
+                        for _, reward_data in data.get('rewards', {}).items():
+                            if 'value' in reward_data and 'USDC' in reward_data['value']:
+                                usdc_value += Decimal(reward_data['value']['USDC']['amount']) / Decimal(10**6)
+                        
                         if usdc_value > 0:
                             protocols_value += usdc_value
-                            positions_in_usdc[f"pendle.{network}.{token}"] = f"{usdc_value:.6f}"
-                except (KeyError, TypeError) as e:
-                    print(f"Warning: Could not process Pendle position for {network}.{token}: {e}")
-                    continue
-
-        # Process Convex protocol positions and rewards
-        for network, tokens in convex_positions.get("convex", {}).items():
-            for token, data in tokens.items():
-                try:
-                    if data is None:
+                            positions_in_usdc[f"convex.{network}.{token}"] = f"{usdc_value:.6f}"
+                            cleaned_convex[network][token] = convex_positions["convex"][network][token]
+                            convex_has_positions = True
+                    except (KeyError, TypeError) as e:
+                        print(f"Warning: Could not process Convex position for {network}.{token}: {e}")
                         continue
-                    # Calculate total value of underlying tokens
-                    usdc_value = Decimal('0')
-                    
-                    # Sum up underlying token values
-                    for _, token_data in data['lp_tokens'].items():
-                        if token_data.get('decimals') == 6:  # If USDC
-                            usdc_value += Decimal(token_data['amount']) / Decimal(10**6)
-                        elif 'value' in token_data and 'USDC' in token_data['value']:
-                            usdc_value += Decimal(token_data['value']['USDC']['amount']) / Decimal(10**6)
-                    
-                    # Add rewards value
-                    for _, reward_data in data.get('rewards', {}).items():
-                        if 'value' in reward_data and 'USDC' in reward_data['value']:
-                            usdc_value += Decimal(reward_data['value']['USDC']['amount']) / Decimal(10**6)
-                    
-                    if usdc_value > 0:
-                        protocols_value += usdc_value
-                        positions_in_usdc[f"convex.{network}.{token}"] = f"{usdc_value:.6f}"
-                except (KeyError, TypeError) as e:
-                    print(f"Warning: Could not process Convex position for {network}.{token}: {e}")
-                    continue
+            print("=== Convex Protocol processing complete ===")
 
-        # Process spot balances (direct token holdings)
-        spot_balances_in_usdc = {}
-        total_spot_value = Decimal('0')
-        for network, tokens in spot_balances["stablecoins"].items():
-            for token, data in tokens.items():
-                if token == "USDC":
-                    value = Decimal(data["amount"]) / Decimal(10**data["decimals"])
-                else:
-                    value = Decimal(data["value"]["USDC"]["amount"]) / Decimal(10**6)
-                if value > 0:  # N'ajouter que si la valeur est > 0
-                    spot_balances_in_usdc[f"spot.{network}.{token}"] = f"{value:.6f}"
-                    total_spot_value += value  # Ajouter au total des spots
+        # Process spot balances
+        spot_has_positions = False
+        if spot_balances:
+            print("\n=== Processing Spot Balances ===")
+            spot_balances_in_usdc = {}
+            total_spot_value = Decimal('0')
+            for network, tokens in spot_balances["stablecoins"].items():
+                for token, data in tokens.items():
+                    if token == "USDC":
+                        value = Decimal(data["amount"]) / Decimal(10**data["decimals"])
+                    else:
+                        value = Decimal(data["value"]["USDC"]["amount"]) / Decimal(10**6)
+                    if value > 0:  # N'ajouter que si la valeur est > 0
+                        spot_balances_in_usdc[f"spot.{network}.{token}"] = f"{value:.6f}"
+                        total_spot_value += value  # Ajouter au total des spots
+                        spot_has_positions = True
+            print("=== Spot Balances processing complete ===")
 
         # Remove zero balances from detailed position data
         cleaned_sky = {}
@@ -166,22 +192,18 @@ class BalanceAggregator:
             "positions_in_usdc": positions_in_usdc,
             "spot_balances_in_usdc": spot_balances_in_usdc,
             "details": {
-                "sky": cleaned_sky,
-                "pendle": cleaned_pendle,
+                "sky": sky_positions["sky"]["sky"] if sky_has_positions else {},
+                "pendle": pendle_positions["pendle"],
+                "convex": convex_positions["convex"],
                 "spot": cleaned_spot
             }
         }
         
-        # N'ajouter convex aux détails que s'il y a des positions
-        if convex_positions and "convex" in convex_positions and convex_positions["convex"]:
-            result["details"]["convex"] = convex_positions["convex"]
-
         return result
 
 def main():
     """
     Command-line interface to test balance aggregation.
-    Accepts address as argument or falls back to DEFAULT_USER_ADDRESS from .env
     """
     import os
     from dotenv import load_dotenv
@@ -200,6 +222,7 @@ def main():
     aggregator = BalanceAggregator()
     test_address = Web3.to_checksum_address(test_address)
     result = aggregator.get_total_usdc_value(test_address)
+    
     print("\nDone! Results:")
     print(json.dumps(result, indent=2))
 
