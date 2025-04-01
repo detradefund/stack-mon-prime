@@ -9,6 +9,12 @@ from config.networks import NETWORK_TOKENS, RPC_URLS
 from .abis import PT_ABI
 from config.base_client import BaseProtocolClient
 
+"""
+Pendle Protocol client implementation.
+Provides low-level interaction with Pendle Principal Tokens (PT) across networks.
+Handles contract initialization, balance checking, and metadata retrieval.
+"""
+
 # Add parent directory to PYTHONPATH
 root_path = str(Path(__file__).parent.parent)
 sys.path.append(root_path)
@@ -17,16 +23,31 @@ sys.path.append(root_path)
 load_dotenv(Path(root_path) / '.env')
 
 class PendleClient(BaseProtocolClient):
+    """
+    Core client for interacting with Pendle Protocol contracts.
+    Implements BaseProtocolClient interface for standardized protocol integration.
+    Manages PT token contracts across Ethereum and Base networks.
+    """
+    
     def __init__(self):
-        # Initialize Web3 connections for each network
+        # Initialize network-specific Web3 connections
         self.eth_w3 = Web3(Web3.HTTPProvider(RPC_URLS['ethereum']))
         self.base_w3 = Web3(Web3.HTTPProvider(RPC_URLS['base']))
         
-        # Initialize contracts for each Pendle token
+        # Setup PT token contract instances
         self.contracts = self._init_contracts()
 
     def _init_contracts(self):
-        """Initialize contracts for all Pendle tokens across networks"""
+        """
+        Initializes Web3 contract instances for all Pendle PT tokens.
+        
+        Returns:
+            Dict mapping networks to their PT token contracts:
+            {
+                'ethereum': {'PT-Token1': Contract, ...},
+                'base': {'PT-Token2': Contract, ...}
+            }
+        """
         contracts = {}
         
         for network, tokens in NETWORK_TOKENS.items():
@@ -43,14 +64,26 @@ class PendleClient(BaseProtocolClient):
         return contracts
 
     def get_balances(self, address: str) -> dict:
-        """Get balances for all Pendle tokens"""
+        """
+        Retrieves balances for all PT tokens across networks.
+        
+        Args:
+            address: Ethereum address to check balances for
+            
+        Returns:
+            Nested dict containing:
+            - Network-level balances
+            - Token amounts and metadata
+            - Underlying token information
+            - Market and expiry details
+        """
         try:
             checksum_address = Web3.to_checksum_address(address)
             balances = {}
             
-            # Iterate through networks and contracts to get balances
+            # Process each network's PT tokens
             for network, network_contracts in self.contracts.items():
-                if network_contracts:  # If there are Pendle tokens on this network
+                if network_contracts:  # Skip networks without PT tokens
                     balances[network] = {}
                     
                     for token_symbol, contract in network_contracts.items():
@@ -80,7 +113,13 @@ class PendleClient(BaseProtocolClient):
             return self._get_empty_balances()
 
     def _get_empty_balances(self) -> dict:
-        """Return empty balances structure for all Pendle tokens"""
+        """
+        Creates empty balance structure for error handling.
+        Maintains consistent response format even when balance fetching fails.
+        
+        Returns:
+            Dict with zero balances but complete token metadata
+        """
         empty_balances = {}
         
         for network, tokens in NETWORK_TOKENS.items():
@@ -89,7 +128,7 @@ class PendleClient(BaseProtocolClient):
                 if token_data.get('protocol') == 'pendle'
             }
             
-            if network_tokens:  # If there are Pendle tokens on this network
+            if network_tokens:  # Skip networks without PT tokens
                 empty_balances[network] = {}
                 
                 for token_symbol, token_data in network_tokens.items():
@@ -112,11 +151,20 @@ class PendleClient(BaseProtocolClient):
         return empty_balances
 
     def get_supported_networks(self) -> list:
-        """Implementation of abstract method"""
+        """
+        Lists networks where Pendle PT tokens are available.
+        Required by BaseProtocolClient interface.
+        """
         return [network for network, contracts in self.contracts.items() if contracts]
     
     def get_protocol_info(self) -> dict:
-        """Implementation of abstract method"""
+        """
+        Provides protocol metadata and supported tokens.
+        Required by BaseProtocolClient interface.
+        
+        Returns:
+            Dict containing protocol name and supported token details
+        """
         protocol_tokens = {}
         
         for network, tokens in NETWORK_TOKENS.items():
@@ -127,14 +175,28 @@ class PendleClient(BaseProtocolClient):
         return {
             "name": "Pendle",
             "tokens": protocol_tokens
-        } 
+        }
 
     def get_balance(self, network: str, token_symbol: str, address: str) -> int:
-        """Get balance for a single token"""
+        """
+        Retrieves balance for a specific PT token.
+        
+        Args:
+            network: Network identifier ('ethereum' or 'base')
+            token_symbol: PT token symbol
+            address: Wallet address to check
+            
+        Returns:
+            Token balance in wei
+        """
         balances = self.get_balances(address)
         return balances[network][token_symbol]['amount'] if token_symbol in balances[network] else 0
 
 if __name__ == "__main__":
+    """
+    Test script for PendleClient functionality.
+    Tests balance fetching with known addresses and environment-configured address.
+    """
     # Test addresses
     test_addresses = [
         "0xc6835323372a4393b90bcc227c58e82d45ce4b7d",  # Known address
@@ -155,7 +217,7 @@ if __name__ == "__main__":
             print("\nBalances:")
             print(json.dumps(balances, indent=2))
             
-            # Print human-readable balances for non-zero amounts
+            # Display human-readable balances for non-zero positions
             print("\nNon-zero balances:")
             for network, tokens in balances.items():
                 for token, data in tokens.items():

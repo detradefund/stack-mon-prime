@@ -10,8 +10,12 @@ root_path = str(Path(__file__).parent.parent)
 load_dotenv(Path(root_path) / '.env')
 
 class BalancePusher:
+    """
+    Handles the storage of portfolio balances in MongoDB.
+    Acts as a bridge between the BalanceAggregator and the database.
+    """
     def __init__(self):
-        # MongoDB connection setup
+        # Required MongoDB configuration from environment variables
         mongo_uri = os.getenv('MONGO_URI')
         database_name = os.getenv('DATABASE_NAME_1')
         collection_name = os.getenv('COLLECTION_NAME')
@@ -25,19 +29,23 @@ class BalancePusher:
         self.aggregator = BalanceAggregator()
 
     def push_balance_data(self, address: str) -> None:
+        """
+        Fetches current portfolio balance and stores it in MongoDB.
+        Creates a timestamped snapshot of all positions and their values.
+        """
         try:
-            # Get balance data
             print("\n========================================")
             print(f"Fetching balance data for {address}")
             print("========================================\n")
             
+            # Get current portfolio snapshot from aggregator
             balance_data = self.aggregator.get_total_usdc_value(address)
             
-            # Add metadata
+            # Add metadata for historical tracking
             balance_data['address'] = address
             balance_data['created_at'] = datetime.utcnow()
             
-            # Insert into MongoDB
+            # Store snapshot in database
             print("\n=== Pushing data to MongoDB ===")
             result = self.collection.insert_one(balance_data)
             print(f"Document successfully pushed with _id: {result.inserted_id}")
@@ -51,10 +59,14 @@ class BalancePusher:
             raise
         
     def close(self):
+        """Closes MongoDB connection"""
         self.client.close()
 
 def main():
-    # Get address from command line or .env
+    """
+    CLI entry point for testing balance pushing functionality.
+    Uses DEFAULT_USER_ADDRESS from .env file.
+    """
     test_address = os.getenv('DEFAULT_USER_ADDRESS')
     
     if not test_address:

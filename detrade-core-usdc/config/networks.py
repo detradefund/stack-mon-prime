@@ -4,27 +4,35 @@ from dotenv import load_dotenv
 # Load environment variables from .env
 load_dotenv()
 
+# RPC endpoints for supported networks
 RPC_URLS = {
     "ethereum": os.getenv('ETHEREUM_RPC'),
     "base": os.getenv('BASE_RPC'),
 }
 
+# Chain IDs for network identification
 CHAIN_IDS = {
     "ethereum": "1",
     "base": "8453"
 }
 
-# Configuration complète des tokens et protocoles par réseau
+# Complete network token configuration
+# Tokens are organized in categories:
+# 1. Yield-bearing tokens (with underlying assets and protocol info)
+# 2. Base stablecoins
+# 3. Other tokens (governance, rewards, etc.)
 NETWORK_TOKENS = {
     "ethereum": {
+        # === Yield-bearing tokens ===
+        # These tokens represent positions in protocols and have underlying assets
         "sUSDS": {
             "address": "0xa3931d71877C0E7a3148CB7Eb4463524FEc27fbD",
             "decimals": 18,
             "name": "Savings USDS",
             "symbol": "sUSDS",
-            "protocol": "sky",
+            "protocol": "sky",  # Protocol identifier for balance aggregation
             "underlying": {
-                "USDS": {
+                "USDS": {  # Underlying token that generates yield
                     "address": "0xdC035D45d973E3EC169d2276DDab16f1e407384F",
                     "decimals": 18,
                     "name": "USDS",
@@ -32,28 +40,37 @@ NETWORK_TOKENS = {
                 }
             }
         },
-        "USDC": {
-            "address": "0xA0b86991c6218b36c1d19D4a2e9Eb0cE3606eB48",
-            "decimals": 6,
-            "name": "USD Coin",
-            "symbol": "USDC"
-        },
         "PT-eUSDE-29MAY2025": {
             "address": "0x50D2C7992b802Eef16c04FeADAB310f31866a545",
             "decimals": 18,
             "name": "Pendle PT Ethereal eUSDE 29MAY2025",
             "symbol": "PT-eUSDE-29MAY2025",
-            "protocol": "pendle",
-            "market": "0x85667e484a32d884010cf16427d90049ccf46e97",
+            "protocol": "pendle",  # Protocol identifier for yield calculation
+            "market": "0x85667e484a32d884010cf16427d90049ccf46e97",  # Required for Pendle market interactions
             "underlying": {
-                "eUSDe": {
+                "eUSDe": {  # Token generating yield in Pendle market
                     "address": "0x90D2af7d622ca3141efA4DAB310f31866a5974Cc8F",
                     "decimals": 18,
                     "name": "Ethereal Pre-deposit Vault",
                     "symbol": "eUSDe"
                 }
             },
-            "expiry": "2025-05-29"
+            "expiry": "2025-05-29"  # Maturity date for principal token
+        },
+        "scrvUSD": {
+            "address": "0x0655977FEb2f289A4aB78af67BAB0d17aAb84367",
+            "decimals": 18,
+            "name": "Savings crvUSD",
+            "symbol": "scrvUSD"
+        },
+
+        # === Base stablecoins ===
+        # Core stablecoins used for value calculation
+        "USDC": {
+            "address": "0xA0b86991c6218b36c1d19D4a2e9Eb0cE3606eB48",
+            "decimals": 6,
+            "name": "USD Coin",
+            "symbol": "USDC"
         },
         "crvUSD": {
             "address": "0xf939e0a03fb07f59a73314e73794be0e57ac1b4e",
@@ -78,9 +95,37 @@ NETWORK_TOKENS = {
             "decimals": 18,
             "name": "Resolv USD",
             "symbol": "USR"
+        },
+
+        # === Protocol & Reward tokens ===
+        # Tokens used for protocol governance and rewards
+        "CVX": {
+            "address": "0x4e3FBD56CD56c3e72c1403e103b45Db9da5B9D2B",
+            "decimals": 18,
+            "name": "Convex Token",
+            "symbol": "CVX"
+        },
+        "CRV": {
+            "address": "0xD533a949740bb3306d119CC777fa900bA034cd52",
+            "decimals": 18,
+            "name": "Curve DAO Token",
+            "symbol": "CRV"
+        },
+        "FXN": {
+            "address": "0x365AccFCa291e7D3914637ABf1F7635dB165Bb09",
+            "decimals": 18,
+            "name": "FXN Token",
+            "symbol": "FXN"
+        },
+        "wstETH": {
+            "address": "0x7f39C581F595B53c5cb19bD0b3f8dA6c935E2Ca0",
+            "decimals": 18,
+            "name": "Wrapped liquid staked Ether 2.0",
+            "symbol": "wstETH"
         }
     },
     "base": {
+        # === Yield-bearing tokens ===
         "sUSDS": {
             "address": "0x5875eEE11Cf8398102FdAd704C9E96607675467a",
             "decimals": 18,
@@ -95,12 +140,6 @@ NETWORK_TOKENS = {
                     "symbol": "USDS"
                 }
             }
-        },
-        "USDC": {
-            "address": "0x833589fCD6eDb6E08f4c7C32D4f71b54bdA02913",
-            "decimals": 6,
-            "name": "USD Coin",
-            "symbol": "USDC"
         },
         "PT-USR-24APR2025": {
             "address": "0xec443e7E0e745348E500084892C89218B3ba4683",
@@ -118,6 +157,14 @@ NETWORK_TOKENS = {
                 }
             },
             "expiry": "2025-04-24"
+        },
+
+        # === Base stablecoins ===
+        "USDC": {
+            "address": "0x833589fCD6eDb6E08f4c7C32D4f71b54bdA02913",
+            "decimals": 6,
+            "name": "USD Coin",
+            "symbol": "USDC"
         },
         "DTUSDC": {
             "address": "0x8092cA384D44260ea4feaf7457B629B8DC6f88F0",

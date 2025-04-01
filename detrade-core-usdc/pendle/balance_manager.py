@@ -7,6 +7,12 @@ from web3 import Web3
 from typing import Dict, Any
 from decimal import Decimal
 
+"""
+Pendle balance manager module.
+Handles balance fetching and USDC valuation for Pendle Principal Tokens (PT).
+Integrates with Pendle's API for accurate price discovery and fallback mechanisms.
+"""
+
 # Add parent directory to PYTHONPATH
 root_path = str(Path(__file__).parent.parent)
 sys.path.append(root_path)
@@ -19,58 +25,76 @@ from config.networks import NETWORK_TOKENS
 from .pt_to_usdc_converter import PendleSwapClient
 
 class PendleBalanceManager:
-    """Manages Pendle PT token balances and their conversions"""
+    """
+    Manages Pendle Principal Token (PT) positions and their USDC valuations.
+    Provides balance aggregation across multiple networks (Ethereum, Base)
+    with price discovery through Pendle's swap API.
+    """
     
     def __init__(self):
+        # Initialize Pendle clients for balance and swap operations
         self.client = PendleClient()
         self.swap_client = PendleSwapClient()
         
     def get_balances(self, address: str) -> Dict[str, Any]:
         """
-        Get all Pendle PT balances and their USDC values for an address
+        Retrieves and values all Pendle PT positions.
         """
+        print("\n=== Processing Pendle Protocol positions ===")
+        print(f"Checking PT token balances for {address}")
+        
         result = {"pendle": {}}
         
-        # Iterate through networks
+        # Process each supported network
         for network in ["ethereum", "base"]:
+            print(f"\n{network.upper()} Network:")
             network_tokens = NETWORK_TOKENS[network]
             network_result = {}
             
-            # Get PT token balances for this network
+            # Find and process all Pendle PT tokens
             for token_symbol, token_data in network_tokens.items():
                 if token_data.get("protocol") != "pendle":
                     continue
                     
-                # Get PT token balance
+                # Get token balance
                 all_balances = self.client.get_balances(address)
                 balance = int(all_balances[network][token_symbol]['amount']) if network in all_balances and token_symbol in all_balances[network] else 0
                 
                 if balance == 0:
                     continue
                 
-                # Get USDC conversion
+                balance_normalized = Decimal(balance) / Decimal(10**token_data["decimals"])
+                print(f"- {token_symbol}:")
+                print(f"  Amount: {balance_normalized:.6f}")
+                
+                # Get USDC valuation
                 try:
                     usdc_amount, price_impact = self.swap_client.get_quote(
                         network=network,
                         token_symbol=token_symbol,
                         amount_in_wei=str(balance)
                     )
+                    usdc_normalized = Decimal(usdc_amount) / Decimal(10**6)
+                    
+                    # Calculer le rate avant de l'afficher
+                    rate = Decimal(usdc_amount) / Decimal(balance) * Decimal(10 ** (18 - 6)) if balance > 0 else Decimal('0')
+                    
+                    print(f"  USDC Value: {usdc_normalized:.6f}")
+                    print(f"  Rate: {rate:.6f}")
+                    print(f"  Source: Pendle API")
+                    print(f"  Price Impact: {price_impact:.4f}%")
+                    
                     fallback = False
                     source = "Pendle API"
                 except Exception as e:
-                    print(f"Warning: Pendle API failed: {str(e)}")
+                    print(f"  Source: Failed ({str(e)})")
                     usdc_amount = 0
                     price_impact = 0
+                    rate = Decimal('0')  # Définir une valeur par défaut pour rate
                     fallback = True
                     source = "Failed"
                 
-                # Calculate rate
-                if balance > 0:
-                    rate = Decimal(usdc_amount) / Decimal(balance) * Decimal(10 ** (18 - 6))
-                else:
-                    rate = Decimal('0')
-                
-                # Build response structure
+                # Add position to results
                 network_result[token_symbol] = {
                     "amount": str(balance),
                     "decimals": token_data["decimals"],
@@ -88,13 +112,20 @@ class PendleBalanceManager:
                     }
                 }
             
-            if network_result:
-                result["pendle"][network] = network_result
-                
+            if not network_result:
+                print("No positions found")
+        
+            # Important: Ajouter les résultats au dictionnaire même si vide
+            result["pendle"][network] = network_result
+        
+        print("=== Pendle Protocol processing complete ===\n")
         return result
 
 def main():
-    # Use provided address or default address from .env
+    """
+    CLI utility for testing Pendle balance aggregation.
+    Accepts address as argument or uses DEFAULT_USER_ADDRESS from environment.
+    """
     test_address = sys.argv[1] if len(sys.argv) > 1 else os.getenv('DEFAULT_USER_ADDRESS')
     
     if not test_address:
