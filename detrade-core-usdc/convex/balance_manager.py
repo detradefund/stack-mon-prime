@@ -46,13 +46,9 @@ class ConvexBalanceManager:
         """
         Retrieves all Convex positions and their USDC valuations.
         """
-        print("\n=== Processing Convex Protocol positions ===")
-        print(f"Checking Convex positions for {address}")
-        
         # Check if user has a dedicated vault
         staking_contract = self.DEDICATED_VAULTS.get(address)
         if not staking_contract:
-            print("No dedicated Convex vault found for this address")
             return {}
         
         # Combine user's staking contract with common pool info
@@ -71,36 +67,6 @@ class ConvexBalanceManager:
         if financial_data and "convex" in financial_data:
             result = financial_data
             
-            # Log positions found
-            for network, tokens in result["convex"].items():
-                print(f"\n{network.upper()} Network:")
-                for token, data in tokens.items():
-                    balance_normalized = Decimal(data['amount']) / Decimal(10**data['decimals'])
-                    print(f"- {token}:")
-                    print(f"  Amount: {balance_normalized:.6f}")
-                    
-                    # Log underlying tokens
-                    print("  Underlying Tokens:")
-                    for symbol, token_data in data['lp_tokens'].items():
-                        amount = Decimal(token_data['amount']) / Decimal(10**token_data['decimals'])
-                        print(f"    - {symbol}: {amount:.6f}")
-                        if 'value' in token_data:
-                            usdc_value = Decimal(token_data['value']['USDC']['amount']) / Decimal(10**6)
-                            print(f"      USDC Value: {usdc_value:.6f}")
-                    
-                    # Log rewards if any
-                    if 'rewards' in data and data['rewards']:
-                        print("  Rewards:")
-                        for symbol, reward_data in data['rewards'].items():
-                            amount = Decimal(reward_data['amount']) / Decimal(10**reward_data['decimals'])
-                            print(f"    - {symbol}: {amount:.6f}")
-                            if 'value' in reward_data:
-                                usdc_value = Decimal(reward_data['value']['USDC']['amount']) / Decimal(10**6)
-                                print(f"      USDC Value: {usdc_value:.6f}")
-        else:
-            print("No positions found")
-        
-        print("=== Convex Protocol processing complete ===\n")
         return result
             
     def init_contracts(self, vault_info: Dict[str, str]):
@@ -141,22 +107,27 @@ class ConvexBalanceManager:
             )
             
             if isinstance(quote, dict) and 'quote' in quote:
+                # Calculer le rate correctement (USDC par token)
+                sell_amount = Decimal(quote['quote']['sellAmount']) / Decimal(10**decimals)
+                buy_amount = Decimal(quote['quote']['buyAmount']) / Decimal(10**6)
+                rate = buy_amount / sell_amount if sell_amount else Decimal('0')
+                
                 return {
                     "amount": int(quote['quote']['buyAmount']),
                     "decimals": 6,
                     "conversion_details": {
                         "source": "CoWSwap",
                         "price_impact": f"{float(quote['quote'].get('priceImpact', 0))*100:.4f}%",
-                        "rate": str(float(quote['quote'].get('sellAmount', 0))/float(quote['quote'].get('buyAmount', 1))),
+                        "rate": f"{float(rate):.6f}",
                         "fee_percentage": f"{float(quote['quote'].get('feeAmount', 0))/float(quote['quote'].get('sellAmount', 1))*100:.4f}%",
                         "fallback": False
                     }
                 }
             
-            # Fallback silencieusement si le montant est trop petit
+            # Fallback pour les petits montants
             error_response = quote if isinstance(quote, str) else json.dumps(quote)
             if "SellAmountDoesNotCoverFee" in error_response:
-                reference_amount = "1000000000000000000000"  # 1000 tokens avec 18 decimals
+                reference_amount = "1000000000000000000000"  # 1000 tokens
                 fallback_quote = get_quote(
                     network="ethereum",
                     sell_token=token_address,
@@ -166,18 +137,12 @@ class ConvexBalanceManager:
                 
                 if isinstance(fallback_quote, dict) and 'quote' in fallback_quote:
                     # Calculer le rate en utilisant les montants normalisés
-                    sell_amount = Decimal(fallback_quote['quote']['sellAmount'])
-                    buy_amount = Decimal(fallback_quote['quote']['buyAmount'])
-                    
-                    # Normaliser les montants (18 decimals -> 1 token, 6 decimals -> 1 USDC)
-                    sell_normalized = sell_amount / Decimal(10**18)
-                    buy_normalized = buy_amount / Decimal(10**6)
-                    
-                    # Calculer le rate (USDC par token)
-                    rate = buy_normalized / sell_normalized
+                    sell_amount = Decimal(fallback_quote['quote']['sellAmount']) / Decimal(10**decimals)
+                    buy_amount = Decimal(fallback_quote['quote']['buyAmount']) / Decimal(10**6)
+                    rate = buy_amount / sell_amount if sell_amount else Decimal('0')
                     
                     # Appliquer le rate au montant original
-                    original_amount_normalized = Decimal(amount) / Decimal(10**18)
+                    original_amount_normalized = Decimal(amount) / Decimal(10**decimals)
                     estimated_value = int(original_amount_normalized * rate * Decimal(10**6))
                     
                     return {
@@ -186,7 +151,7 @@ class ConvexBalanceManager:
                         "conversion_details": {
                             "source": "CoWSwap-Fallback",
                             "price_impact": "0.0000%",
-                            "rate": f"{float(rate):.6f}",  # Format le rate de la même façon que dans les logs
+                            "rate": f"{float(rate):.6f}",
                             "fee_percentage": "N/A",
                             "fallback": True
                         }

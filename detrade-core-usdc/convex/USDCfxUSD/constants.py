@@ -11,6 +11,5 @@ POOL_INFO = {
 # Mapping of user addresses to their dedicated staking contracts
 DEDICATED_VAULTS = {
     "0xAbD81C60a18A34567151eA70374eA9c839a41cF5": "0xE6fa29c9689831eE30e9061ce95e2071E4883019",
-    # To add a new user, simply add:
-    # "0xUserAddress": "0xTheirStakingContract"
+    "0xc6835323372A4393B90bCc227c58e82D45CE4b7d": "0x82b579A95F11Dc548189cfFe32649D530Fdba7b7"
 } 

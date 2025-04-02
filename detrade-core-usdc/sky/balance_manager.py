@@ -36,32 +36,8 @@ class BalanceManager:
         """
         Retrieves all Sky Protocol positions for a given address.
         """
-        print("\n=== Processing Sky Protocol positions ===")
-        print(f"Checking sUSDS balances for {address}")
-        
         balances = self.sky_client.get_balances(address)
         
-        # Log position details if any were found
-        if "sky" in balances:
-            for network, network_data in balances["sky"].items():
-                if network_data:
-                    print(f"\n{network.upper()} Network:")
-                    for token, data in network_data.items():
-                        amount = Decimal(data['amount']) / Decimal(10**data['decimals'])
-                        usds_amount = Decimal(data['value']['USDS']['amount']) / Decimal(10**data['value']['USDS']['decimals'])
-                        usdc_value = Decimal(data['value']['USDC']['amount']) / Decimal(10**6)
-                        conversion = data['value']['USDC']['conversion_details']
-                        print(f"- {token}:")
-                        print(f"  Amount: {amount:.6f}")
-                        print(f"  USDS Value: {usds_amount:.6f}")
-                        print(f"  USDC Value: {usdc_value:.6f}")
-                        print(f"  Rate: {conversion['rate']}")
-                        print(f"  Source: {conversion['source']}")
-                        print(f"  Price Impact: {conversion['price_impact']}")
-        else:
-            print("No Sky Protocol positions found")
-        
-        print("=== Sky Protocol processing complete ===\n")
         return {
             "sky": balances
         }

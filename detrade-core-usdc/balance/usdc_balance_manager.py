@@ -232,9 +232,6 @@ class SpotBalanceManager(BaseProtocolClient):
 
     def get_balances(self, address: str) -> Dict[str, Any]:
         """Get spot token balances across all networks"""
-        print("\n=== Processing Spot Balances ===")
-        print(f"Checking spot token balances for {address}")
-        
         result = {
             "summary": {
                 "total_tokens": "0",
@@ -252,8 +249,6 @@ class SpotBalanceManager(BaseProtocolClient):
             
             # Process each network
             for network in self.get_supported_networks():
-                print(f"\n{network.upper()} Network:")
-                network_found = False
                 result["stablecoins"][network] = {}
                 network_summaries[network] = {"tokens": "0", "usdc_value": "0"}
                 
@@ -266,7 +261,6 @@ class SpotBalanceManager(BaseProtocolClient):
                     balance = contract.functions.balanceOf(checksum_address).call()
                     
                     if balance > 0:
-                        network_found = True
                         token_symbol = token_type.upper()
                         if token_type == "crvusd":
                             token_symbol = "crvUSD"
@@ -275,11 +269,9 @@ class SpotBalanceManager(BaseProtocolClient):
                         elif token_type == "scrvusd":
                             token_symbol = "scrvUSD"
                         
-                        # Format and display balance
+                        # Format balance
                         decimals = 6 if token_type == "usdc" else 18
                         balance_normalized = Decimal(balance) / Decimal(10**decimals)
-                        print(f"- {token_symbol}:")
-                        print(f"  Amount: {balance_normalized:.6f}")
                         
                         # Add to result
                         if token_type == "usdc":
@@ -291,11 +283,6 @@ class SpotBalanceManager(BaseProtocolClient):
                         else:
                             usdc_amount, conversion = self._get_usdc_value(network, token_symbol, str(balance))
                             usdc_normalized = Decimal(usdc_amount) / Decimal(10**6)
-                            print(f"  USDC Value: {usdc_normalized:.6f}")
-                            print(f"  Rate: {conversion['rate']}")
-                            print(f"  Source: {conversion['source']}")
-                            if conversion.get('price_impact') != "N/A":
-                                print(f"  Price Impact: {conversion['price_impact']}")
                             
                             result["stablecoins"][network][token_symbol] = {
                                 "amount": str(balance),
@@ -315,9 +302,6 @@ class SpotBalanceManager(BaseProtocolClient):
                         total_usdc_value += usdc_value
                         network_summaries[network]["tokens"] = str(Decimal(network_summaries[network]["tokens"]) + balance_normalized)
                         network_summaries[network]["usdc_value"] = str(Decimal(network_summaries[network]["usdc_value"]) + usdc_value)
-                
-                if not network_found:
-                    print("No balances found")
             
             # Update summary
             result["summary"].update({
@@ -329,7 +313,6 @@ class SpotBalanceManager(BaseProtocolClient):
         except Exception as e:
             print(f"Error getting spot token balances: {str(e)}")
         
-        print("=== Spot Balances processing complete ===\n")
         return result
 
     def format_balance(self, balance: int, decimals: int) -> str:
@@ -390,22 +373,10 @@ def main():
         sys.exit(1)
     
     manager = SpotBalanceManager()
-    
-    print(f"\nFetching spot token balances for {test_address}")
-    print("=" * 50)
-    
     balances = manager.get_balances(test_address)
     
-    print("\nRaw balances:")
+    print("\nSpot balances:")
     print(json.dumps(balances, indent=2))
-    
-    print("\nHuman readable balances:")
-    for network, tokens in balances["stablecoins"].items():
-        print(f"\n{network.upper()}:")
-        for token_symbol, token_data in tokens.items():
-            amount = int(token_data["amount"])
-            decimals = token_data["decimals"]
-            print(f"  {token_symbol}: {manager.format_balance(amount, decimals)} {token_symbol}")
 
 if __name__ == "__main__":
     main() 

@@ -40,14 +40,10 @@ class PendleBalanceManager:
         """
         Retrieves and values all Pendle PT positions.
         """
-        print("\n=== Processing Pendle Protocol positions ===")
-        print(f"Checking PT token balances for {address}")
-        
         result = {"pendle": {}}
         
         # Process each supported network
         for network in ["ethereum", "base"]:
-            print(f"\n{network.upper()} Network:")
             network_tokens = NETWORK_TOKENS[network]
             network_result = {}
             
@@ -64,8 +60,6 @@ class PendleBalanceManager:
                     continue
                 
                 balance_normalized = Decimal(balance) / Decimal(10**token_data["decimals"])
-                print(f"- {token_symbol}:")
-                print(f"  Amount: {balance_normalized:.6f}")
                 
                 # Get USDC valuation
                 try:
@@ -79,15 +73,9 @@ class PendleBalanceManager:
                     # Calculer le rate avant de l'afficher
                     rate = Decimal(usdc_amount) / Decimal(balance) * Decimal(10 ** (18 - 6)) if balance > 0 else Decimal('0')
                     
-                    print(f"  USDC Value: {usdc_normalized:.6f}")
-                    print(f"  Rate: {rate:.6f}")
-                    print(f"  Source: Pendle API")
-                    print(f"  Price Impact: {price_impact:.4f}%")
-                    
                     fallback = False
                     source = "Pendle API"
                 except Exception as e:
-                    print(f"  Source: Failed ({str(e)})")
                     usdc_amount = 0
                     price_impact = 0
                     rate = Decimal('0')  # Définir une valeur par défaut pour rate
@@ -112,13 +100,8 @@ class PendleBalanceManager:
                     }
                 }
             
-            if not network_result:
-                print("No positions found")
-        
-            # Important: Ajouter les résultats au dictionnaire même si vide
             result["pendle"][network] = network_result
         
-        print("=== Pendle Protocol processing complete ===\n")
         return result
 
 def main():
