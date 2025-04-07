@@ -20,7 +20,7 @@
   const rightLinks = [
     {
       name: 'Documentation',
-      comingSoon: true
+      url: 'https://docs.detrade.fund'
     },
     {
       name: 'App',
@@ -31,22 +31,6 @@
       url: 'https://detrade.fund'
     }
   ];
-
-  let showComingSoon = false;
-  let comingSoonTimeout;
-
-  function handleDocClick(e) {
-    e.preventDefault();
-    showComingSoon = true;
-    
-    // Clear any existing timeout
-    if (comingSoonTimeout) clearTimeout(comingSoonTimeout);
-    
-    // Hide the message after 2 seconds
-    comingSoonTimeout = setTimeout(() => {
-      showComingSoon = false;
-    }, 2000);
-  }
 </script>
 
 <footer class="footer">
@@ -77,27 +61,12 @@
 
     <div class="right-links">
       {#each rightLinks as link}
-        {#if link.comingSoon}
-          <div class="link-wrapper">
-            <button class="right-link coming-soon-btn" on:click={handleDocClick}>
-              {link.name}
-            </button>
-            <span class="coming-soon-badge">Coming soon</span>
-          </div>
-        {:else}
-          <a href={link.url} target="_blank" rel="noopener noreferrer" class="right-link">
-            {link.name}
-          </a>
-        {/if}
+        <a href={link.url} target="_blank" rel="noopener noreferrer" class="right-link">
+          {link.name}
+        </a>
       {/each}
     </div>
   </div>
-
-  {#if showComingSoon}
-    <div class="coming-soon-tooltip" transition:fade>
-      Coming soon
-    </div>
-  {/if}
 </footer>
 
 <style>
@@ -214,64 +183,5 @@
     .right-links {
       order: 3;
     }
-  }
-
-  .coming-soon-btn {
-    background: none;
-    border: none;
-    padding: 0;
-    font: inherit;
-    cursor: pointer;
-  }
-
-  .coming-soon-tooltip {
-    position: absolute;
-    bottom: calc(100% + 10px);
-    left: 50%;
-    transform: translateX(-50%);
-    background: rgba(13, 17, 28, 0.95);
-    border: 1px solid var(--color-accent);
-    color: var(--color-accent);
-    padding: 0.5rem 1rem;
-    border-radius: 8px;
-    font-size: 0.875rem;
-    white-space: nowrap;
-    pointer-events: none;
-  }
-
-  /* Make the coming soon button look like other links */
-  .coming-soon-btn {
-    color: #94a3b8;
-    text-decoration: none;
-    font-size: 0.96rem;
-    transition: all 0.2s ease;
-  }
-
-  .coming-soon-btn:hover {
-    color: #60a5fa;
-    transform: translateY(-1px);
-  }
-
-  .link-wrapper {
-    position: relative;
-    display: flex;
-    flex-direction: column;
-    align-items: flex-start;
-    gap: 0.25rem;
-  }
-
-  .coming-soon-badge {
-    font-size: 0.75rem;
-    color: #60a5fa;
-    font-style: italic;
-    opacity: 0.8;
-    line-height: 1;
-    position: absolute;
-    top: 100%;
-    left: 50%;
-    transform: translateX(-50%);
-    margin-top: 0.25rem;
-    text-align: center;
-    width: 100%;
   }
 </style> 
