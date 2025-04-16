@@ -57,6 +57,23 @@ NETWORK_TOKENS = {
             },
             "expiry": "2025-05-29"  # Maturity date for principal token
         },
+        "PT-cUSDO-19JUN2025": {
+            "address": "0x933B9FfEE0Ad3Ef8E4DBb52688ea905826D73755",
+            "decimals": 18,
+            "name": "PT Compounding Open Dollar 19JUN2025",
+            "symbol": "PT-cUSDO-19JUN2025",
+            "protocol": "pendle",  # Protocol identifier for yield calculation
+            "market": "0xa77c0de4d26b7c97d1d42abd6733201206122e25",  # Required for Pendle market interactions
+            "underlying": {
+                "cUSDO": {  # Token generating yield in Pendle market
+                    "address": "0xaD55aebc9b8c03FC43cd9f62260391c13c23e7c0",
+                    "decimals": 18,
+                    "name": "Compounding Open Dollar",
+                    "symbol": "cUSDO"
+                }
+            },
+            "expiry": "2025-06-19"  # Maturity date for principal token
+        },
         "scrvUSD": {
             "address": "0x0655977FEb2f289A4aB78af67BAB0d17aAb84367",
             "decimals": 18,
