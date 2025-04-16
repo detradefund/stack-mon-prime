@@ -13,8 +13,6 @@ jobs:
   update-balance:
     runs-on: ubuntu-latest
     timeout-minutes: 10  # Ajoute un timeout
-    permissions:
-      contents: read
     steps:
       - uses: actions/checkout@v3
       
@@ -43,13 +41,4 @@ jobs:
         run: |
           python -m pip install --upgrade pip
           pip install -r requirements.txt --no-cache-dir
-          python builder/balance_pusher.py
-          git config --list
-          git config user.name
-          git config user.email
-      
-      - name: Debug Git Config
-        run: |
-          git config --list
-          git config user.name
-          git config user.email 
+          python builder/balance_pusher.py 
