@@ -13,8 +13,8 @@ sys.path.append(root_path)
 from pendle.balance_manager import PendleBalanceManager, format_position_data as format_pendle_data
 from convex.balance_manager import ConvexBalanceManager
 from sky.balance_manager import BalanceManager as SkyBalanceManager
-from ..tokemak.balance_manager import BalanceManager as TokemakBalanceManager, format_tokemak_data
-from ..spot.balance_manager import SpotBalanceManager
+from tokemak.balance_manager import BalanceManager as TokemakBalanceManager, format_tokemak_data
+from spot.balance_manager import SpotBalanceManager
 from dtusdc.supply_reader import SupplyReader
 
 class BalanceAggregator:
