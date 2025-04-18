@@ -1,8 +1,8 @@
 """
 Pendle protocol integration package.
-Provides PendleClient for interacting with Pendle positions and markets.
+Provides balance tracking and USDC valuation for Pendle Principal Tokens (PT).
 """
 
-from .client import PendleClient
+from .balance_manager import PendleBalanceManager, format_position_data
 
-__all__ = ['PendleClient'] 
+__all__ = ['PendleBalanceManager', 'format_position_data'] 

@@ -25,6 +25,13 @@ NETWORK_TOKENS = {
     "ethereum": {
         # === Yield-bearing tokens ===
         # These tokens represent positions in protocols and have underlying assets
+        "autoUSD": {
+            "address": "0xa7569A44f348d3D70d8ad5889e50F78E33d80D35",
+            "decimals": 18,
+            "name": "Tokemak autoUSD",
+            "symbol": "autoUSD",
+            "protocol": "tokemak"  # Protocol identifier for balance aggregation
+        },
         "sUSDS": {
             "address": "0xa3931d71877C0E7a3148CB7Eb4463524FEc27fbD",
             "decimals": 18,
@@ -116,6 +123,12 @@ NETWORK_TOKENS = {
 
         # === Protocol & Reward tokens ===
         # Tokens used for protocol governance and rewards
+        "TOKE": {
+            "address": "0x2e9d63788249371f1DFC918a52f8d799F4a38C94",
+            "decimals": 18,
+            "name": "Tokemak",
+            "symbol": "TOKE"
+        },
         "CVX": {
             "address": "0x4e3FBD56CD56c3e72c1403e103b45Db9da5B9D2B",
             "decimals": 18,

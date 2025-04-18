@@ -3,6 +3,7 @@ import sys
 from pathlib import Path
 from typing import Dict, Any
 from decimal import Decimal
+import time
 
 # Add parent directory to PYTHONPATH
 root_path = str(Path(__file__).parent.parent)
@@ -113,16 +114,20 @@ class SpotBalanceManager(BaseProtocolClient):
 
     def _get_usdc_value(self, network: str, token_symbol: str, amount: str) -> tuple[str, dict]:
         """
-        Get USDC value for a given token amount using CoWSwap
+        Get USDC value for a given token amount using CoWSwap with retry mechanism
         Returns (usdc_amount, conversion_details)
         """
+        retry_delays = [1, 3, 3]  # Delays in seconds between retries
+        
         try:
             if token_symbol == "USDC":
                 return amount, {
                     "source": "Direct",
                     "price_impact": "0",
                     "rate": "1",
-                    "fallback": False
+                    "fee_percentage": "0.0000%",
+                    "fallback": False,
+                    "note": "Direct 1:1 conversion"
                 }
 
             # Get token contract address and decimals
@@ -141,77 +146,89 @@ class SpotBalanceManager(BaseProtocolClient):
                 token_address = NETWORK_TOKENS["ethereum"][token_symbol]["address"]
                 token_decimals = NETWORK_TOKENS["ethereum"][token_symbol]["decimals"]
 
-            # Try with original amount first
-            quote = get_quote(
-                network=network,
-                sell_token=token_address,
-                buy_token=NETWORK_TOKENS[network]["USDC"]["address"],
-                amount=amount
-            )
+            for attempt, delay in enumerate(retry_delays, 1):
+                try:
+                    # Try direct quote first
+                    quote = get_quote(
+                        network=network,
+                        sell_token=token_address,
+                        buy_token=NETWORK_TOKENS[network]["USDC"]["address"],
+                        amount=amount
+                    )
 
-            if isinstance(quote, dict) and 'quote' in quote:
-                usdc_amount = quote['quote']['buyAmount']
-                sell_amount = quote['quote']['sellAmount']
-                fee_amount = quote['quote'].get('feeAmount', '0')
-                
-                # Calculate rate and price impact
-                sell_normalized = Decimal(sell_amount) / Decimal(10**token_decimals)
-                usdc_normalized = Decimal(usdc_amount) / Decimal(10**6)
-                rate = usdc_normalized / sell_normalized if sell_normalized != 0 else Decimal('0')
-                
-                price_impact = "N/A" if token_symbol in ["CVX", "CRV"] else f"{float((rate - Decimal('1.0')) * Decimal('100')):.4f}%"
-                fee_percentage = (Decimal(fee_amount) / Decimal(amount)) * Decimal('100')
-                
-                return str(usdc_amount), {
-                    "source": "CoWSwap",
-                    "price_impact": price_impact,
-                    "rate": f"{float(rate):.6f}",
-                    "fee_percentage": f"{float(fee_percentage):.4f}%",
-                    "fallback": False
-                }
+                    if isinstance(quote, dict) and 'quote' in quote:
+                        usdc_amount = quote['quote']['buyAmount']
+                        sell_amount = quote['quote']['sellAmount']
+                        fee_amount = quote['quote'].get('feeAmount', '0')
+                        
+                        # Calculate rate and price impact
+                        sell_normalized = Decimal(sell_amount) / Decimal(10**token_decimals)
+                        usdc_normalized = Decimal(usdc_amount) / Decimal(10**6)
+                        rate = usdc_normalized / sell_normalized if sell_normalized != 0 else Decimal('0')
+                        
+                        price_impact = "N/A" if token_symbol in ["CVX", "CRV"] else f"{float((rate - Decimal('1.0')) * Decimal('100')):.4f}%"
+                        fee_percentage = (Decimal(fee_amount) / Decimal(amount)) * Decimal('100')
+                        
+                        return str(usdc_amount), {
+                            "source": "CoWSwap",
+                            "price_impact": price_impact,
+                            "rate": f"{float(rate):.6f}",
+                            "fee_percentage": f"{float(fee_percentage):.4f}%",
+                            "fallback": False,
+                            "note": "Direct CoWSwap quote"
+                        }
 
-            # Si le montant est trop petit, utiliser le fallback silencieusement
-            error_response = quote if isinstance(quote, str) else str(quote)
-            if "SellAmountDoesNotCoverFee" in error_response:
-                # Utiliser un montant plus grand pour obtenir un prix de référence
-                reference_amount = "1000000000000000000000"  # 1000 tokens avec 18 decimals
-                fallback_quote = get_quote(
-                    network=network,
-                    sell_token=token_address,
-                    buy_token=NETWORK_TOKENS[network]["USDC"]["address"],
-                    amount=reference_amount
-                )
-                
-                if isinstance(fallback_quote, dict) and 'quote' in fallback_quote:
-                    # Calculer le rate en utilisant les montants normalisés
-                    sell_amount = Decimal(fallback_quote['quote']['sellAmount'])
-                    buy_amount = Decimal(fallback_quote['quote']['buyAmount'])
-                    
-                    # Normaliser les montants (18 decimals -> 1 token, 6 decimals -> 1 USDC)
-                    sell_normalized = sell_amount / Decimal(10**18)
-                    buy_normalized = buy_amount / Decimal(10**6)
-                    
-                    # Calculer le rate (USDC par token)
-                    rate = buy_normalized / sell_normalized
-                    
-                    # Appliquer le rate au montant original
-                    original_amount_normalized = Decimal(amount) / Decimal(10**18)
-                    estimated_value = int(original_amount_normalized * rate * Decimal(10**6))
-                    
-                    return str(estimated_value), {
-                        "source": "CoWSwap-Fallback",
-                        "price_impact": "0.0000%",
-                        "rate": f"{float(rate):.6f}",
-                        "fee_percentage": "N/A",
-                        "fallback": True,
-                        "fallback_reference": "1000 units"
-                    }
+                    # Handle small amounts with fallback
+                    error_response = quote if isinstance(quote, str) else str(quote)
+                    if "SellAmountDoesNotCoverFee" in error_response:
+                        # Use larger amount for price discovery
+                        reference_amount = "1000000000000000000000"  # 1000 tokens with 18 decimals
+                        fallback_quote = get_quote(
+                            network=network,
+                            sell_token=token_address,
+                            buy_token=NETWORK_TOKENS[network]["USDC"]["address"],
+                            amount=reference_amount
+                        )
+                        
+                        if isinstance(fallback_quote, dict) and 'quote' in fallback_quote:
+                            # Calculate rate using normalized amounts
+                            sell_amount = Decimal(fallback_quote['quote']['sellAmount'])
+                            buy_amount = Decimal(fallback_quote['quote']['buyAmount'])
+                            
+                            sell_normalized = sell_amount / Decimal(10**token_decimals)
+                            buy_normalized = buy_amount / Decimal(10**6)
+                            
+                            rate = buy_normalized / sell_normalized
+                            
+                            # Apply rate to original amount
+                            original_amount_normalized = Decimal(amount) / Decimal(10**token_decimals)
+                            estimated_value = int(original_amount_normalized * rate * Decimal(10**6))
+                            
+                            return str(estimated_value), {
+                                "source": "CoWSwap-Fallback",
+                                "price_impact": "0.0000%",
+                                "rate": f"{float(rate):.6f}",
+                                "fee_percentage": "N/A",
+                                "fallback": True,
+                                "note": "Using reference amount of 1000 tokens for price discovery due to small amount"
+                            }
+
+                    if attempt < len(retry_delays):
+                        time.sleep(delay)
+                        continue
+
+                except Exception as e:
+                    if attempt < len(retry_delays):
+                        time.sleep(delay)
+                        continue
 
             return "0", {
-                "source": "Failed Quote",
+                "source": "Failed",
                 "price_impact": "N/A",
                 "rate": "0",
-                "fallback": True
+                "fee_percentage": "N/A",
+                "fallback": True,
+                "note": "All quote attempts failed"
             }
 
         except Exception as e:
@@ -219,7 +236,9 @@ class SpotBalanceManager(BaseProtocolClient):
                 "source": "Error",
                 "price_impact": "N/A",
                 "rate": "0",
-                "fallback": True
+                "fee_percentage": "N/A",
+                "fallback": True,
+                "note": f"Technical error: {str(e)[:200]}"
             }
 
     def _convert_to_usdc(self, amount_18_decimals: str) -> str:
@@ -232,25 +251,32 @@ class SpotBalanceManager(BaseProtocolClient):
 
     def get_balances(self, address: str) -> Dict[str, Any]:
         """Get spot token balances across all networks"""
+        print("\n" + "="*80)
+        print("SPOT BALANCE MANAGER")
+        print("="*80)
+        
+        print("\nDebug get_balances:")
+        print(f"Processing address: {address}")
+        checksum_address = Web3.to_checksum_address(address)
+        print(f"Checksum address: {checksum_address}")
+        
         result = {
-            "summary": {
-                "total_tokens": "0",
-                "total_usdc_value": "0",
-                "networks": {}
-            },
-            "stablecoins": {}
+            "usdc_totals": {
+                "total": {
+                    "wei": 0,
+                    "formatted": "0.00"
+                }
+            }
         }
         
         try:
-            checksum_address = Web3.to_checksum_address(address)
-            total_tokens = Decimal('0')
             total_usdc_value = Decimal('0')
-            network_summaries = {}
             
             # Process each network
             for network in self.get_supported_networks():
-                result["stablecoins"][network] = {}
-                network_summaries[network] = {"tokens": "0", "usdc_value": "0"}
+                print(f"\nProcessing network: {network}")
+                network_has_balance = False
+                network_balances = {}
                 
                 # Process each token type
                 for token_type, network_contracts in self.contracts.items():
@@ -261,6 +287,7 @@ class SpotBalanceManager(BaseProtocolClient):
                     balance = contract.functions.balanceOf(checksum_address).call()
                     
                     if balance > 0:
+                        network_has_balance = True
                         token_symbol = token_type.upper()
                         if token_type == "crvusd":
                             token_symbol = "crvUSD"
@@ -273,18 +300,37 @@ class SpotBalanceManager(BaseProtocolClient):
                         decimals = 6 if token_type == "usdc" else 18
                         balance_normalized = Decimal(balance) / Decimal(10**decimals)
                         
+                        print(f"\nProcessing token: {token_symbol}")
+                        print(f"Amount: {balance} (decimals: {decimals})")
+                        print(f"Formatted amount: {balance_normalized:.6f} {token_symbol}")
+                        
                         # Add to result
                         if token_type == "usdc":
-                            result["stablecoins"][network][token_symbol] = {
+                            network_balances[token_symbol] = {
                                 "amount": str(balance),
-                                "decimals": decimals
+                                "decimals": decimals,
+                                "value": {
+                                    "USDC": {
+                                        "amount": str(balance),
+                                        "decimals": decimals,
+                                        "conversion_details": {
+                                            "source": "Direct",
+                                            "price_impact": "0.0000%",
+                                            "rate": "1.000000",
+                                            "fee_percentage": "0.0000%",
+                                            "fallback": False,
+                                            "note": "Direct 1:1 conversion"
+                                        }
+                                    }
+                                }
                             }
+                            print("✓ Direct 1:1 conversion with USDC")
                             usdc_value = balance_normalized
                         else:
                             usdc_amount, conversion = self._get_usdc_value(network, token_symbol, str(balance))
                             usdc_normalized = Decimal(usdc_amount) / Decimal(10**6)
                             
-                            result["stablecoins"][network][token_symbol] = {
+                            network_balances[token_symbol] = {
                                 "amount": str(balance),
                                 "decimals": decimals,
                                 "value": {
@@ -295,23 +341,48 @@ class SpotBalanceManager(BaseProtocolClient):
                                     }
                                 }
                             }
+                            print(f"✓ Converted to USDC: {usdc_normalized:.6f} USDC")
+                            print(f"  Rate: {conversion['rate']} USDC/{token_symbol}")
+                            print(f"  Source: {conversion['source']}")
+                            if conversion['note']:
+                                print(f"  Note: {conversion['note']}")
+                            
                             usdc_value = usdc_normalized
                         
-                        # Update totals
-                        total_tokens += balance_normalized
+                        # Update total
                         total_usdc_value += usdc_value
-                        network_summaries[network]["tokens"] = str(Decimal(network_summaries[network]["tokens"]) + balance_normalized)
-                        network_summaries[network]["usdc_value"] = str(Decimal(network_summaries[network]["usdc_value"]) + usdc_value)
+                
+                print(f"\nNetwork {network} processing complete")
+                # Only add network to result if it has balances
+                if network_has_balance:
+                    result[network] = network_balances
             
-            # Update summary
-            result["summary"].update({
-                "total_tokens": f"{total_tokens:.6f}",
-                "total_usdc_value": f"{total_usdc_value:.6f}",
-                "networks": network_summaries
-            })
+            # Update global USDC totals
+            result["usdc_totals"]["total"]["wei"] = int(total_usdc_value * Decimal(10**6))
+            result["usdc_totals"]["total"]["formatted"] = f"{total_usdc_value:.6f}"
+            
+            # Trier les tokens par valeur USDC décroissante pour chaque réseau
+            for network in self.get_supported_networks():
+                if network in result:
+                    # Convertir le dictionnaire en liste de tuples (token, data)
+                    tokens = list(result[network].items())
+                    
+                    # Trier par valeur USDC (en wei)
+                    sorted_tokens = sorted(
+                        tokens,
+                        key=lambda x: int(x[1].get('value', {}).get('USDC', {}).get('amount', '0')),
+                        reverse=True
+                    )
+                    
+                    # Recréer le dictionnaire trié
+                    result[network] = dict(sorted_tokens)
+            
+            print("\n" + "="*80)
+            print(f"TOTAL SPOT VALUE: {total_usdc_value:.6f} USDC")
+            print("="*80)
             
         except Exception as e:
-            print(f"Error getting spot token balances: {str(e)}")
+            print(f"\n✗ Error getting spot token balances: {str(e)}")
         
         return result
 

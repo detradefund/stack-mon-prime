@@ -1,6 +1,7 @@
-# Package marker - can remain empty as we no longer export these modules
+"""Sky Protocol integration package"""
 
-from .client import SkyClient
-from . import balance_manager
+from .balance_manager import BalanceManager
 
-__all__ = ['SkyClient', 'balance_manager']
+__all__ = ['BalanceManager']
+
+# Empty file to mark directory as Python package

@@ -3,7 +3,7 @@ from pathlib import Path
 from datetime import datetime, timezone
 from dotenv import load_dotenv
 from pymongo import MongoClient
-from balance_aggregator import BalanceAggregator
+from .aggregator import main as aggregator_main
 
 # Add parent directory to PYTHONPATH and load environment variables
 root_path = str(Path(__file__).parent.parent)
@@ -26,7 +26,6 @@ class BalancePusher:
         self.client = MongoClient(mongo_uri)
         self.db = self.client[database_name]
         self.collection = self.db[collection_name]
-        self.aggregator = BalanceAggregator()
 
     def convert_large_numbers_to_strings(self, data):
         """Recursively converts large integers to strings in a nested dictionary/list structure"""
@@ -48,8 +47,8 @@ class BalancePusher:
             print(f"Fetching balance data for {address}")
             print("========================================\n")
             
-            # Get current portfolio snapshot from aggregator
-            balance_data = self.aggregator.get_total_usdc_value(address)
+            # Get current portfolio snapshot using aggregator's main function
+            balance_data = aggregator_main()
             
             # Convert large numbers to strings
             balance_data = self.convert_large_numbers_to_strings(balance_data)
@@ -93,4 +92,4 @@ def main():
         pusher.close()
 
 if __name__ == "__main__":
-    main() 
+    main()
