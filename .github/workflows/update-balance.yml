@@ -28,6 +28,7 @@ jobs:
           DEFAULT_USER_ADDRESS: ${{ secrets.DEFAULT_USER_ADDRESS }}
           BASE_RPC: ${{ secrets.BASE_RPC }}
           ETHEREUM_RPC: ${{ secrets.ETHEREUM_RPC }}
+          PYTHONPATH: ..
         working-directory: ./detrade-core-usdc/builder
         run: |
           python -m pip install --upgrade pip
