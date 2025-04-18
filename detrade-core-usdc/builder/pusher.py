@@ -3,7 +3,7 @@ from pathlib import Path
 from datetime import datetime, timezone
 from dotenv import load_dotenv
 from pymongo import MongoClient
-from .aggregator import main as aggregator_main
+from aggregator import main as aggregator_main
 
 # Add parent directory to PYTHONPATH and load environment variables
 root_path = str(Path(__file__).parent.parent)
