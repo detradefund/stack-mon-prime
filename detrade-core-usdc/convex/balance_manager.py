@@ -44,17 +44,13 @@ class ConvexBalanceManager:
         return os.getenv('ETHEREUM_RPC')
         
     def get_balances(self, address: str) -> Dict[str, Any]:
-        """
-        Retrieves all Convex positions and their USDC valuations.
-        """
+        """Get Convex balances and rewards for address"""
         print("\n" + "="*80)
         print("CONVEX BALANCE MANAGER")
         print("="*80)
         
         print("\nDebug get_balances:")
         print(f"Processing address: {address}")
-        
-        # Convertir l'adresse en format checksum
         checksum_address = Web3.to_checksum_address(address)
         print(f"Checksum address: {checksum_address}")
         
@@ -64,7 +60,7 @@ class ConvexBalanceManager:
         
         if not staking_contract:
             print("No staking contract found")
-            return {}
+            return {"convex": {}}
         
         # Combine user's staking contract with common pool info
         vault_info = {
@@ -79,24 +75,9 @@ class ConvexBalanceManager:
         print("Contracts initialized")
         
         # Get financial data
-        result = {}
-        financial_data = self._get_financial_data(vault_info)
+        result = self._get_financial_data(vault_info)
         
-        if financial_data and "convex" in financial_data:
-            result = financial_data
-        
-        if result and "convex" in result:
-            total_value = sum(
-                float(pool_data['usdc_totals']['total']['formatted'])
-                for chain_data in result['convex'].values()
-                for pool_data in chain_data.values()
-                if isinstance(pool_data, dict) and 'usdc_totals' in pool_data
-            )
-            print("\n" + "="*80)
-            print(f"TOTAL CONVEX VALUE: {total_value:.6f} USDC")
-            print("="*80)
-        
-        return result
+        return result if result else {"convex": {}}
             
     def init_contracts(self, vault_info: Dict[str, str]):
         """
@@ -117,133 +98,32 @@ class ConvexBalanceManager:
 
     def get_quote_with_fallback(self, token_address: str, amount: int, decimals: int, symbol: str) -> Dict[str, Any]:
         """
-        Gets USDC conversion quote for tokens with fallback mechanism.
-        Includes retry mechanism for technical errors.
+        Gets USDC conversion quote for tokens.
+        Uses the centralized quote logic from cow_client.py
         """
-        retry_delays = [1, 3, 3]  # Délais en secondes entre les tentatives
-        
         print(f"\nAttempting to get quote for {symbol}:")
         
-        for attempt, delay in enumerate(retry_delays, 1):
-            try:
-                print(f"[Attempt {attempt}/3] Requesting CoWSwap quote...")
-                
-                # Try direct quote first
-                quote = get_quote(
-                    network="ethereum",
-                    sell_token=token_address,
-                    buy_token=self.network_tokens["ethereum"]["USDC"]["address"],
-                    amount=str(int(amount))
-                )
-                
-                if isinstance(quote, dict) and 'quote' in quote:
-                    # Calculer le rate correctement (USDC par token)
-                    sell_amount = Decimal(quote['quote']['sellAmount']) / Decimal(10**decimals)
-                    buy_amount = Decimal(quote['quote']['buyAmount']) / Decimal(10**6)
-                    rate = buy_amount / sell_amount if sell_amount else Decimal('0')
-                    
-                    print(f"✓ Direct quote successful:")
-                    print(f"  - Sell amount: {sell_amount} {symbol}")
-                    print(f"  - Buy amount: {buy_amount} USDC")
-                    print(f"  - Rate: {float(rate):.6f} USDC/{symbol}")
-                    print(f"  - Fee: {float(quote['quote'].get('feeAmount', 0))/float(quote['quote'].get('sellAmount', 1))*100:.4f}%")
-                    
-                    return {
-                        "amount": int(quote['quote']['buyAmount']),
-                        "decimals": 6,
-                        "conversion_details": {
-                            "source": "CoWSwap",
-                            "price_impact": f"{float(quote['quote'].get('priceImpact', 0))*100:.4f}%",
-                            "rate": f"{float(rate):.6f}",
-                            "fee_percentage": f"{float(quote['quote'].get('feeAmount', 0))/float(quote['quote'].get('sellAmount', 1))*100:.4f}%",
-                            "fallback": False,
-                            "note": "Direct CoWSwap quote"
-                        }
-                    }
-                
-                # Gestion des erreurs CoWSwap
-                error_response = quote if isinstance(quote, str) else json.dumps(quote)
-                
-                # Cas spécifique: montant trop petit
-                if "SellAmountDoesNotCoverFee" in error_response:
-                    print("! Amount too small for direct quote, trying fallback method...")
-                    reference_amount = "1000000000000000000000"  # 1000 tokens
-                    
-                    print(f"Requesting quote with reference amount (1000 {symbol})...")
-                    fallback_quote = get_quote(
-                        network="ethereum",
-                        sell_token=token_address,
-                        buy_token=self.network_tokens["ethereum"]["USDC"]["address"],
-                        amount=reference_amount
-                    )
-                    
-                    if isinstance(fallback_quote, dict) and 'quote' in fallback_quote:
-                        # Calculer le rate en utilisant les montants normalisés
-                        sell_amount = Decimal(fallback_quote['quote']['sellAmount']) / Decimal(10**decimals)
-                        buy_amount = Decimal(fallback_quote['quote']['buyAmount']) / Decimal(10**6)
-                        rate = buy_amount / sell_amount if sell_amount else Decimal('0')
-                        
-                        # Appliquer le rate au montant original
-                        original_amount_normalized = Decimal(amount) / Decimal(10**decimals)
-                        estimated_value = int(original_amount_normalized * rate * Decimal(10**6))
-                        
-                        print(f"✓ Fallback successful:")
-                        print(f"  - Discovered rate: {float(rate):.6f} USDC/{symbol}")
-                        print(f"  - Estimated value: {estimated_value/10**6:.6f} USDC")
-                        
-                        return {
-                            "amount": estimated_value,
-                            "decimals": 6,
-                            "conversion_details": {
-                                "source": "CoWSwap-Fallback",
-                                "price_impact": "0.0000%",
-                                "rate": f"{float(rate):.6f}",
-                                "fee_percentage": "N/A",
-                                "fallback": True,
-                                "note": "Using reference amount of 1000 tokens for price discovery due to small amount"
-                            }
-                        }
-                    
-                    print("✗ Fallback method failed")
-                
-                # Autres cas d'erreur CoWSwap
-                print(f"✗ CoWSwap error: {error_response[:200]}...")
-                error_details = {
-                    "amount": 0,
-                    "decimals": 6,
-                    "conversion_details": {
-                        "source": "Error",
-                        "price_impact": "0.0000%",
-                        "rate": "0.000000",
-                        "fee_percentage": "0.0000%",
-                        "fallback": False,
-                        "note": f"CoWSwap error: {error_response[:200]}..."
-                    }
-                }
-                return error_details
+        result = get_quote(
+            network="ethereum",
+            sell_token=token_address,
+            buy_token=self.network_tokens["ethereum"]["USDC"]["address"],
+            amount=str(int(amount)),
+            token_decimals=decimals,
+            token_symbol=symbol
+        )
 
-            except Exception as e:
-                print(f"✗ Technical error (attempt {attempt}/3):")
-                print(f"  {str(e)}")
-                
-                if attempt < len(retry_delays):
-                    print(f"  Retrying in {delay} seconds...")
-                    time.sleep(delay)
-                    continue
-                
-                print("✗ All retry attempts failed")
-                return {
-                    "amount": 0,
-                    "decimals": 6,
-                    "conversion_details": {
-                        "source": "Error",
-                        "price_impact": "0.0000%",
-                        "rate": "0.000000",
-                        "fee_percentage": "0.0000%",
-                        "fallback": False,
-                        "note": f"Technical error after 3 retries: {str(e)[:200]}..."
-                    }
-                }
+        if result["quote"]:
+            return {
+                "amount": int(result["quote"]["quote"]["buyAmount"]),
+                "decimals": 6,
+                "conversion_details": result["conversion_details"]
+            }
+        
+        return {
+            "amount": 0,
+            "decimals": 6,
+            "conversion_details": result["conversion_details"]
+        }
 
     def _calculate_usdc_totals(self, lp_tokens: Dict, rewards: Dict) -> Dict[str, int]:
         """
@@ -383,20 +263,44 @@ class ConvexBalanceManager:
                 
                 rewards[symbol] = reward_data
 
-            # Calculer les totaux avant de retourner
+            # Calculer les totaux
             usdc_totals = self._calculate_usdc_totals(lp_balances, rewards)
+            total_usdc_value = int(usdc_totals["total"]["wei"])
 
-            print("[Convex] Calculation complete")
+            print("\n[Convex] Calculation complete")
+            
+            # Afficher les LP tokens
+            for token_symbol, token_data in lp_balances.items():
+                if "value" in token_data and "USDC" in token_data["value"]:
+                    amount = int(token_data["value"]["USDC"]["amount"])
+                    if amount > 0:
+                        formatted_amount = amount / 10**6
+                        print(f"convex.ethereum.{vault_info['name']}.{token_symbol}: {formatted_amount:.6f} USDC")
+
+            # Afficher les rewards
+            for token_symbol, reward_data in rewards.items():
+                if "value" in reward_data and "USDC" in reward_data["value"]:
+                    amount = int(reward_data["value"]["USDC"]["amount"])
+                    if amount > 0:
+                        formatted_amount = amount / 10**6
+                        print(f"convex.ethereum.{vault_info['name']}.rewards.{token_symbol}: {formatted_amount:.6f} USDC")
+
             return {
                 "convex": {
                     "ethereum": {
                         vault_info['name']: {
                             "staking_contract": vault_info['staking_contract'],
-                            "amount": contract_lp_balance,
+                            "amount": str(contract_lp_balance),
                             "decimals": 18,
                             "lp_tokens": lp_balances,
-                            "rewards": rewards,
-                            "usdc_totals": usdc_totals
+                            "rewards": rewards
+                        },
+                        "usdc_totals": usdc_totals
+                    },
+                    "usdc_totals": {
+                        "total": {
+                            "wei": total_usdc_value,
+                            "formatted": f"{total_usdc_value/10**6:.6f}"
                         }
                     }
                 }
@@ -404,7 +308,7 @@ class ConvexBalanceManager:
 
         except Exception as e:
             print(f"[Convex] Error: {str(e)}")
-            return None 
+            return {"convex": {}}
 
 if __name__ == "__main__":
     from dotenv import load_dotenv

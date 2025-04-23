@@ -3,7 +3,8 @@ from pathlib import Path
 from datetime import datetime, timezone
 from dotenv import load_dotenv
 from pymongo import MongoClient
-from aggregator import main as aggregator_main
+from typing import Dict, Any
+from builder.aggregator import main as aggregator_main
 
 # Add parent directory to PYTHONPATH and load environment variables
 root_path = str(Path(__file__).parent.parent)
@@ -16,69 +17,147 @@ class BalancePusher:
     """
     def __init__(self):
         # Required MongoDB configuration from environment variables
-        mongo_uri = os.getenv('MONGO_URI')
-        database_name = os.getenv('DATABASE_NAME_1')
-        collection_name = os.getenv('COLLECTION_NAME')
+        self.mongo_uri = os.getenv('MONGO_URI')
+        self.database_name = os.getenv('DATABASE_NAME_1')
+        self.collection_name = os.getenv('COLLECTION_NAME')
         
-        if not all([mongo_uri, database_name, collection_name]):
+        if not all([self.mongo_uri, self.database_name, self.collection_name]):
             raise ValueError("Missing required environment variables for MongoDB connection")
         
-        self.client = MongoClient(mongo_uri)
-        self.db = self.client[database_name]
-        self.collection = self.db[collection_name]
+        # Initialize MongoDB connection
+        self._init_mongo_connection()
 
-    def convert_large_numbers_to_strings(self, data):
-        """Recursively converts large integers to strings in a nested dictionary/list structure"""
+    def _init_mongo_connection(self) -> None:
+        """Initialize MongoDB connection and verify access"""
+        try:
+            self.client = MongoClient(self.mongo_uri)
+            self.db = self.client[self.database_name]
+            self.collection = self.db[self.collection_name]
+            
+            # Test connection
+            self.client.admin.command('ping')
+            print("\n✓ MongoDB connection initialized successfully")
+            print(f"Database: {self.database_name}")
+            print(f"Collection: {self.collection_name}\n")
+            
+        except Exception as e:
+            print(f"\n❌ Failed to initialize MongoDB connection: {str(e)}")
+            raise
+
+    def _prepare_balance_data(self, raw_data: Dict[str, Any], address: str) -> Dict[str, Any]:
+        """Prepare balance data for storage"""
+        # Convert large numbers to strings
+        data = self.convert_large_numbers_to_strings(raw_data)
+        
+        # Add metadata
+        timestamp = datetime.now(timezone.utc)
+        data.update({
+            'address': address,
+            'created_at': timestamp,
+            'timestamp': timestamp.strftime("%Y-%m-%d %H:%M:%S UTC")
+        })
+        
+        return data
+
+    def _verify_insertion(self, doc_id: Any) -> bool:
+        """Verify document was properly inserted"""
+        try:
+            inserted_doc = self.collection.find_one({"_id": doc_id})
+            return bool(inserted_doc)
+        except Exception as e:
+            print(f"❌ Failed to verify document insertion: {str(e)}")
+            return False
+
+    def convert_large_numbers_to_strings(self, data: Dict) -> Dict:
+        """Recursively converts large integers to strings"""
         if isinstance(data, dict):
             return {k: self.convert_large_numbers_to_strings(v) for k, v in data.items()}
         elif isinstance(data, list):
             return [self.convert_large_numbers_to_strings(x) for x in data]
-        elif isinstance(data, int) and data > 2**53:  # 2**53 est la limite sûre pour les entiers en JavaScript
+        elif isinstance(data, int) and data > 2**53:
             return str(data)
         return data
 
     def push_balance_data(self, address: str) -> None:
         """
-        Fetches current portfolio balance and stores it in MongoDB.
-        Creates a timestamped snapshot of all positions and their values.
+        Main method to fetch and store portfolio balance data.
         """
         try:
-            print("\n========================================")
-            print(f"Fetching balance data for {address}")
-            print("========================================\n")
+            # Capture start time in UTC for data collection
+            collection_timestamp = datetime.now(timezone.utc)
             
-            # Get current portfolio snapshot using aggregator's main function
+            print("\n" + "="*80)
+            print(f"PUSHING BALANCE DATA FOR {address}")
+            print("="*80 + "\n")
+
+            # 1. Fetch current portfolio data
+            print("1. Fetching portfolio data...")
+            print(f"Collection started at: {collection_timestamp.strftime('%Y-%m-%d %H:%M:%S UTC')}")
             balance_data = aggregator_main()
+            print("✓ Portfolio data fetched successfully\n")
+
+            # 2. Prepare data for storage
+            print("2. Preparing data for storage...")
+            push_timestamp = datetime.now(timezone.utc)
             
-            # Convert large numbers to strings
-            balance_data = self.convert_large_numbers_to_strings(balance_data)
+            # Add both timestamps to the data
+            prepared_data = self.convert_large_numbers_to_strings(balance_data)
             
-            # Add metadata for historical tracking
-            balance_data['address'] = address
-            balance_data['created_at'] = datetime.now(timezone.utc)
+            # Réorganiser les champs avec timestamp en premier
+            prepared_data = {
+                'timestamp': collection_timestamp.strftime("%Y-%m-%d %H:%M:%S UTC"),
+                'created_at': push_timestamp.strftime("%Y-%m-%d %H:%M:%S UTC"),
+                'address': address,
+                **prepared_data  # Reste des données
+            }
             
-            # Store snapshot in database
-            print("\n=== Pushing data to MongoDB ===")
-            result = self.collection.insert_one(balance_data)
-            print(f"Document successfully pushed with _id: {result.inserted_id}")
-            print("\n========================================")
+            print("✓ Data prepared successfully\n")
+
+            # 3. Store data in MongoDB
+            print("3. Storing data in MongoDB...")
+            result = self.collection.insert_one(prepared_data)
+            
+            if not result.inserted_id:
+                raise Exception("No document ID returned after insertion")
+            
+            print(f"✓ Document inserted with ID: {result.inserted_id}\n")
+
+            # 4. Verify insertion
+            print("4. Verifying document insertion...")
+            if self._verify_insertion(result.inserted_id):
+                print("✓ Document verified in database\n")
+            else:
+                raise Exception("Document verification failed")
+
+            # 5. Print summary avec la durée de collection
+            collection_duration = (push_timestamp - collection_timestamp).total_seconds()
+            print("="*80)
+            print("SUMMARY")
+            print("="*80)
+            print(f"Address: {address}")
             print(f"Total Value: {balance_data['nav']['usdc']} USDC")
-            print(f"Timestamp: {balance_data['timestamp']}")
-            print("========================================\n")
-            
+            print(f"Collection started at: {prepared_data['timestamp']}")
+            print(f"Pushed at: {push_timestamp.strftime('%Y-%m-%d %H:%M:%S UTC')}")
+            print(f"Collection duration: {collection_duration:.2f} seconds")
+            print(f"Database: {self.database_name}")
+            print(f"Collection: {self.collection_name}")
+            print(f"Document ID: {result.inserted_id}")
+            print("="*80 + "\n")
+
         except Exception as e:
-            print(f"\n❌ Error pushing data to MongoDB: {str(e)}")
+            print(f"\n❌ Error in push_balance_data: {str(e)}")
             raise
         
     def close(self):
-        """Closes MongoDB connection"""
-        self.client.close()
+        """Close MongoDB connection"""
+        try:
+            self.client.close()
+            print("✓ MongoDB connection closed")
+        except Exception as e:
+            print(f"❌ Error closing MongoDB connection: {str(e)}")
 
 def main():
-    """
-    CLI entry point for testing balance pushing functionality.
-    Uses DEFAULT_USER_ADDRESS from .env file.
-    """
+    """CLI entry point for testing balance pushing functionality."""
     test_address = os.getenv('DEFAULT_USER_ADDRESS')
     
     if not test_address:

@@ -52,17 +52,17 @@ NETWORK_TOKENS = {
             "decimals": 18,
             "name": "Pendle PT Ethereal eUSDE 29MAY2025",
             "symbol": "PT-eUSDE-29MAY2025",
-            "protocol": "pendle",  # Protocol identifier for yield calculation
-            "market": "0x85667e484a32d884010cf16427d90049ccf46e97",  # Required for Pendle market interactions
+            "protocol": "pendle",
+            "market": "0x85667e484a32d884010cf16427d90049ccf46e97",
             "underlying": {
-                "eUSDe": {  # Token generating yield in Pendle market
-                    "address": "0x90D2af7d622ca3141efA4DAB310f31866a5974Cc8F",
+                "eUSDe": {
+                    "address": "0x90d2af7d622ca3141efa4d8f1f24d86e5974cc8f",
                     "decimals": 18,
                     "name": "Ethereal Pre-deposit Vault",
                     "symbol": "eUSDe"
                 }
             },
-            "expiry": "2025-05-29"  # Maturity date for principal token
+            "expiry": "2025-05-29"
         },
         "PT-cUSDO-19JUN2025": {
             "address": "0x933B9FfEE0Ad3Ef8E4DBb52688ea905826D73755",
@@ -96,6 +96,24 @@ NETWORK_TOKENS = {
             "name": "USD Coin",
             "symbol": "USDC"
         },
+        "USDS": {
+            "address": "0xdC035D45d973E3EC169d2276DDab16f1e407384F",
+            "decimals": 18,
+            "name": "USDS",
+            "symbol": "USDS"
+        },
+        "eUSDe": {  # Ajout de eUSDe en format standard
+            "address": "0x90d2af7d622ca3141efa4d8f1f24d86e5974cc8f",  # Correction de l'adresse
+            "decimals": 18,
+            "name": "Ethereal Pre-deposit Vault",
+            "symbol": "eUSDe"
+        },
+        "cUSDO": {  # Ajout de cUSDO en format standard
+            "address": "0xaD55aebc9b8c03FC43cd9f62260391c13c23e7c0",
+            "decimals": 18,
+            "name": "Compounding Open Dollar",
+            "symbol": "cUSDO"
+        },
         "crvUSD": {
             "address": "0xf939e0a03fb07f59a73314e73794be0e57ac1b4e",
             "decimals": 18,
@@ -123,6 +141,12 @@ NETWORK_TOKENS = {
 
         # === Protocol & Reward tokens ===
         # Tokens used for protocol governance and rewards
+        "PENDLE": {
+            "address": "0x808507121B80c02388fAd14726482e061B8da827",
+            "decimals": 18,
+            "name": "Pendle",
+            "symbol": "PENDLE"
+        },
         "TOKE": {
             "address": "0x2e9d63788249371f1DFC918a52f8d799F4a38C94",
             "decimals": 18,
@@ -195,6 +219,18 @@ NETWORK_TOKENS = {
             "decimals": 6,
             "name": "USD Coin",
             "symbol": "USDC"
+        },
+        "USDS": {
+            "address": "0x820C137fa70C8691f0e44Dc420a5e53c168921Dc",
+            "decimals": 18,
+            "name": "USDS",
+            "symbol": "USDS"
+        },
+        "USR": {
+            "address": "0x35E5dB674D8e93a03d814FA0ADa70731efe8a4b9",
+            "decimals": 18,
+            "name": "Resolve USD",
+            "symbol": "USR"
         },
         "DTUSDC": {
             "address": "0x8092cA384D44260ea4feaf7457B629B8DC6f88F0",

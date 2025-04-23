@@ -13,9 +13,10 @@ sys.path.append(root_path)
 from pendle.balance_manager import PendleBalanceManager, format_position_data as format_pendle_data
 from convex.balance_manager import ConvexBalanceManager
 from sky.balance_manager import BalanceManager as SkyBalanceManager
-from tokemak.balance_manager import BalanceManager as TokemakBalanceManager, format_tokemak_data
+from tokemak.balance_manager import BalanceManager as TokemakBalanceManager
 from spot.balance_manager import SpotBalanceManager
 from dtusdc.supply_reader import SupplyReader
+from equilibria.balance_manager import BalanceManager as EquilibriaBalanceManager
 
 class BalanceAggregator:
     """
@@ -33,16 +34,11 @@ class BalanceAggregator:
         self.sky_manager = SkyBalanceManager()
         self.tokemak_manager = TokemakBalanceManager()
         self.spot_manager = SpotBalanceManager()
+        self.equilibria_manager = EquilibriaBalanceManager()
         
     def get_all_balances(self, address: str) -> Dict[str, Any]:
         """
         Fetches and combines balances from all supported protocols
-        
-        Args:
-            address: Ethereum address to check
-            
-        Returns:
-            Combined balance data from all protocols with USDC valuations
         """
         # Get UTC timestamp before any on-chain requests
         timestamp = datetime.now(timezone.utc).strftime("%Y-%m-%d %H:%M:%S UTC")
@@ -57,13 +53,13 @@ class BalanceAggregator:
         result = {}
         total_usdc = 0
         
-        # Get Pendle balances
+        # Get pendle balances
         try:
             pendle_balances = self.pendle_manager.get_balances(checksum_address)
             if pendle_balances:
-                formatted_pendle = format_pendle_data(pendle_balances)
-                result.update(formatted_pendle)
-                total_usdc += int(formatted_pendle["pendle"]["usdc_totals"]["total"]["wei"])
+                result.update(pendle_balances)
+                if "pendle" in pendle_balances and "usdc_totals" in pendle_balances["pendle"]:
+                    total_usdc += int(pendle_balances["pendle"]["usdc_totals"]["total"]["wei"])
                 print("✓ Pendle positions fetched successfully")
         except Exception as e:
             print(f"✗ Error fetching Pendle positions: {str(e)}")
@@ -93,20 +89,37 @@ class BalanceAggregator:
         except Exception as e:
             print(f"✗ Error fetching Sky Protocol positions: {str(e)}")
 
+        # Get Equilibria balances
+        try:
+            equilibria_balances = self.equilibria_manager.get_balances(checksum_address)
+            # Vérifier si on a une balance non-nulle avant d'ajouter au résultat
+            if (equilibria_balances and 
+                "equilibria" in equilibria_balances and 
+                "ethereum" in equilibria_balances["equilibria"] and
+                "GHO-USR" in equilibria_balances["equilibria"]["ethereum"] and
+                int(equilibria_balances["equilibria"]["ethereum"]["GHO-USR"]["amount"]) > 0):
+                
+                result.update(equilibria_balances)
+                chain_data = equilibria_balances["equilibria"]["ethereum"]
+                if "GHO-USR" in chain_data:
+                    total_usdc += int(chain_data["GHO-USR"]["usdc_totals"]["total"]["wei"])
+                print("✓ Equilibria positions fetched successfully")
+        except Exception as e:
+            print(f"✗ Error fetching Equilibria positions: {str(e)}")
+        
         # Get Tokemak balances
         try:
             tokemak_balances = self.tokemak_manager.get_balances(checksum_address)
             if tokemak_balances:
-                formatted_tokemak = format_tokemak_data(tokemak_balances)
-                result.update(formatted_tokemak)
-                if "tokemak" in formatted_tokemak:
-                    chain_data = formatted_tokemak["tokemak"]["ethereum"]
+                result.update(tokemak_balances)
+                if "tokemak" in tokemak_balances:
+                    chain_data = tokemak_balances["tokemak"]["ethereum"]
                     if "usdc_totals" in chain_data:
                         total_usdc += int(chain_data["usdc_totals"]["total"]["wei"])
                 print("✓ Tokemak positions fetched successfully")
         except Exception as e:
             print(f"✗ Error fetching Tokemak positions: {str(e)}")
-
+        
         # Get spot balances
         try:
             spot_balances = self.spot_manager.get_balances(checksum_address)
@@ -114,7 +127,16 @@ class BalanceAggregator:
                 print("✓ Spot positions fetched successfully")
         except Exception as e:
             print(f"✗ Error fetching Spot positions: {str(e)}")
-            spot_balances = {}
+            spot_balances = {
+                "spot": {
+                    "usdc_totals": {
+                        "total": {
+                            "wei": 0,
+                            "formatted": "0.000000"
+                        }
+                    }
+                }
+            }
 
         # Add global USDC total across PROTOCOLS ONLY (not including spot)
         result["usdc_totals"] = {
@@ -126,47 +148,39 @@ class BalanceAggregator:
         
         # Create a sorted list of protocols based on their USDC totals
         protocol_totals = []
-        
-        # Add Sky if exists
-        if "sky" in result and "usdc_totals" in result["sky"]:
-            protocol_totals.append(
-                ("sky", int(result["sky"]["usdc_totals"]["total"]["wei"]))
-            )
-        
-        # Add Pendle if exists
-        if "pendle" in result and "usdc_totals" in result["pendle"]:
-            protocol_totals.append(
-                ("pendle", int(result["pendle"]["usdc_totals"]["total"]["wei"]))
-            )
-        
-        # Add Tokemak if exists
-        if ("tokemak" in result and 
-            "ethereum" in result["tokemak"] and 
-            "usdc_totals" in result["tokemak"]["ethereum"]):
-            protocol_totals.append(
-                ("tokemak", int(result["tokemak"]["ethereum"]["usdc_totals"]["total"]["wei"]))
-            )
-        
-        # Add Convex if exists
-        if "convex" in result:
-            convex_total = sum(
-                int(pool_data["usdc_totals"]["total"]["wei"])
-                for chain_data in result["convex"].values()
-                for pool_data in chain_data.values()
-                if isinstance(pool_data, dict) and "usdc_totals" in pool_data
-            )
-            protocol_totals.append(("convex", convex_total))
-        
+
+        # Add each protocol with its total
+        for protocol_name, protocol_data in result.items():
+            if protocol_name != "usdc_totals":
+                if "usdc_totals" in protocol_data:
+                    # Pour les protocoles avec un total global direct (Sky, Pendle)
+                    protocol_totals.append(
+                        (protocol_name, int(protocol_data["usdc_totals"]["total"]["wei"]))
+                    )
+                elif protocol_name in ["convex", "equilibria"]:
+                    # Pour les protocoles avec des pools
+                    total = sum(
+                        int(pool_data["usdc_totals"]["total"]["wei"])
+                        for chain_data in protocol_data.values()
+                        for pool_data in chain_data.values()
+                        if isinstance(pool_data, dict) and "usdc_totals" in pool_data
+                    )
+                    protocol_totals.append((protocol_name, total))
+                elif protocol_name == "tokemak" and "ethereum" in protocol_data:
+                    # Pour Tokemak qui a une structure spécifique
+                    if "usdc_totals" in protocol_data["ethereum"]:
+                        protocol_totals.append(
+                            (protocol_name, int(protocol_data["ethereum"]["usdc_totals"]["total"]["wei"]))
+                        )
+
         # Sort protocols by USDC value in descending order
         protocol_totals.sort(key=lambda x: x[1], reverse=True)
-        
+
         # Create new ordered dictionary with sorted protocols
-        ordered_balances = {
-            protocol: result[protocol]
-            for protocol, _ in protocol_totals
-            if protocol in result  # Additional safety check
-        }
-        
+        ordered_balances = {}
+        for protocol, total in protocol_totals:
+            ordered_balances[protocol] = result[protocol]
+
         # Add the global USDC totals at the end
         ordered_balances["usdc_totals"] = result["usdc_totals"]
         
@@ -182,49 +196,108 @@ class BalanceAggregator:
 def build_overview(all_balances: Dict[str, Any]) -> Dict[str, Any]:
     """Build overview section with summary and positions"""
     
-    # Calculate summary values
-    protocols_value = Decimal(all_balances["protocols"]["usdc_totals"]["total"]["formatted"])
-    spot_value = Decimal(all_balances["spot"]["usdc_totals"]["total"]["formatted"])
-    total_value = protocols_value + spot_value
-    
-    # Get total supply from SupplyReader
-    supply_reader = SupplyReader()
-    total_supply = supply_reader.format_total_supply()
-    
-    # Calculate share price (total value / total supply)
-    total_supply_decimal = Decimal(total_supply)
-    share_price = total_value / total_supply_decimal if total_supply_decimal != 0 else Decimal('0')
-    
     # Initialize positions dictionary
     positions = {}
     
-    # Get Sky Protocol positions
-    if "sky" in all_balances["protocols"]:
-        for network, network_data in all_balances["protocols"]["sky"].items():
-            if isinstance(network_data, dict) and "sUSDS" in network_data:
-                key = f"sky.{network}.sUSDS"
-                value = network_data["sUSDS"]["value"]["USDC"]["amount"]
-                positions[key] = str(Decimal(value) / Decimal(1e6))
-    
-    # Get Pendle positions
-    if "pendle" in all_balances["protocols"]:
-        for network, network_data in all_balances["protocols"]["pendle"].items():
-            if isinstance(network_data, dict):
-                for token, token_data in network_data.items():
-                    if isinstance(token_data, dict) and "value" in token_data:
-                        key = f"pendle.{network}.{token}"
-                        value = token_data["value"]["USDC"]["amount"]
-                        positions[key] = str(Decimal(value) / Decimal(1e6))
-    
-    # Get Convex positions
-    if "convex" in all_balances["protocols"]:
-        for network, network_data in all_balances["protocols"]["convex"].items():
-            for pool_name, pool_data in network_data.items():
-                if isinstance(pool_data, dict) and "usdc_totals" in pool_data:
-                    key = f"convex.{network}.{pool_name}"
-                    value = pool_data["usdc_totals"]["total"]["wei"]
-                    positions[key] = str(Decimal(value) / Decimal(1e6))
-    
+    # Process each protocol's positions
+    for protocol_name, protocol_data in all_balances["protocols"].items():
+        if protocol_name == "usdc_totals":
+            continue
+            
+        for network, network_data in protocol_data.items():
+            if network == "usdc_totals":
+                continue
+                
+            # Pour Sky
+            if protocol_name == "sky":
+                for token_name, token_data in network_data.items():
+                    if token_name != "usdc_totals" and isinstance(token_data, dict):
+                        key = f"{protocol_name}.{network}.{token_name}"
+                        value = f"{Decimal(token_data['value']['USDC']['amount']) / Decimal(1e6):.6f}"
+                        positions[key] = value
+            
+            # Pour Pendle
+            elif protocol_name == "pendle":
+                for token_name, token_data in network_data.items():
+                    if token_name != "usdc_totals" and isinstance(token_data, dict):
+                        key = f"{protocol_name}.{network}.{token_name}"
+                        value = f"{Decimal(token_data['value']['USDC']['amount']) / Decimal(1e6):.6f}"
+                        positions[key] = value
+            
+            # Pour Convex
+            elif protocol_name == "convex":
+                for pool_name, pool_data in network_data.items():
+                    if pool_name != "usdc_totals" and isinstance(pool_data, dict):
+                        pool_total = Decimal('0')
+                        
+                        # Traiter les LP tokens
+                        if "lp_tokens" in pool_data:
+                            for token_name, token_data in pool_data["lp_tokens"].items():
+                                amount = Decimal(token_data["amount"])
+                                decimals = Decimal(10 ** token_data["decimals"])
+                                pool_total += amount / decimals
+                        
+                        # Traiter les rewards
+                        if "rewards" in pool_data:
+                            for token_name, token_data in pool_data["rewards"].items():
+                                amount = Decimal(token_data["amount"])
+                                decimals = Decimal(10 ** token_data["decimals"])
+                                pool_total += amount / decimals
+                        
+                        # Ajouter l'entrée si le pool a une valeur
+                        if pool_total > 0:
+                            key = f"{protocol_name}.{network}.{pool_name}"
+                            value = str(pool_total)
+                            positions[key] = value
+
+            # Pour Equilibria
+            elif protocol_name == "equilibria":
+                for pool_name, pool_data in network_data.items():
+                    if pool_name != "usdc_totals" and isinstance(pool_data, dict):
+                        pool_total = 0
+                        
+                        # Ajouter la valeur principale du pool
+                        if "value" in pool_data and "USDC" in pool_data["value"]:
+                            pool_total += int(pool_data["value"]["USDC"]["amount"])
+                        
+                        # Ajouter les valeurs des rewards
+                        if "rewards" in pool_data:
+                            for token_name, token_data in pool_data["rewards"].items():
+                                if isinstance(token_data, dict) and "value" in token_data and "USDC" in token_data["value"]:
+                                    pool_total += int(token_data["value"]["USDC"]["amount"])
+                        
+                        # Ajouter l'entrée si le pool a une valeur
+                        if pool_total > 0:
+                            key = f"{protocol_name}.{network}.{pool_name}"
+                            value = str(Decimal(pool_total) / Decimal(1e6))
+                            positions[key] = value
+
+            # Pour Tokemak
+            elif protocol_name == "tokemak":
+                # On garde une trace des pools pour éviter les doublons
+                pool_totals = {}
+                
+                for pool_name, pool_data in network_data.items():
+                    if pool_name != "usdc_totals" and isinstance(pool_data, dict):
+                        # Si c'est un pool principal (pas TOKE)
+                        if pool_name != "TOKE":
+                            pool_total = 0
+                            
+                            # Ajouter les valeurs des LP tokens
+                            if "value" in pool_data and "USDC" in pool_data["value"]:
+                                pool_total += int(pool_data["value"]["USDC"]["amount"])
+                            
+                            # Ajouter les valeurs de TOKE associées
+                            if "toke" in pool_data and isinstance(pool_data["toke"], dict):
+                                if "value" in pool_data["toke"] and "USDC" in pool_data["toke"]["value"]:
+                                    pool_total += int(pool_data["toke"]["value"]["USDC"]["amount"])
+                            
+                            # Ajouter l'entrée si le pool a une valeur
+                            if pool_total > 0:
+                                key = f"{protocol_name}.{network}.{pool_name}"
+                                value = str(Decimal(pool_total) / Decimal(1e6))
+                                positions[key] = value
+
     # Sort positions by value in descending order
     sorted_positions = dict(sorted(
         positions.items(),
@@ -232,30 +305,42 @@ def build_overview(all_balances: Dict[str, Any]) -> Dict[str, Any]:
         reverse=True
     ))
     
+    # Calculate protocols_value from positions
+    protocols_value = sum(Decimal(value) for value in sorted_positions.values())
+    
+    # Calculate other values
+    spot_value = Decimal(all_balances["spot"]["usdc_totals"]["total"]["formatted"])
+    total_value = protocols_value + spot_value
+    
+    # Get total supply from SupplyReader
+    supply_reader = SupplyReader()
+    total_supply = supply_reader.format_total_supply()
+    
+    # Calculate share price
+    total_supply_decimal = Decimal(total_supply)
+    share_price = total_value / total_supply_decimal if total_supply_decimal != 0 else Decimal('0')
+    
     return {
-        "timestamp": datetime.now(timezone.utc).strftime("%Y-%m-%d %H:%M:%S UTC"),
         "nav": {
-            "usdc": str(total_value),
-            "share_price": str(share_price),
+            "usdc": f"{total_value:.6f}",
+            "share_price": f"{share_price:.6f}",
             "total_supply": total_supply
         },
         "overview": {
             "summary": {
-                "total_value_usdc": str(total_value),
-                "protocols_value_usdc": str(protocols_value),
-                "spot_value_usdc": str(spot_value)
+                "total_value_usdc": f"{total_value:.6f}",
+                "protocols_value_usdc": f"{protocols_value:.6f}",
+                "spot_value_usdc": f"{spot_value:.6f}"
             },
-            "positions": sorted_positions
+            "positions": {k: f"{Decimal(v):.6f}" for k, v in sorted_positions.items()}
         }
     }
 
 def main():
-    """
-    CLI utility for testing balance aggregation.
-    Accepts address as argument or uses DEFAULT_USER_ADDRESS from environment.
-    """
+    """CLI utility for testing balance aggregation."""
     from dotenv import load_dotenv
     import os
+    from datetime import datetime, timezone
     
     # Load environment variables
     load_dotenv()
@@ -271,52 +356,18 @@ def main():
     aggregator = BalanceAggregator()
     all_balances = aggregator.get_all_balances(test_address)
     
-    # Create a sorted list of protocols based on their USDC totals
-    protocol_totals = []
-    
-    # Add protocols only if they exist
-    if "sky" in all_balances["protocols"]:
-        protocol_totals.append(
-            ("sky", int(all_balances["protocols"]["sky"]["usdc_totals"]["total"]["wei"]))
-        )
-    
-    if "pendle" in all_balances["protocols"]:
-        protocol_totals.append(
-            ("pendle", int(all_balances["protocols"]["pendle"]["usdc_totals"]["total"]["wei"]))
-        )
-    
-    if ("tokemak" in all_balances["protocols"] and 
-        "ethereum" in all_balances["protocols"]["tokemak"] and 
-        "usdc_totals" in all_balances["protocols"]["tokemak"]["ethereum"]):
-        protocol_totals.append(
-            ("tokemak", int(all_balances["protocols"]["tokemak"]["ethereum"]["usdc_totals"]["total"]["wei"]))
-        )
-    
-    if "convex" in all_balances["protocols"]:
-        convex_total = sum(int(pool_data["usdc_totals"]["total"]["wei"]) 
-                          for chain_data in all_balances["protocols"]["convex"].values() 
-                          for pool_data in chain_data.values() 
-                          if isinstance(pool_data, dict) and "usdc_totals" in pool_data)
-        protocol_totals.append(("convex", convex_total))
-    
-    # Sort protocols by USDC value in descending order
-    protocol_totals.sort(key=lambda x: x[1], reverse=True)
-    
-    # Create new ordered dictionary with sorted protocols
-    ordered_balances = {
-        protocol: all_balances["protocols"][protocol]
-        for protocol, _ in protocol_totals
-    }
-    
-    # Add the global USDC totals at the end
-    ordered_balances["usdc_totals"] = all_balances["protocols"]["usdc_totals"]
-    
     # Build the final result with overview, protocols and spot sections
     overview = build_overview(all_balances)
+    
+    # Format created_at to match timestamp format
+    created_at = datetime.now(timezone.utc).strftime("%Y-%m-%d %H:%M:%S UTC")
+    
     final_result = {
         **overview,  # Add overview at the top
-        "protocols": ordered_balances,
-        "spot": all_balances["spot"]
+        "protocols": all_balances["protocols"],
+        "spot": all_balances["spot"],
+        "address": test_address,
+        "created_at": created_at
     }
     
     # Display final result
