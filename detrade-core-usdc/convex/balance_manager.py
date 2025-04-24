@@ -49,18 +49,16 @@ class ConvexBalanceManager:
         print("CONVEX BALANCE MANAGER")
         print("="*80)
         
-        print("\nDebug get_balances:")
-        print(f"Processing address: {address}")
-        checksum_address = Web3.to_checksum_address(address)
-        print(f"Checksum address: {checksum_address}")
-        
         # Check if user has a dedicated vault
+        checksum_address = Web3.to_checksum_address(address)
         staking_contract = self.DEDICATED_VAULTS.get(checksum_address)
-        print(f"Staking contract for {checksum_address}: {staking_contract}")
         
         if not staking_contract:
             print("No staking contract found")
             return {"convex": {}}
+        
+        print("\nProcessing network: ethereum")
+        print("\nProcessing position: USDCfxUSD")
         
         # Combine user's staking contract with common pool info
         vault_info = {
@@ -68,11 +66,13 @@ class ConvexBalanceManager:
             "name": "USDCfxUSD",
             **self.POOL_INFO
         }
-        print(f"Vault info: {json.dumps(vault_info, indent=2)}")
+        print(f"\nContract information:")
+        print("  staking_contract: " + staking_contract + " (StakingProxyERC20)")
+        print("  gauge: " + self.POOL_INFO['gauge'] + " (SharedLiquidityGauge)")
+        print("  pool: " + self.POOL_INFO['pool'] + " (CurveStableSwapNG)")
         
         # Initialize contracts
         self.init_contracts(vault_info)
-        print("Contracts initialized")
         
         # Get financial data
         result = self._get_financial_data(vault_info)
@@ -127,21 +127,21 @@ class ConvexBalanceManager:
 
     def _calculate_usdc_totals(self, lp_tokens: Dict, rewards: Dict) -> Dict[str, int]:
         """
-        Calcule les totaux USDC pour les LP tokens et les rewards
+        Calculate USDC totals for LP tokens and rewards
         """
-        # Total USDC des LP tokens
+        # USDC total from LP tokens
         lp_total = 0
         for token_data in lp_tokens.values():
             if "value" in token_data and "USDC" in token_data["value"]:
                 lp_total += token_data["value"]["USDC"]["amount"]
         
-        # Total USDC des rewards
+        # USDC total from rewards
         rewards_total = 0
         for reward_data in rewards.values():
             if "value" in reward_data and "USDC" in reward_data["value"]:
                 rewards_total += reward_data["value"]["USDC"]["amount"]
         
-        # Total combiné
+        # Combined total
         total = lp_total + rewards_total
         
         return {
@@ -164,9 +164,10 @@ class ConvexBalanceManager:
         Fetches and calculates complete position data for user's dedicated vault
         """
         try:
-            print("\n[Convex] Fetching position data...")
-            
             # Get LP token position size
+            print("\nQuerying Curve pool for deposited LP tokens:")
+            print(f"  Contract: {self.POOL_INFO['pool']} (CurveStableSwapNG)")
+            print("  Function: balanceOf(address) - Returns amount of USDC/fxUSD LP tokens deposited in staking contract")
             contract_lp_balance = self.gauge_contract.functions.balanceOf(
                 vault_info['staking_contract']
             ).call()
@@ -179,33 +180,61 @@ class ConvexBalanceManager:
             print(f"Formatted amount: {(Decimal(contract_lp_balance) / Decimal(10**18)):.6f} LP")
             
             # Calculate share of pool
-            total_supply = self.gauge_contract.functions.totalSupply().call()
+            print("\nQuerying Curve pool contract for total supply:")
+            print(f"  Contract: {self.POOL_INFO['pool']}")
+            print("  Function: totalSupply() - Returns total USDC/fxUSD LP tokens in Curve pool")
+            total_supply = self.curve_pool.functions.totalSupply().call()
             ratio = contract_lp_balance / total_supply if total_supply > 0 else 0
+            print(f"\n[Convex] Calculating pool share:")
+            print(f"  User LP balance: {contract_lp_balance}")
+            print(f"  Total LP supply: {total_supply}")
+            print(f"  Share ratio: {ratio:.6%}")
 
             # Process underlying tokens
-            print("[Convex] Processing underlying tokens...")
+            print("\n[Convex] Processing underlying tokens...")
+            print("\nQuerying Curve pool contract:")
+            print(f"  Contract: {self.POOL_INFO['pool']}")
+            print("  Function: N_COINS() - Returns number of tokens in pool")
             n_coins = self.curve_pool.functions.N_COINS().call()
+            print(f"Number of tokens in pool: {n_coins}")
             lp_balances = {}
             
             for i in range(n_coins):
+                print(f"\nQuerying token information for index {i}:")
+                print("  Function: coins(uint256) - Returns token address")
                 coin_address = self.curve_pool.functions.coins(i).call()
+                if coin_address == "0xA0b86991c6218b36c1d19D4a2e9Eb0cE3606eB48":
+                    print(f"  Token address: {coin_address} (USDC)")
+                elif coin_address == "0x085780639CC2cACd35E474e71f4d000e2405d8f6":
+                    print(f"  Token address: {coin_address} (fxUSD)")
+                
+                print("  Function: balances(uint256) - Returns token balance in pool")
                 pool_balance = self.curve_pool.functions.balances(i).call()
                 
                 token_contract = self.w3.eth.contract(
                     address=coin_address, 
                     abi=self.curve_abi
                 )
+                print("  Querying token contract:")
+                print("    Function: symbol() - Returns token symbol")
                 symbol = token_contract.functions.symbol().call()
+                print("    Function: decimals() - Returns token decimals")
                 decimals = token_contract.functions.decimals().call()
+                
+                print(f"\nProcessing {symbol}:")
+                print(f"  Total in pool: {pool_balance / 10**decimals:.6f} {symbol}")
+                
                 balance = int(pool_balance * ratio)
+                formatted_balance = balance / 10**decimals
+                print(f"  User share: {formatted_balance:.6f} {symbol} ({balance} wei)")
                 
                 token_data = {
                     "amount": balance,
                     "decimals": decimals
                 }
 
-                # Pour USDC, ajoutons la valeur avec une explication
                 if symbol == "USDC":
+                    print("  Converting USDC: Direct 1:1 conversion")
                     token_data["value"] = {
                         "USDC": {
                             "amount": balance,
@@ -220,11 +249,14 @@ class ConvexBalanceManager:
                             }
                         }
                     }
-                else:  # Pour fxUSD et autres tokens non-USDC
+                else:
+                    print(f"  Converting {symbol}: Using CoWSwap for price discovery")
                     quote_result = self.get_quote_with_fallback(
                         coin_address, balance, decimals, symbol
                     )
                     if quote_result:
+                        usdc_value = quote_result["amount"] / 10**6
+                        print(f"  → {usdc_value:.6f} USDC")
                         token_data["value"] = {
                             "USDC": quote_result
                         }
@@ -232,14 +264,35 @@ class ConvexBalanceManager:
                 lp_balances[symbol] = token_data
 
             # Process reward tokens
-            print("[Convex] Processing reward tokens...")
+            print("\n[Convex] Processing reward tokens...")
+            print("\nQuerying staking contract for earned rewards:")
+            print(f"  Contract: {vault_info['staking_contract']}")
+            print("  Function: earned() - Returns two arrays:")
+            print("    - Array of reward token addresses")
+            print("    - Array of unclaimed amounts for each token")
             earned_result = self.staking_contract.functions.earned().call()
+            
+            print("\nUnclaimed rewards:")
             rewards = {}
             
+            # First display all rewards
             for addr, amount in zip(earned_result[0], earned_result[1]):
-                if amount == 0:
-                    continue
-                    
+                token_contract = self.w3.eth.contract(
+                    address=addr, 
+                    abi=self.curve_abi
+                )
+                symbol = token_contract.functions.symbol().call()
+                decimals = token_contract.functions.decimals().call()
+                formatted_amount = amount / 10**decimals
+                
+                print(f"  • {symbol}:")
+                print(f"    Address: {addr}")
+                print(f"    Amount: {formatted_amount:.6f} ({amount} wei)")
+                print(f"    Decimals: {decimals}")
+            
+            print("\nConverting rewards to USDC:")
+            # Then do the conversions
+            for addr, amount in zip(earned_result[0], earned_result[1]):
                 token_contract = self.w3.eth.contract(
                     address=addr, 
                     abi=self.curve_abi
@@ -252,18 +305,21 @@ class ConvexBalanceManager:
                     "decimals": decimals
                 }
 
-                # Get USDC value for reward tokens
-                quote_result = self.get_quote_with_fallback(
-                    addr, amount, decimals, symbol
-                )
-                if quote_result:
-                    reward_data["value"] = {
-                        "USDC": quote_result
-                    }
+                if amount > 0:
+                    print(f"\nConverting {symbol} rewards to USDC:")
+                    quote_result = self.get_quote_with_fallback(
+                        addr, amount, decimals, symbol
+                    )
+                    if quote_result:
+                        usdc_value = quote_result["amount"] / 10**6
+                        print(f"  → {usdc_value:.6f} USDC")
+                        reward_data["value"] = {
+                            "USDC": quote_result
+                        }
                 
                 rewards[symbol] = reward_data
 
-            # Calculer les totaux
+            # Calculate totals
             usdc_totals = self._calculate_usdc_totals(lp_balances, rewards)
             total_usdc_value = int(usdc_totals["total"]["wei"])
 
@@ -314,17 +370,17 @@ if __name__ == "__main__":
     from dotenv import load_dotenv
     import os
     
-    # Charger les variables d'environnement
+    # Load environment variables
     load_dotenv()
     DEFAULT_USER_ADDRESS = Web3.to_checksum_address(os.getenv('DEFAULT_USER_ADDRESS'))
     
-    # Créer une instance du manager
+    # Create manager instance
     manager = ConvexBalanceManager()
     
-    # Récupérer les balances
+    # Get balances
     balances = manager.get_balances(DEFAULT_USER_ADDRESS)
     
-    # Afficher le résultat final
+    # Display final result
     print("\n" + "="*80)
     print("FINAL RESULT:")
     print("="*80 + "\n")

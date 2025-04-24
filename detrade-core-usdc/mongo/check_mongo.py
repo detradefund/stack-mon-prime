@@ -12,7 +12,7 @@ def check_mongodb():
     try:
         # Get MongoDB configuration
         mongo_uri = os.getenv('MONGO_URI')
-        database_name = os.getenv('DATABASE_NAME_1')
+        database_name = os.getenv('DATABASE_NAME')
         collection_name = os.getenv('COLLECTION_NAME')
         
         print("\nConnecting to MongoDB...")

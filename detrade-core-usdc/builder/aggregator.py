@@ -15,7 +15,7 @@ from convex.balance_manager import ConvexBalanceManager
 from sky.balance_manager import BalanceManager as SkyBalanceManager
 from tokemak.balance_manager import BalanceManager as TokemakBalanceManager
 from spot.balance_manager import SpotBalanceManager
-from dtusdc.supply_reader import SupplyReader
+from shares.supply_reader import SupplyReader
 from equilibria.balance_manager import BalanceManager as EquilibriaBalanceManager
 
 class BalanceAggregator:
@@ -92,7 +92,7 @@ class BalanceAggregator:
         # Get Equilibria balances
         try:
             equilibria_balances = self.equilibria_manager.get_balances(checksum_address)
-            # Vérifier si on a une balance non-nulle avant d'ajouter au résultat
+            # Check if we have a non-zero balance before adding to result
             if (equilibria_balances and 
                 "equilibria" in equilibria_balances and 
                 "ethereum" in equilibria_balances["equilibria"] and
@@ -208,7 +208,7 @@ def build_overview(all_balances: Dict[str, Any]) -> Dict[str, Any]:
             if network == "usdc_totals":
                 continue
                 
-            # Pour Sky
+            # For Sky
             if protocol_name == "sky":
                 for token_name, token_data in network_data.items():
                     if token_name != "usdc_totals" and isinstance(token_data, dict):
@@ -216,7 +216,7 @@ def build_overview(all_balances: Dict[str, Any]) -> Dict[str, Any]:
                         value = f"{Decimal(token_data['value']['USDC']['amount']) / Decimal(1e6):.6f}"
                         positions[key] = value
             
-            # Pour Pendle
+            # For Pendle
             elif protocol_name == "pendle":
                 for token_name, token_data in network_data.items():
                     if token_name != "usdc_totals" and isinstance(token_data, dict):
@@ -224,78 +224,75 @@ def build_overview(all_balances: Dict[str, Any]) -> Dict[str, Any]:
                         value = f"{Decimal(token_data['value']['USDC']['amount']) / Decimal(1e6):.6f}"
                         positions[key] = value
             
-            # Pour Convex
+            # For Convex
             elif protocol_name == "convex":
                 for pool_name, pool_data in network_data.items():
                     if pool_name != "usdc_totals" and isinstance(pool_data, dict):
+                        # Calculate total by adding USDC values of LP tokens and rewards
                         pool_total = Decimal('0')
                         
-                        # Traiter les LP tokens
+                        # Add USDC values of LP tokens
                         if "lp_tokens" in pool_data:
-                            for token_name, token_data in pool_data["lp_tokens"].items():
-                                amount = Decimal(token_data["amount"])
-                                decimals = Decimal(10 ** token_data["decimals"])
-                                pool_total += amount / decimals
+                            for token_data in pool_data["lp_tokens"].values():
+                                if "value" in token_data and "USDC" in token_data["value"]:
+                                    pool_total += Decimal(token_data["value"]["USDC"]["amount"]) / Decimal(1e6)
                         
-                        # Traiter les rewards
+                        # Add USDC values of rewards
                         if "rewards" in pool_data:
-                            for token_name, token_data in pool_data["rewards"].items():
-                                amount = Decimal(token_data["amount"])
-                                decimals = Decimal(10 ** token_data["decimals"])
-                                pool_total += amount / decimals
+                            for token_data in pool_data["rewards"].values():
+                                if "value" in token_data and "USDC" in token_data["value"]:
+                                    pool_total += Decimal(token_data["value"]["USDC"]["amount"]) / Decimal(1e6)
                         
-                        # Ajouter l'entrée si le pool a une valeur
+                        # Add entry if pool has value
                         if pool_total > 0:
                             key = f"{protocol_name}.{network}.{pool_name}"
-                            value = str(pool_total)
+                            value = f"{pool_total:.6f}"
                             positions[key] = value
 
-            # Pour Equilibria
+            # For Equilibria
             elif protocol_name == "equilibria":
                 for pool_name, pool_data in network_data.items():
                     if pool_name != "usdc_totals" and isinstance(pool_data, dict):
                         pool_total = 0
                         
-                        # Ajouter la valeur principale du pool
+                        # Add main pool value
                         if "value" in pool_data and "USDC" in pool_data["value"]:
                             pool_total += int(pool_data["value"]["USDC"]["amount"])
                         
-                        # Ajouter les valeurs des rewards
+                        # Add reward values
                         if "rewards" in pool_data:
                             for token_name, token_data in pool_data["rewards"].items():
                                 if isinstance(token_data, dict) and "value" in token_data and "USDC" in token_data["value"]:
                                     pool_total += int(token_data["value"]["USDC"]["amount"])
                         
-                        # Ajouter l'entrée si le pool a une valeur
+                        # Add entry if pool has value
                         if pool_total > 0:
                             key = f"{protocol_name}.{network}.{pool_name}"
                             value = str(Decimal(pool_total) / Decimal(1e6))
                             positions[key] = value
 
-            # Pour Tokemak
+            # For Tokemak
             elif protocol_name == "tokemak":
-                # On garde une trace des pools pour éviter les doublons
-                pool_totals = {}
-                
                 for pool_name, pool_data in network_data.items():
                     if pool_name != "usdc_totals" and isinstance(pool_data, dict):
-                        # Si c'est un pool principal (pas TOKE)
-                        if pool_name != "TOKE":
-                            pool_total = 0
+                        # If it's a main pool (not rewards)
+                        if pool_name != "rewards":
+                            pool_total = Decimal('0')
                             
-                            # Ajouter les valeurs des LP tokens
+                            # Add main USDC value of the pool
                             if "value" in pool_data and "USDC" in pool_data["value"]:
-                                pool_total += int(pool_data["value"]["USDC"]["amount"])
+                                pool_total += Decimal(pool_data["value"]["USDC"]["amount"]) / Decimal(1e6)
                             
-                            # Ajouter les valeurs de TOKE associées
-                            if "toke" in pool_data and isinstance(pool_data["toke"], dict):
-                                if "value" in pool_data["toke"] and "USDC" in pool_data["toke"]["value"]:
-                                    pool_total += int(pool_data["toke"]["value"]["USDC"]["amount"])
+                            # Add rewards at network level
+                            if "rewards" in network_data:
+                                for reward_name, reward_data in network_data["rewards"].items():
+                                    if "value" in reward_data and "USDC" in reward_data["value"]:
+                                        pool_total += Decimal(reward_data["value"]["USDC"]["amount"]) / Decimal(1e6)
                             
-                            # Ajouter l'entrée si le pool a une valeur
+                            # Add entry if pool has value
                             if pool_total > 0:
                                 key = f"{protocol_name}.{network}.{pool_name}"
-                                value = str(Decimal(pool_total) / Decimal(1e6))
+                                value = f"{pool_total:.6f}"
                                 positions[key] = value
 
     # Sort positions by value in descending order

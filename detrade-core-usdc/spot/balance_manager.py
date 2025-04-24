@@ -10,10 +10,9 @@ root_path = str(Path(__file__).parent.parent)
 sys.path.append(root_path)
 
 from config.networks import NETWORK_TOKENS, RPC_URLS
-from config.base_client import BaseProtocolClient
 from cowswap.cow_client import get_quote
 
-class SpotBalanceManager(BaseProtocolClient):
+class SpotBalanceManager:
     """Manages spot token balances across networks"""
     
     def __init__(self):
@@ -45,7 +44,7 @@ class SpotBalanceManager(BaseProtocolClient):
         for network, w3 in self.connections.items():
             # Get all spot tokens (those without 'protocol' key)
             spot_tokens = {
-                symbol: token_data  # On garde la casse originale
+                symbol: token_data  # Keep original case
                 for symbol, token_data in NETWORK_TOKENS[network].items()
                 if "protocol" not in token_data
             }
@@ -106,16 +105,15 @@ class SpotBalanceManager(BaseProtocolClient):
             return "0"
 
     def get_balances(self, address: str) -> Dict[str, Any]:
-        """Get spot token balances across all networks"""
         print("\n" + "="*80)
         print("SPOT BALANCE MANAGER")
         print("="*80)
         
-        print("\nDebug get_balances:")
-        print(f"Processing address: {address}")
-        checksum_address = Web3.to_checksum_address(address)
-        print(f"Checksum address: {checksum_address}")
+        print("\nProcessing method:")
+        print("  - Querying balanceOf(address) for each token")
+        print("  - Converting non-USDC tokens to USDC via CoWSwap")
         
+        checksum_address = Web3.to_checksum_address(address)
         result = {
             "usdc_totals": {
                 "total": {
@@ -144,16 +142,12 @@ class SpotBalanceManager(BaseProtocolClient):
                     contract = network_contracts[network]
                     balance = contract.functions.balanceOf(checksum_address).call()
                     
-                    # Get token symbol from network configuration
-                    token_symbol = token_type  # token_type est déjà la clé de NETWORK_TOKENS
-                    
-                    # Format balance
+                    token_symbol = token_type
                     decimals = NETWORK_TOKENS[network][token_symbol]["decimals"]
                     balance_normalized = Decimal(balance) / Decimal(10**decimals)
                     
                     print(f"\nProcessing token: {token_symbol}")
-                    print(f"Amount: {balance} (decimals: {decimals})")
-                    print(f"Formatted amount: {balance_normalized:.6f} {token_symbol}")
+                    print(f"  Amount: {balance_normalized:.6f} {token_symbol}")
                     
                     if balance > 0:
                         network_has_balance = True
@@ -180,10 +174,10 @@ class SpotBalanceManager(BaseProtocolClient):
                 print(f"\nNetwork {network} processing complete")
                 # Only add network to result if it has balances
                 if network_has_balance:
-                    # Sauvegarder les totaux actuels
+                    # Save current totals
                     current_totals = result["usdc_totals"]
                     
-                    # Ajouter le réseau
+                    # Add network
                     result[network] = network_balances
                     result[network]["usdc_totals"] = {
                         "total": {
@@ -192,10 +186,10 @@ class SpotBalanceManager(BaseProtocolClient):
                         }
                     }
                     
-                    # Restaurer les totaux
+                    # Restore totals
                     result["usdc_totals"] = current_totals
             
-            # Trier les tokens par valeur USDC pour chaque réseau
+            # Sort tokens by USDC value for each network
             for network in self.get_supported_networks():
                 if network in result:
                     tokens = [(k, v) for k, v in result[network].items() if k != "usdc_totals"]
@@ -206,15 +200,15 @@ class SpotBalanceManager(BaseProtocolClient):
                     )
                     result[network].update(dict(sorted_tokens))
             
-            # Calculer le total global à la fin
+            # Calculate global total at the end
             total_usdc_wei = sum(
                 network_data["usdc_totals"]["total"]["wei"]
                 for network_data in result.values()
                 if isinstance(network_data, dict) and "usdc_totals" in network_data
-                and network_data != result["usdc_totals"]  # Exclure le total global
+                and network_data != result["usdc_totals"]  # Exclude global total
             )
 
-            # Mettre à jour le total global
+            # Update global total
             result["usdc_totals"] = {
                 "total": {
                     "wei": total_usdc_wei,
@@ -222,10 +216,10 @@ class SpotBalanceManager(BaseProtocolClient):
                 }
             }
 
-            # Afficher le résumé
+            # Display summary
             print("\n[Spot] Calculation complete")
             
-            # Afficher les positions par réseau et token
+            # Display positions by network and token
             for network in result:
                 if network != "usdc_totals":
                     for token_symbol, token_data in result[network].items():
@@ -234,7 +228,7 @@ class SpotBalanceManager(BaseProtocolClient):
                             if amount > 0:
                                 print(f"spot.{network}.{token_symbol}: {amount/1e6:.6f} USDC")
 
-            # Déplacer usdc_totals à la fin
+            # Move usdc_totals to the end
             final_result = {}
             for network in result:
                 if network != "usdc_totals":
@@ -293,7 +287,7 @@ class SpotBalanceManager(BaseProtocolClient):
                 "CRV": {
                     "ethereum": NETWORK_TOKENS["ethereum"]["CRV"]
                 },
-                "PENDLE": {  # Ajout du token PENDLE
+                "PENDLE": {  # Add PENDLE token
                     "ethereum": NETWORK_TOKENS["ethereum"]["PENDLE"]
                 }
             }

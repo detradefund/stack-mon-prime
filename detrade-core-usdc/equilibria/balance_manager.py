@@ -8,6 +8,7 @@ import time
 from decimal import Decimal
 import json
 from typing import Dict, Any
+from datetime import datetime
 
 # Load environment variables
 load_dotenv()
@@ -97,6 +98,8 @@ class BalanceManager:
         # Get pool info using pid
         self.pool_info = self.get_pool_info(self.pool_id)
 
+        self.current_timestamp = int(datetime.now().timestamp())
+
     def get_pool_id(self):
         """
         Get the pool ID from the BaseRewardPoolV2 contract
@@ -145,12 +148,54 @@ class BalanceManager:
             print(f"Error while fetching balance: {e}")
             return 0
 
+    def is_pt_expired(self, token_data: Dict) -> bool:
+        """
+        Check if a PT token is expired
+        """
+        expiry = token_data.get('expiry')
+        if not expiry:
+            return False
+        return self.current_timestamp > expiry
+
     def get_remove_liquidity_data(self, balance_wei):
         """
         Get remove liquidity data from Pendle API including amount out and price impact
         Returns a tuple of (amount_out, price_impact)
         """
         try:
+            # Check if token is expired
+            token_data = NETWORK_TOKENS['ethereum'].get('GHO-USR')
+            if token_data and token_data.get('protocol') == 'pendle' and self.is_pt_expired(token_data):
+                print(f"\nToken {token_data['symbol']} is expired (matured)")
+                
+                # Identify underlying token from config
+                underlying_token = next(iter(token_data['underlying'].values()))
+                print(f"Converting directly to underlying {underlying_token['symbol']} token (1:1)")
+                
+                # Direct conversion to underlying token (1:1)
+                underlying_amount = balance_wei  # same amount due to same decimals
+                
+                # Convert underlying token to USDC via CoWSwap
+                print(f"\nConverting {underlying_token['symbol']} to USDC via CoWSwap:")
+                result = get_quote(
+                    network="ethereum",
+                    sell_token=underlying_token['address'],
+                    buy_token=USDC_ADDRESS,
+                    amount=str(underlying_amount),
+                    token_decimals=underlying_token['decimals'],
+                    token_symbol=underlying_token['symbol']
+                )
+                
+                if result["quote"]:
+                    usdc_amount = int(result["quote"]["quote"]["buyAmount"])
+                    price_impact = float(result["conversion_details"].get("price_impact", "0"))
+                    if isinstance(price_impact, str) and price_impact == "N/A":
+                        price_impact = 0
+                    return usdc_amount, price_impact/100
+                
+                raise Exception(f"Failed to convert {underlying_token['symbol']} to USDC")
+
+            # If not expired, use existing code for Pendle API
             url = f"{PENDLE_API_BASE}/{MARKET_ADDRESS}/remove-liquidity"
             params = {
                 "receiver": DEFAULT_USER_ADDRESS,
@@ -164,7 +209,7 @@ class BalanceManager:
             response.raise_for_status()
             
             data = response.json()['data']
-            amount_out = int(data['amountOut'])  # Raw amount in USDC wei
+            amount_out = int(data['amountOut'])
             price_impact = float(data['priceImpact'])
             
             return amount_out, price_impact
@@ -264,7 +309,7 @@ class BalanceManager:
             buy_amount = int(result["quote"]["quote"]["buyAmount"])
             price_impact_str = result["conversion_details"].get("price_impact", "0")
             
-            # Gérer le cas où price_impact est "N/A" (cas du fallback)
+            # Handle case where price_impact is "N/A" (fallback case)
             if price_impact_str == "N/A":
                 price_impact = 0
             else:
@@ -275,138 +320,148 @@ class BalanceManager:
         return 0, 0, False, {}
 
     def get_balances(self, address: str) -> Dict[str, Any]:
-        """
-        Get all balances for a given address
-        """
-        if address is None:
-            if not DEFAULT_USER_ADDRESS:
-                raise ValueError("DEFAULT_USER_ADDRESS not configured in .env file")
-            address = DEFAULT_USER_ADDRESS
-
         print("\n" + "="*80)
         print("EQUILIBRIA BALANCE MANAGER")
         print("="*80)
-
-        print("\nDebug get_balances:")
-        print(f"Processing address: {address}")
-        print(f"Checksum address: {Web3.to_checksum_address(address)}")
-
-        result = {"equilibria": {}}
-        total_usdc_wei = 0
-
+        
         print("\nProcessing network: ethereum")
-        print("\nProcessing token: GHO-USR LP")
         
-        # Afficher vault info avec une meilleure structure
-        print("\nVault info:")
-        print("  staking_contract: " + BASE_REWARD_POOL_ADDRESS)
-        print("  name: GHO-USR")
-        print("  market: " + MARKET_ADDRESS)
-        print("  booster: " + PENDLE_BOOSTER_ADDRESS)
-
-        balance_wei = self.get_staked_balance(address)
-        print(f"\nAmount: {balance_wei} (decimals: 18)")
-        print(f"Formatted amount: {balance_wei / 1e18:.6f} GHO-USR LP")
-
-        print("\nAttempting to get quote for GHO-USR LP:")
-        print("[Attempt 1/1] Requesting Pendle SDK quote...")
+        checksum_address = Web3.to_checksum_address(address)
+        result = {"equilibria": {}}  # Initialize with complete structure
         
-        amount_out, price_impact = self.get_remove_liquidity_data(balance_wei)
-        rate, rate_impact = self.get_lp_token_rate()
+        try:
+            # Get LP token position
+            print(f"\nProcessing position: GHO-USR LP")
+            
+            # Contract information
+            print("\nContract information:")
+            print(f"  staking_contract: {self.pool_info['rewardPool']} (BaseRewardPoolV2)")
+            print(f"  market: {self.pool_info['market']} (PendleMarket)")
+            print(f"  booster: {self.pool_info['rewardPool']} (EquilibriaBooster)")
+            
+            # Get staked LP token balance
+            print("\nQuerying staked LP token balance:")
+            print(f"  Contract: {self.pool_info['rewardPool']} (BaseRewardPoolV2)")
+            print("  Function: balanceOf(address) - Returns user's staked LP token balance")
+            balance = self.get_staked_balance(address)
+            
+            if balance == 0:
+                print("No staked LP balance found")
+                return {"equilibria": {}}
+            
+            print(f"  Amount: {balance} (decimals: 18)")
+            print(f"  Formatted: {(Decimal(balance) / Decimal(10**18)):.6f} GHO-USR LP")
+            
+            # Convert LP tokens to USDC
+            print("\nConverting LP tokens to USDC:")
+            print("  Method: Calling Pendle SDK remove-liquidity endpoint")
+            print(f"  Market: {self.pool_info['market']}")
+            usdc_amount, price_impact = self.get_remove_liquidity_data(balance)
+            formatted_usdc = Decimal(usdc_amount) / Decimal(10**6)
+            print("✓ Conversion successful:")
+            print(f"  - USDC value: {formatted_usdc:.6f}")
+            print(f"  - Price impact: {price_impact:.4f}%")
+            
+            # Get reward token balance
+            print("\nQuerying reward token (PENDLE):")
+            print(f"  Contract: {self.pool_info['rewardPool']} (BaseRewardPoolV2)")
+            print("  Function: earned(address, token) - Returns pending PENDLE rewards")
+            reward_balance = self.get_earned_rewards(address)['PENDLE']
+            
+            print(f"  Amount: {reward_balance} (decimals: 18)")
+            print(f"  Formatted: {(Decimal(reward_balance) / Decimal(10**18)):.6f} PENDLE")
+            
+            # Convert rewards to USDC
+            print("\nConverting rewards to USDC:")
+            pendle_usdc_amount, pendle_price_impact, success, conversion_details = self.get_reward_value_in_usdc(
+                "PENDLE", 
+                str(reward_balance)
+            )
+            
+            # Calculate totals
+            print("\nCalculating USDC totals:")
+            lp_total = usdc_amount
+            rewards_total = pendle_usdc_amount
+            total = lp_total + rewards_total
+            
+            print(f"  LP tokens: {lp_total/1e6:.6f} USDC")
+            print(f"  Rewards: {rewards_total/1e6:.6f} USDC")
+            print(f"  Total: {total/1e6:.6f} USDC")
+            
+            print("\n[Equilibria] Calculation complete")
 
-        print("✓ Quote successful:")
-        print(f"  - Sell amount: {balance_wei / 1e18:.6f} GHO-USR LP")
-        print(f"  - Buy amount: {amount_out / 1e6:.6f} USDC")
-        print(f"  - Rate: {rate:.6f} USDC/GHO-USR LP")
-        print(f"  - Price impact: {price_impact * 100:.4f}%")
+            # Ensure structure exists before adding data
+            if "ethereum" not in result["equilibria"]:
+                result["equilibria"]["ethereum"] = {}
 
-        earned_rewards = self.get_earned_rewards(address)
-        rewards_total_usdc = 0
-        rewards_dict = {}
-
-        # Process rewards
-        for token, amount in earned_rewards.items():
-            if int(amount) > 0:
-                print(f"\nProcessing reward token: {token}")
-                print(f"Amount: {amount} (decimals: 18)")
-                print(f"Formatted amount: {int(amount) / 1e18:.6f} {token}")
-                
-                usdc_amount, price_impact, success, conversion_details = self.get_reward_value_in_usdc(token, str(amount))
-                if success:
-                    rewards_total_usdc += usdc_amount
-                    rewards_dict[token] = {
-                        "amount": str(amount),
-                        "decimals": 18,
-                        "value": {
-                            "USDC": {
-                                "amount": usdc_amount,
-                                "decimals": 6,
-                                "conversion_details": conversion_details
+            result["equilibria"]["ethereum"] = {
+                "GHO-USR": {
+                    "staking_contract": self.pool_info['rewardPool'],
+                    "amount": str(balance),
+                    "decimals": 18,
+                    "value": {
+                        "USDC": {
+                            "amount": usdc_amount,
+                            "decimals": 6,
+                            "conversion_details": {
+                                "source": "Pendle SDK",
+                                "price_impact": f"{price_impact:.6f}",
+                                "rate": f"{formatted_usdc/Decimal(balance)*Decimal(10**12):.6f}",
+                                "fee_percentage": "0.0000%",
+                                "fallback": False,
+                                "note": "Direct Conversion using Pendle SDK"
+                            }
+                        }
+                    },
+                    "rewards": {
+                        "PENDLE": {
+                            "amount": str(reward_balance),
+                            "decimals": 18,
+                            "value": {
+                                "USDC": {
+                                    "amount": pendle_usdc_amount,
+                                    "decimals": 6,
+                                    "conversion_details": conversion_details
+                                }
                             }
                         }
                     }
-                else:
-                    print("✗ Quote failed")
-
-        total_usdc = amount_out + rewards_total_usdc
-        total_usdc_wei = total_usdc  # Pour le total global
-
-        # Construction du dictionnaire de résultat
-        result["equilibria"]["ethereum"] = {
-            "GHO-USR": {
-                "staking_contract": self.pool_info['rewardPool'],
-                "amount": str(balance_wei),
-                "decimals": 18,
-                "value": {
-                    "USDC": {
-                        "amount": amount_out,
-                        "decimals": 6,
-                        "conversion_details": {
-                            "source": "Pendle SDK",
-                            "price_impact": f"{price_impact * 100:.4f}%",
-                            "rate": f"{rate:.6f}",
-                            "fee_percentage": "0.0000%",
-                            "fallback": False,
-                            "note": "Direct Conversion using Pendle SDK"
-                        }
+                },
+                "usdc_totals": {
+                    "lp_tokens_total": {
+                        "wei": lp_total,
+                        "formatted": f"{lp_total/1e6:.6f}"
+                    },
+                    "rewards_total": {
+                        "wei": rewards_total,
+                        "formatted": f"{rewards_total/1e6:.6f}"
+                    },
+                    "total": {
+                        "wei": total,
+                        "formatted": f"{total/1e6:.6f}"
                     }
-                },
-                "rewards": rewards_dict
-            },
-            "usdc_totals": {
-                "lp_tokens_total": {
-                    "wei": amount_out,
-                    "formatted": f"{amount_out / 1e6:.6f}"
-                },
-                "rewards_total": {
-                    "wei": rewards_total_usdc,
-                    "formatted": f"{rewards_total_usdc / 1e6:.6f}"
-                },
-                "total": {
-                    "wei": total_usdc,
-                    "formatted": f"{total_usdc / 1e6:.6f}"
                 }
             }
-        }
 
-        # Ajouter le total global au niveau du protocole
-        result["equilibria"]["usdc_totals"] = {
-            "total": {
-                "wei": total_usdc_wei,
-                "formatted": f"{total_usdc_wei / 1e6:.6f}"
+            # Add global total
+            result["equilibria"]["usdc_totals"] = {
+                "total": {
+                    "wei": total,
+                    "formatted": f"{total/1e6:.6f}"
+                }
             }
-        }
 
-        # Déplacer l'affichage des positions ici, après tous les calculs
-        print("\n[Equilibria] Calculation complete")
-        
-        # Afficher le LP token
-        if amount_out > 0:
-            print(f"equilibria.ethereum.GHO-USR: {amount_out/1e6:.6f} USDC")
-        
-        # Afficher les rewards
-        if rewards_total_usdc > 0:
-            print(f"equilibria.ethereum.GHO-USR.rewards.PENDLE: {rewards_total_usdc/1e6:.6f} USDC")
+        except Exception as e:
+            print(f"✗ Error fetching Equilibria positions: {str(e)}")
+            # In case of error, return a valid but empty structure
+            return {"equilibria": {
+                "usdc_totals": {
+                    "total": {
+                        "wei": 0,
+                        "formatted": "0.000000"
+                    }
+                }
+            }}
 
         return result
 
@@ -425,4 +480,20 @@ if __name__ == "__main__":
         
     bm = BalanceManager()
     results = bm.get_balances(test_address)
+    
+    # Display position summary
+    if results and "equilibria" in results:
+        data = results["equilibria"]
+        if "ethereum" in data:
+            position = data["ethereum"]["GHO-USR"]
+            if "value" in position and "USDC" in position["value"]:
+                print(f"equilibria.ethereum.GHO-USR: {position['value']['USDC']['amount']/1e6:.6f} USDC")
+            if "rewards" in position:
+                for token, reward in position["rewards"].items():
+                    if "value" in reward and "USDC" in reward["value"]:
+                        print(f"equilibria.ethereum.GHO-USR.rewards.{token}: {reward['value']['USDC']['amount']/1e6:.6f} USDC")
+    
+    print("\n" + "="*80)
+    print("FINAL RESULT:")
+    print("="*80 + "\n")
     print(json.dumps(results, indent=2))

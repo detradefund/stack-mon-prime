@@ -18,7 +18,7 @@ class BalancePusher:
     def __init__(self):
         # Required MongoDB configuration from environment variables
         self.mongo_uri = os.getenv('MONGO_URI')
-        self.database_name = os.getenv('DATABASE_NAME_1')
+        self.database_name = os.getenv('DATABASE_NAME')
         self.collection_name = os.getenv('COLLECTION_NAME')
         
         if not all([self.mongo_uri, self.database_name, self.collection_name]):
@@ -103,12 +103,12 @@ class BalancePusher:
             # Add both timestamps to the data
             prepared_data = self.convert_large_numbers_to_strings(balance_data)
             
-            # Réorganiser les champs avec timestamp en premier
+            # Reorganize fields with timestamp first
             prepared_data = {
                 'timestamp': collection_timestamp.strftime("%Y-%m-%d %H:%M:%S UTC"),
                 'created_at': push_timestamp.strftime("%Y-%m-%d %H:%M:%S UTC"),
                 'address': address,
-                **prepared_data  # Reste des données
+                **prepared_data  # Rest of the data
             }
             
             print("✓ Data prepared successfully\n")

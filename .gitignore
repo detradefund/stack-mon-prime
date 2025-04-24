@@ -14,7 +14,8 @@ Thumbs.db
 
 # Env
 .env
-.env.*
+.env.local
+.env.*.local
 !.env.example
 !.env.test
 
@@ -24,3 +25,8 @@ vite.config.ts.timestamp-*
 
 # GitHub Actions
 .github/
+
+# Python
+__pycache__/
+*.py[cod]
+*$py.class

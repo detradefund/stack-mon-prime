@@ -62,7 +62,7 @@ NETWORK_TOKENS = {
                     "symbol": "eUSDe"
                 }
             },
-            "expiry": "2025-05-29"
+            "expiry": 1748476800
         },
         "PT-cUSDO-19JUN2025": {
             "address": "0x933B9FfEE0Ad3Ef8E4DBb52688ea905826D73755",
@@ -79,7 +79,7 @@ NETWORK_TOKENS = {
                     "symbol": "cUSDO"
                 }
             },
-            "expiry": "2025-06-19"  # Maturity date for principal token
+            "expiry":1750291200
         },
         "scrvUSD": {
             "address": "0x0655977FEb2f289A4aB78af67BAB0d17aAb84367",
@@ -102,13 +102,13 @@ NETWORK_TOKENS = {
             "name": "USDS",
             "symbol": "USDS"
         },
-        "eUSDe": {  # Ajout de eUSDe en format standard
-            "address": "0x90d2af7d622ca3141efa4d8f1f24d86e5974cc8f",  # Correction de l'adresse
+        "eUSDe": {  # Add eUSDe in standard format
+            "address": "0x90d2af7d622ca3141efa4d8f1f24d86e5974cc8f",  # Address correction
             "decimals": 18,
             "name": "Ethereal Pre-deposit Vault",
             "symbol": "eUSDe"
         },
-        "cUSDO": {  # Ajout de cUSDO en format standard
+        "cUSDO": {  # Add cUSDO in standard format
             "address": "0xaD55aebc9b8c03FC43cd9f62260391c13c23e7c0",
             "decimals": 18,
             "name": "Compounding Open Dollar",
@@ -210,7 +210,7 @@ NETWORK_TOKENS = {
                     "symbol": "USR"
                 }
             },
-            "expiry": "2025-04-24"
+            "expiry": 1745452800
         },
 
         # === Base stablecoins ===
