@@ -23,9 +23,6 @@ Thumbs.db
 vite.config.js.timestamp-*
 vite.config.ts.timestamp-*
 
-# GitHub Actions
-.github/
-
 # Python
 __pycache__/
 *.py[cod]
