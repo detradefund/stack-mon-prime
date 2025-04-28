@@ -31,10 +31,10 @@ jobs:
           BASE_RPC: ${{ secrets.BASE_RPC }}
           ETHEREUM_RPC: ${{ secrets.ETHEREUM_RPC }}
           PYTHONPATH: ${{ github.workspace }}/dev-detrade-core-usdc
-        working-directory: ./dev-detrade-core-usdc/builder
+        working-directory: ${{ github.workspace }}/dev-detrade-core-usdc/builder
         run: |
           python -m pip install --upgrade pip
-          cd ..
+          cd ${{ github.workspace }}/dev-detrade-core-usdc
           pip install -r requirements.txt
-          cd builder
+          cd ${{ github.workspace }}/dev-detrade-core-usdc/builder
           python pusher.py 
