@@ -20,6 +20,13 @@ jobs:
         with:
           python-version: '3.10'
       
+      - name: Debug directory structure
+        run: |
+          pwd
+          ls -la
+          ls -la dev-detrade-core-usdc
+          ls -la dev-detrade-core-usdc/builder
+      
       - name: Install dependencies and run script (dev)
         env:
           MONGO_URI: ${{ secrets.MONGO_URI }}
@@ -30,9 +37,8 @@ jobs:
           ETHEREUM_RPC: ${{ secrets.ETHEREUM_RPC }}
           PYTHONPATH: ${{ github.workspace }}/dev-detrade-core-usdc
         run: |
-          cd ${{ github.workspace }}/dev-detrade-core-usdc/builder
+          cd dev-detrade-core-usdc
           python -m pip install --upgrade pip
-          cd ..
           pip install -r requirements.txt
           cd builder
           python pusher.py 
