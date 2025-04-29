@@ -18,11 +18,13 @@ Used by balance managers to value non-USDC assets.
 sys.path.append(str(Path(__file__).parent.parent))
 
 from config.networks import NETWORK_TOKENS
-from dotenv import load_dotenv
+from utils.retry import APIRetry
 
 # Load environment variables
 load_dotenv()
-DEFAULT_USER_ADDRESS = os.getenv('DEFAULT_USER_ADDRESS')
+
+# Zero address for price quotes
+ZERO_ADDRESS = "0x0000000000000000000000000000000000000000"
 
 def get_quote(network: str, sell_token: str, buy_token: str, amount: str, token_decimals: int = 18, token_symbol: str = "") -> dict:
     """
@@ -41,19 +43,18 @@ def get_quote(network: str, sell_token: str, buy_token: str, amount: str, token_
         - quote: API response with buy amount, etc.
         - conversion_details: Information about the conversion method used
     """
-    retry_delays = [3, 5]  # Delays in seconds between retries
     api_network = "mainnet" if network == "ethereum" else network
     api_url = f"https://api.cow.fi/{api_network}/api/v1/quote"
 
     def make_request(params):
-        response = requests.post(api_url, json=params)
+        response = APIRetry.post(api_url, json=params)
         return response.json() if response.ok else response.text
 
     base_params = {
         "sellToken": sell_token,
         "buyToken": buy_token,
-        "from": DEFAULT_USER_ADDRESS,
-        "receiver": DEFAULT_USER_ADDRESS,
+        "from": ZERO_ADDRESS,
+        "receiver": ZERO_ADDRESS,
         "validTo": int(datetime.now(timezone.utc).timestamp() + 3600),  # 1 hour validity
         "appData": "0x0000000000000000000000000000000000000000000000000000000000000000",
         "partiallyFillable": False,
@@ -155,27 +156,6 @@ def get_quote(network: str, sell_token: str, buy_token: str, amount: str, token_
                     "fee_percentage": "N/A",
                     "fallback": True,
                     "note": "Using reference amount of 1000 tokens for price discovery"
-                }
-            }
-
-    # For other errors, retry with delays
-    for attempt, delay in enumerate(retry_delays, 2):
-        print(f"! Error on attempt {attempt-1}, retrying in {delay} seconds...")
-        time.sleep(delay)
-        print(f"[Attempt {attempt}/3] Requesting CoWSwap quote...")
-        
-        quote = make_request(params)
-        
-        if isinstance(quote, dict) and 'quote' in quote:
-            return {
-                "quote": quote,
-                "conversion_details": {
-                    "source": "CoWSwap",
-                    "price_impact": quote['quote'].get('priceImpact', '0'),
-                    "rate": str(Decimal(quote['quote']['buyAmount']) / (Decimal(quote['quote']['sellAmount']) / Decimal(10**12))),
-                    "fee_percentage": str(Decimal(quote['quote'].get('feeAmount', '0')) / Decimal(amount) * 100),
-                    "fallback": False,
-                    "note": f"Direct quote after {attempt} attempts"
                 }
             }
 

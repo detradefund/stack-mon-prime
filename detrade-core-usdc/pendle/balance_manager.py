@@ -9,6 +9,7 @@ from decimal import Decimal
 import requests
 import time
 from datetime import datetime
+from utils.retry import Web3Retry, APIRetry
 
 """
 Pendle balance manager module.
@@ -121,7 +122,9 @@ class PendleBalanceManager:
                     
                     for token_symbol, contract in network_contracts.items():
                         token_data = NETWORK_TOKENS[network][token_symbol]
-                        balance = contract.functions.balanceOf(checksum_address).call()
+                        balance = Web3Retry.call_contract_function(
+                            contract.functions.balanceOf(checksum_address).call
+                        )
                         
                         if balance > 0:
                             balances[network][token_symbol] = {
@@ -199,7 +202,7 @@ class PendleBalanceManager:
                 "amountIn": amount_in_wei
             }
             
-            response = requests.get(url, params=params)
+            response = APIRetry.get(url, params=params)
             response.raise_for_status()
             data = response.json()
             
@@ -449,14 +452,14 @@ def format_position_data(positions_data):
 def main():
     """
     CLI utility for testing Pendle balance aggregation.
-    Accepts address as argument or uses DEFAULT_USER_ADDRESS from environment.
+    Uses production address by default.
     """
-    test_address = sys.argv[1] if len(sys.argv) > 1 else os.getenv('DEFAULT_USER_ADDRESS')
+    # Production address
+    PRODUCTION_ADDRESS = "0xc6835323372A4393B90bCc227c58e82D45CE4b7d"
     
-    if not test_address:
-        print("Error: No address provided and DEFAULT_USER_ADDRESS not found in .env")
-        sys.exit(1)
-        
+    # Use command line argument if provided, otherwise use production address
+    test_address = sys.argv[1] if len(sys.argv) > 1 else PRODUCTION_ADDRESS
+    
     manager = PendleBalanceManager()
     balances = manager.get_balances(test_address)
     formatted_balances = format_position_data(balances)

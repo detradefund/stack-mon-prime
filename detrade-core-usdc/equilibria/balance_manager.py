@@ -9,13 +9,19 @@ from decimal import Decimal
 import json
 from typing import Dict, Any
 from datetime import datetime
+from utils.retry import Web3Retry, APIRetry
 
 # Load environment variables
 load_dotenv()
 
 # Web3 configuration with environment variables
 ETHEREUM_RPC = os.getenv('ETHEREUM_RPC')
-DEFAULT_USER_ADDRESS = os.getenv('DEFAULT_USER_ADDRESS')
+
+# Zero address for API calls
+ZERO_ADDRESS = "0x0000000000000000000000000000000000000000"
+
+# Production addresses
+PRODUCTION_ADDRESS = "0xc6835323372A4393B90bCc227c58e82D45CE4b7d"
 
 # Contract addresses
 BASE_REWARD_POOL_ADDRESS = '0xC565b6781e629f29600741543c2403dbD49391F2'
@@ -105,7 +111,9 @@ class BalanceManager:
         Get the pool ID from the BaseRewardPoolV2 contract
         """
         try:
-            pid = self.reward_pool.functions.pid().call()
+            pid = Web3Retry.call_contract_function(
+                self.reward_pool.functions.pid().call
+            )
             return pid
         except Exception as e:
             print(f"Error fetching pool ID: {e}")
@@ -117,7 +125,9 @@ class BalanceManager:
         Returns tuple of (market, token, rewardPool, shutdown)
         """
         try:
-            pool_info = self.pendle_booster.functions.poolInfo(pool_id).call()
+            pool_info = Web3Retry.call_contract_function(
+                self.pendle_booster.functions.poolInfo(pool_id).call
+            )
             return {
                 'market': pool_info[0],
                 'token': pool_info[1],
@@ -131,18 +141,18 @@ class BalanceManager:
     def get_staked_balance(self, address=None):
         """
         Get staked LP-GHO-USR balance from BaseRewardPoolV2
-        If no address is provided, uses default address
+        If no address is provided, uses production address
         Returns the raw balance in wei
         """
         if address is None:
-            if not DEFAULT_USER_ADDRESS:
-                raise ValueError("DEFAULT_USER_ADDRESS not configured in .env file")
-            address = DEFAULT_USER_ADDRESS
+            address = PRODUCTION_ADDRESS
 
         try:
-            balance = self.reward_pool.functions.balanceOf(
-                self.w3.to_checksum_address(address)
-            ).call()
+            balance = Web3Retry.call_contract_function(
+                self.reward_pool.functions.balanceOf(
+                    self.w3.to_checksum_address(address)
+                ).call
+            )
             return balance
         except Exception as e:
             print(f"Error while fetching balance: {e}")
@@ -198,14 +208,14 @@ class BalanceManager:
             # If not expired, use existing code for Pendle API
             url = f"{PENDLE_API_BASE}/{MARKET_ADDRESS}/remove-liquidity"
             params = {
-                "receiver": DEFAULT_USER_ADDRESS,
+                "receiver": ZERO_ADDRESS,  # Use ZERO_ADDRESS for API calls
                 "slippage": "0.01",
                 "enableAggregator": "true",
                 "amountIn": str(balance_wei),
                 "tokenOut": USDC_ADDRESS
             }
             
-            response = requests.get(url, params=params)
+            response = APIRetry.get(url, params=params)
             response.raise_for_status()
             
             data = response.json()['data']
@@ -221,28 +231,30 @@ class BalanceManager:
     def get_earned_rewards(self, address=None):
         """
         Get earned rewards (PENDLE and CRV) for an address
-        If no address is provided, uses default address
+        If no address is provided, uses production address
         Returns a dict with raw reward amounts in wei
         """
         if address is None:
-            if not DEFAULT_USER_ADDRESS:
-                raise ValueError("DEFAULT_USER_ADDRESS not configured in .env file")
-            address = DEFAULT_USER_ADDRESS
+            address = PRODUCTION_ADDRESS
 
         rewards = {}
         try:
             # Get PENDLE rewards
-            pendle_earned = self.reward_pool.functions.earned(
-                self.w3.to_checksum_address(address),
-                self.w3.to_checksum_address(PENDLE_TOKEN_ADDRESS)
-            ).call()
+            pendle_earned = Web3Retry.call_contract_function(
+                self.reward_pool.functions.earned(
+                    self.w3.to_checksum_address(address),
+                    self.w3.to_checksum_address(PENDLE_TOKEN_ADDRESS)
+                ).call
+            )
             rewards['PENDLE'] = pendle_earned
 
             # Get CRV rewards
-            crv_earned = self.reward_pool.functions.earned(
-                self.w3.to_checksum_address(address),
-                self.w3.to_checksum_address(CRV_TOKEN_ADDRESS)
-            ).call()
+            crv_earned = Web3Retry.call_contract_function(
+                self.reward_pool.functions.earned(
+                    self.w3.to_checksum_address(address),
+                    self.w3.to_checksum_address(CRV_TOKEN_ADDRESS)
+                ).call
+            )
             rewards['CRV'] = crv_earned
 
             return rewards
@@ -267,14 +279,14 @@ class BalanceManager:
             
             url = f"{PENDLE_API_BASE}/{MARKET_ADDRESS}/remove-liquidity"
             params = {
-                "receiver": DEFAULT_USER_ADDRESS,
+                "receiver": ZERO_ADDRESS,  # Use ZERO_ADDRESS for API calls
                 "slippage": "0.01",
                 "enableAggregator": "true",
                 "amountIn": str(one_token),
                 "tokenOut": USDC_ADDRESS
             }
             
-            response = requests.get(url, params=params)
+            response = APIRetry.get(url, params=params)
             response.raise_for_status()
             
             data = response.json()['data']
@@ -467,17 +479,11 @@ class BalanceManager:
 
 # Code for direct testing
 if __name__ == "__main__":
-    import os
-    from dotenv import load_dotenv
     import sys
     
-    # Get address from command line or .env
-    test_address = sys.argv[1] if len(sys.argv) > 1 else os.getenv('DEFAULT_USER_ADDRESS')
+    # Use command line argument if provided, otherwise use PRODUCTION_ADDRESS
+    test_address = sys.argv[1] if len(sys.argv) > 1 else PRODUCTION_ADDRESS
     
-    if not test_address:
-        print("Error: No address provided and DEFAULT_USER_ADDRESS not found in .env")
-        sys.exit(1)
-        
     bm = BalanceManager()
     results = bm.get_balances(test_address)
     

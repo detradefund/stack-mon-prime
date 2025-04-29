@@ -11,6 +11,10 @@ sys.path.append(root_path)
 
 from config.networks import NETWORK_TOKENS, RPC_URLS
 from cowswap.cow_client import get_quote
+from utils.retry import Web3Retry, APIRetry
+
+# Production address
+PRODUCTION_ADDRESS = "0xc6835323372A4393B90bCc227c58e82D45CE4b7d"
 
 class SpotBalanceManager:
     """Manages spot token balances across networks"""
@@ -140,7 +144,9 @@ class SpotBalanceManager:
                         continue
                         
                     contract = network_contracts[network]
-                    balance = contract.functions.balanceOf(checksum_address).call()
+                    balance = Web3Retry.call_contract_function(
+                        contract.functions.balanceOf(checksum_address).call
+                    )
                     
                     token_symbol = token_type
                     decimals = NETWORK_TOKENS[network][token_symbol]["decimals"]
@@ -294,19 +300,10 @@ class SpotBalanceManager:
         }
 
 def main():
-    import os
-    from dotenv import load_dotenv
     import json
     
-    # Load environment variables
-    load_dotenv(Path(root_path) / '.env')
-    
-    # Get address from command line or .env
-    test_address = sys.argv[1] if len(sys.argv) > 1 else os.getenv('DEFAULT_USER_ADDRESS')
-    
-    if not test_address:
-        print("Error: No address provided and DEFAULT_USER_ADDRESS not found in .env")
-        sys.exit(1)
+    # Use command line argument if provided, otherwise use production address
+    test_address = sys.argv[1] if len(sys.argv) > 1 else PRODUCTION_ADDRESS
     
     manager = SpotBalanceManager()
     balances = manager.get_balances(test_address)

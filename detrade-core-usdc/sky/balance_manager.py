@@ -8,6 +8,7 @@ from decimal import Decimal
 from typing import Dict, Any
 from dotenv import load_dotenv
 from config.networks import RPC_URLS, NETWORK_TOKENS
+from utils.retry import Web3Retry, APIRetry
 
 """
 Sky Protocol balance manager module.
@@ -35,6 +36,9 @@ MINIMAL_SUSDS_ABI = [
         "type": "function"
     }
 ]
+
+# Production address
+PRODUCTION_ADDRESS = "0xc6835323372A4393B90bCc227c58e82D45CE4b7d"
 
 class BalanceManager:
     def __init__(self):
@@ -76,7 +80,9 @@ class BalanceManager:
                 print("\nQuerying sUSDS balance:")
                 print(f"  Contract: {NETWORK_TOKENS[network]['sUSDS']['address']}")
                 print("  Function: balanceOf(address) - Returns user's sUSDS balance")
-                balance = contract.functions.balanceOf(checksum_address).call()
+                balance = Web3Retry.call_contract_function(
+                    contract.functions.balanceOf(checksum_address).call
+                )
                 
                 if balance > 0:
                     print(f"  Amount: {balance} (decimals: 18)")
@@ -86,7 +92,9 @@ class BalanceManager:
                     print("\nConverting sUSDS to USDS:")
                     print(f"  Contract: {NETWORK_TOKENS['ethereum']['sUSDS']['address']}")
                     print("  Function: convertToAssets(uint256) - Returns equivalent USDS amount")
-                    usds_value = self.eth_contract.functions.convertToAssets(balance).call()
+                    usds_value = Web3Retry.call_contract_function(
+                        self.eth_contract.functions.convertToAssets(balance).call
+                    )
                     print(f"  USDS value: {(Decimal(usds_value) / Decimal(10**18)):.6f} USDS")
                     
                     # Convert USDS to USDC via CoWSwap
@@ -166,14 +174,11 @@ class BalanceManager:
 
 def main():
     """CLI utility for testing"""
-    import os
     import json
     
-    test_address = sys.argv[1] if len(sys.argv) > 1 else os.getenv('DEFAULT_USER_ADDRESS')
-    if not test_address:
-        print("Error: No address provided and DEFAULT_USER_ADDRESS not found in .env")
-        sys.exit(1)
-        
+    # Use command line argument if provided, otherwise use production address
+    test_address = sys.argv[1] if len(sys.argv) > 1 else PRODUCTION_ADDRESS
+    
     manager = BalanceManager()
     balances = manager.get_balances(test_address)
     

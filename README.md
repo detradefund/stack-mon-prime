@@ -163,18 +163,34 @@ pip install -r requirements.txt
 ```bash
 # MongoDB configuration
 MONGO_URI=your_mongodb_uri
-DATABASE_NAME_1=your_database
-COLLECTION_NAME=your_collection
 
 # Network RPC endpoints
 ETH_RPC_URL=your_ethereum_rpc
 BASE_RPC_URL=your_base_rpc
-
-# Default test address
-DEFAULT_USER_ADDRESS=your_test_address
 ```
 
-3. Verify protocol modules:
+3. Database Configuration:
+The system uses two hardcoded databases:
+- `detrade-core-usdc`: Production database
+- `dev-detrade-core-usdc`: Development database
+
+The addresses and database configurations are hardcoded in `builder/pusher.py`:
+```python
+configurations = [
+    {
+        'address': '0xc6835323372A4393B90bCc227c58e82D45CE4b7d',  # Production address
+        'database_name': 'detrade-core-usdc',
+        'collection_name': 'oracle'
+    },
+    {
+        'address': '0xAbD81C60a18A34567151eA70374eA9c839a41cF5',  # Development address
+        'database_name': 'dev-detrade-core-usdc',
+        'collection_name': 'oracle'
+    }
+]
+```
+
+4. Verify protocol modules:
 ```bash
 # Test individual protocols
 python -m pendle.balance_manager

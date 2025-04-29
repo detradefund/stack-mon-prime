@@ -193,7 +193,7 @@ class BalanceAggregator:
         
         return final_result
 
-def build_overview(all_balances: Dict[str, Any]) -> Dict[str, Any]:
+def build_overview(all_balances: Dict[str, Any], address: str) -> Dict[str, Any]:
     """Build overview section with summary and positions"""
     
     # Initialize positions dictionary
@@ -310,7 +310,7 @@ def build_overview(all_balances: Dict[str, Any]) -> Dict[str, Any]:
     total_value = protocols_value + spot_value
     
     # Get total supply from SupplyReader
-    supply_reader = SupplyReader()
+    supply_reader = SupplyReader(address=address)
     total_supply = supply_reader.format_total_supply()
     
     # Calculate share price
@@ -333,28 +333,25 @@ def build_overview(all_balances: Dict[str, Any]) -> Dict[str, Any]:
         }
     }
 
-def main():
-    """CLI utility for testing balance aggregation."""
-    from dotenv import load_dotenv
-    import os
-    from datetime import datetime, timezone
+def main(address=None):
+    """
+    Main function to aggregate all balance data.
+    Accepts address as argument or uses the first address from configurations.
+    """
+    if not address:
+        # Use the first address from our configurations
+        address = '0xc6835323372A4393B90bCc227c58e82D45CE4b7d'
     
-    # Load environment variables
-    load_dotenv()
-    
-    # Get test address
-    test_address = sys.argv[1] if len(sys.argv) > 1 else os.getenv('DEFAULT_USER_ADDRESS')
-    
-    if not test_address:
-        print("Error: No address provided and DEFAULT_USER_ADDRESS not found in .env")
-        sys.exit(1)
-    
+    if not address:
+        print("Error: No address provided")
+        return None
+        
     # Create aggregator and get balances
     aggregator = BalanceAggregator()
-    all_balances = aggregator.get_all_balances(test_address)
+    all_balances = aggregator.get_all_balances(address)
     
     # Build the final result with overview, protocols and spot sections
-    overview = build_overview(all_balances)
+    overview = build_overview(all_balances, address)
     
     # Format created_at to match timestamp format
     created_at = datetime.now(timezone.utc).strftime("%Y-%m-%d %H:%M:%S UTC")
@@ -363,7 +360,7 @@ def main():
         **overview,  # Add overview at the top
         "protocols": all_balances["protocols"],
         "spot": all_balances["spot"],
-        "address": test_address,
+        "address": address,
         "created_at": created_at
     }
     

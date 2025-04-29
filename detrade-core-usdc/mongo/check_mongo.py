@@ -1,23 +1,20 @@
 from pymongo import MongoClient
-import os
-from dotenv import load_dotenv
 from datetime import datetime
 from pprint import pprint
+import os
+from dotenv import load_dotenv
 
 # Load environment variables
 load_dotenv()
 
 def check_mongodb():
-    """Check MongoDB connection and display recent documents"""
+    """Check MongoDB connection and display most recent document from both databases"""
     try:
-        # Get MongoDB configuration
+        # Get MongoDB URI from .env
         mongo_uri = os.getenv('MONGO_URI')
-        database_name = os.getenv('DATABASE_NAME')
-        collection_name = os.getenv('COLLECTION_NAME')
-        
-        print("\nConnecting to MongoDB...")
-        print(f"Database: {database_name}")
-        print(f"Collection: {collection_name}\n")
+        # Hardcoded configuration
+        databases = ["detrade-core-usdc", "dev-detrade-core-usdc"]
+        collection_name = "oracle"
         
         # Connect to MongoDB
         client = MongoClient(mongo_uri)
@@ -26,26 +23,30 @@ def check_mongodb():
         client.admin.command('ping')
         print("✓ Connection successful!")
         
-        # Get database and collection
-        db = client[database_name]
-        collection = db[collection_name]
-        
-        # Get most recent document
-        print("\nFetching most recent document...")
-        doc = collection.find_one(
-            sort=[('created_at', -1)]
-        )
-        
-        if doc:
-            print("\nMost recent document:")
-            print("="*80)
-            print(f"ID: {doc['_id']}")
-            print(f"Address: {doc['address']}")
-            print(f"Created at: {doc['created_at']}")
-            print(f"Total Value: {doc['nav']['usdc']} USDC")
-            print("="*80)
-        else:
-            print("No documents found in collection")
+        for db_name in databases:
+            print(f"\n{'='*80}")
+            print(f"Database: {db_name}")
+            print(f"{'='*80}")
+            
+            # Get database and collection
+            db = client[db_name]
+            collection = db[collection_name]
+            
+            # Get most recent document based on timestamp
+            print(f"\nFetching most recent document from {db_name}...")
+            doc = collection.find_one(
+                sort=[('timestamp', -1)]
+            )
+            
+            if doc:
+                print("\nMost recent document:")
+                print("-"*40)
+                print(f"ID: {doc['_id']}")
+                print(f"Address: {doc['address']}")
+                print(f"Timestamp: {doc['timestamp']}")
+                print(f"Total Value: {doc['nav']['usdc']} USDC")
+            else:
+                print(f"No documents found in {db_name}.{collection_name}")
             
     except Exception as e:
         print(f"\n❌ Error: {str(e)}")

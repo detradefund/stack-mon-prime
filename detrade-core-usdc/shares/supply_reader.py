@@ -5,6 +5,7 @@ from dotenv import load_dotenv
 from pathlib import Path
 import sys
 import logging
+from utils.retry import Web3Retry
 
 """
 DTUSDC token supply reader.
@@ -47,18 +48,17 @@ class SupplyReader:
     Simple reader for DTUSDC token total supply on Base network.
     """
     
-    def __init__(self, rpc_url: str = None):
+    def __init__(self, address: str = None, rpc_url: str = None):
         logger.info("\n=== Supply Reader Initialization ===")
         
-        # Load environment variables and get user address
-        load_dotenv()
-        user_address = os.getenv('DEFAULT_USER_ADDRESS')
-        logger.info(f"User Address: {user_address}")
+        # Use provided address or default to production address
+        self.user_address = address or '0xc6835323372A4393B90bCc227c58e82D45CE4b7d'
+        logger.info(f"User Address: {self.user_address}")
         
         # Get contract info
-        contract_info = CONTRACT_MAPPING.get(user_address)
+        contract_info = CONTRACT_MAPPING.get(self.user_address)
         if not contract_info:
-            raise ValueError(f"No contract mapping found for user address: {user_address}")
+            raise ValueError(f"No contract mapping found for user address: {self.user_address}")
         
         self.contract_address = contract_info['address']
         self.contract_name = contract_info['name']
@@ -86,7 +86,9 @@ class SupplyReader:
     
     def get_total_supply(self) -> str:
         """Returns raw total supply in wei as string"""
-        total_supply = self.contract.functions.totalSupply().call()
+        total_supply = Web3Retry.call_contract_function(
+            self.contract.functions.totalSupply().call
+        )
         logger.info(f"Raw Supply: {total_supply} wei")
         return str(total_supply)
 

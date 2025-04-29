@@ -9,9 +9,10 @@ import time
 # Add parent directory to path to import config
 sys.path.append(str(Path(__file__).parent.parent))
 
-from config.networks import NETWORK_TOKENS
+from config.networks import NETWORK_TOKENS, RPC_URLS
 from cowswap.cow_client import get_quote
 from .USDCfxUSD.constants import POOL_INFO, DEDICATED_VAULTS
+from utils.retry import Web3Retry, APIRetry
 
 class ConvexBalanceManager:
     """
@@ -168,9 +169,9 @@ class ConvexBalanceManager:
             print("\nQuerying Curve pool for deposited LP tokens:")
             print(f"  Contract: {self.POOL_INFO['pool']} (CurveStableSwapNG)")
             print("  Function: balanceOf(address) - Returns amount of USDC/fxUSD LP tokens deposited in staking contract")
-            contract_lp_balance = self.gauge_contract.functions.balanceOf(
-                vault_info['staking_contract']
-            ).call()
+            contract_lp_balance = Web3Retry.call_contract_function(
+                self.gauge_contract.functions.balanceOf(vault_info['staking_contract']).call
+            )
             
             if contract_lp_balance == 0:
                 print("[Convex] No LP balance found")
@@ -183,7 +184,9 @@ class ConvexBalanceManager:
             print("\nQuerying Curve pool contract for total supply:")
             print(f"  Contract: {self.POOL_INFO['pool']}")
             print("  Function: totalSupply() - Returns total USDC/fxUSD LP tokens in Curve pool")
-            total_supply = self.curve_pool.functions.totalSupply().call()
+            total_supply = Web3Retry.call_contract_function(
+                self.curve_pool.functions.totalSupply().call
+            )
             ratio = contract_lp_balance / total_supply if total_supply > 0 else 0
             print(f"\n[Convex] Calculating pool share:")
             print(f"  User LP balance: {contract_lp_balance}")
@@ -195,21 +198,27 @@ class ConvexBalanceManager:
             print("\nQuerying Curve pool contract:")
             print(f"  Contract: {self.POOL_INFO['pool']}")
             print("  Function: N_COINS() - Returns number of tokens in pool")
-            n_coins = self.curve_pool.functions.N_COINS().call()
+            n_coins = Web3Retry.call_contract_function(
+                self.curve_pool.functions.N_COINS().call
+            )
             print(f"Number of tokens in pool: {n_coins}")
             lp_balances = {}
             
             for i in range(n_coins):
                 print(f"\nQuerying token information for index {i}:")
                 print("  Function: coins(uint256) - Returns token address")
-                coin_address = self.curve_pool.functions.coins(i).call()
+                coin_address = Web3Retry.call_contract_function(
+                    self.curve_pool.functions.coins(i).call
+                )
                 if coin_address == "0xA0b86991c6218b36c1d19D4a2e9Eb0cE3606eB48":
                     print(f"  Token address: {coin_address} (USDC)")
                 elif coin_address == "0x085780639CC2cACd35E474e71f4d000e2405d8f6":
                     print(f"  Token address: {coin_address} (fxUSD)")
                 
                 print("  Function: balances(uint256) - Returns token balance in pool")
-                pool_balance = self.curve_pool.functions.balances(i).call()
+                pool_balance = Web3Retry.call_contract_function(
+                    self.curve_pool.functions.balances(i).call
+                )
                 
                 token_contract = self.w3.eth.contract(
                     address=coin_address, 
@@ -217,9 +226,13 @@ class ConvexBalanceManager:
                 )
                 print("  Querying token contract:")
                 print("    Function: symbol() - Returns token symbol")
-                symbol = token_contract.functions.symbol().call()
+                symbol = Web3Retry.call_contract_function(
+                    token_contract.functions.symbol().call
+                )
                 print("    Function: decimals() - Returns token decimals")
-                decimals = token_contract.functions.decimals().call()
+                decimals = Web3Retry.call_contract_function(
+                    token_contract.functions.decimals().call
+                )
                 
                 print(f"\nProcessing {symbol}:")
                 print(f"  Total in pool: {pool_balance / 10**decimals:.6f} {symbol}")
@@ -270,7 +283,9 @@ class ConvexBalanceManager:
             print("  Function: earned() - Returns two arrays:")
             print("    - Array of reward token addresses")
             print("    - Array of unclaimed amounts for each token")
-            earned_result = self.staking_contract.functions.earned().call()
+            earned_result = Web3Retry.call_contract_function(
+                self.staking_contract.functions.earned().call
+            )
             
             print("\nUnclaimed rewards:")
             rewards = {}
@@ -281,8 +296,12 @@ class ConvexBalanceManager:
                     address=addr, 
                     abi=self.curve_abi
                 )
-                symbol = token_contract.functions.symbol().call()
-                decimals = token_contract.functions.decimals().call()
+                symbol = Web3Retry.call_contract_function(
+                    token_contract.functions.symbol().call
+                )
+                decimals = Web3Retry.call_contract_function(
+                    token_contract.functions.decimals().call
+                )
                 formatted_amount = amount / 10**decimals
                 
                 print(f"  • {symbol}:")
@@ -297,8 +316,12 @@ class ConvexBalanceManager:
                     address=addr, 
                     abi=self.curve_abi
                 )
-                symbol = token_contract.functions.symbol().call()
-                decimals = token_contract.functions.decimals().call()
+                symbol = Web3Retry.call_contract_function(
+                    token_contract.functions.symbol().call
+                )
+                decimals = Web3Retry.call_contract_function(
+                    token_contract.functions.decimals().call
+                )
                 
                 reward_data = {
                     "amount": amount,
@@ -367,18 +390,16 @@ class ConvexBalanceManager:
             return {"convex": {}}
 
 if __name__ == "__main__":
-    from dotenv import load_dotenv
     import os
     
-    # Load environment variables
-    load_dotenv()
-    DEFAULT_USER_ADDRESS = Web3.to_checksum_address(os.getenv('DEFAULT_USER_ADDRESS'))
+    # Production address
+    PRODUCTION_ADDRESS = "0xc6835323372A4393B90bCc227c58e82D45CE4b7d"
     
     # Create manager instance
     manager = ConvexBalanceManager()
     
     # Get balances
-    balances = manager.get_balances(DEFAULT_USER_ADDRESS)
+    balances = manager.get_balances(PRODUCTION_ADDRESS)
     
     # Display final result
     print("\n" + "="*80)

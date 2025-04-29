@@ -8,6 +8,7 @@ from dotenv import load_dotenv
 from config.networks import NETWORK_TOKENS, RPC_URLS
 from decimal import Decimal
 from cowswap.cow_client import get_quote
+from utils.retry import Web3Retry, APIRetry
 
 """
 Tokemak balance manager module.
@@ -41,6 +42,9 @@ MINIMAL_ABI = [
         "type": "function"
     }
 ]
+
+# Production address
+PRODUCTION_ADDRESS = "0xc6835323372A4393B90bCc227c58e82D45CE4b7d"
 
 class BalanceManager:
     def __init__(self):
@@ -91,7 +95,9 @@ class BalanceManager:
             print("\nQuerying staked autoUSD balance:")
             print(f"  Contract: {self.MAIN_REWARDER_ADDRESS}")
             print("  Function: balanceOf(address) - Returns user's staked autoUSD balance")
-            shares = self.main_rewarder.functions.balanceOf(checksum_address).call()
+            shares = Web3Retry.call_contract_function(
+                self.main_rewarder.functions.balanceOf(checksum_address).call
+            )
             
             if shares == 0:
                 print("No staked balance found")
@@ -104,7 +110,9 @@ class BalanceManager:
             print("\nConverting autoUSD to USDC:")
             print(f"  Contract: {self.AUTO_USD_ADDRESS}")
             print("  Function: convertToAssets(uint256) - Returns equivalent USDC amount")
-            assets = self.auto_pool.functions.convertToAssets(shares).call()
+            assets = Web3Retry.call_contract_function(
+                self.auto_pool.functions.convertToAssets(shares).call
+            )
             
             # Calculate real conversion rate
             rate = Decimal(assets) / Decimal(shares) * Decimal(10**12) if shares > 0 else Decimal('0')
@@ -117,7 +125,9 @@ class BalanceManager:
             print("\nQuerying reward token (TOKE):")
             print(f"  Contract: {self.MAIN_REWARDER_ADDRESS}")
             print("  Function: earned(address) - Returns pending TOKE rewards")
-            earned = self.main_rewarder.functions.earned(checksum_address).call()
+            earned = Web3Retry.call_contract_function(
+                self.main_rewarder.functions.earned(checksum_address).call
+            )
             print(f"  Amount: {earned} (decimals: 18)")
             print(f"  Formatted: {(Decimal(earned) / Decimal(10**18)):.6f} TOKE")
             
@@ -223,14 +233,11 @@ class BalanceManager:
 
 def main():
     """CLI utility for testing"""
-    import os
     import json
     
-    test_address = sys.argv[1] if len(sys.argv) > 1 else os.getenv('DEFAULT_USER_ADDRESS')
-    if not test_address:
-        print("Error: No address provided and DEFAULT_USER_ADDRESS not found in .env")
-        sys.exit(1)
-        
+    # Use command line argument if provided, otherwise use production address
+    test_address = sys.argv[1] if len(sys.argv) > 1 else PRODUCTION_ADDRESS
+    
     manager = BalanceManager()
     balances = manager.get_balances(test_address)
     

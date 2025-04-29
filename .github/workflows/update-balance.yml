@@ -1,4 +1,4 @@
-name: Update Balance DeTrade Core USDC
+name: Update Balance DeTrade Core USDC & Dev DeTrade Core USDC
 
 on:
   push:
@@ -23,9 +23,6 @@ jobs:
       - name: Install dependencies and run script
         env:
           MONGO_URI: ${{ secrets.MONGO_URI }}
-          DATABASE_NAME: ${{ secrets.DATABASE_NAME }}
-          COLLECTION_NAME: ${{ secrets.COLLECTION_NAME }}
-          DEFAULT_USER_ADDRESS: ${{ secrets.DEFAULT_USER_ADDRESS }}
           BASE_RPC: ${{ secrets.BASE_RPC }}
           ETHEREUM_RPC: ${{ secrets.ETHEREUM_RPC }}
           PYTHONPATH: ${{ github.workspace }}/detrade-core-usdc

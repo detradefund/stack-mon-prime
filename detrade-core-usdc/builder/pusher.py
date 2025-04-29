@@ -15,11 +15,11 @@ class BalancePusher:
     Handles the storage of portfolio balances in MongoDB.
     Acts as a bridge between the BalanceAggregator and the database.
     """
-    def __init__(self):
+    def __init__(self, database_name=None, collection_name=None):
         # Required MongoDB configuration from environment variables
         self.mongo_uri = os.getenv('MONGO_URI')
-        self.database_name = os.getenv('DATABASE_NAME')
-        self.collection_name = os.getenv('COLLECTION_NAME')
+        self.database_name = database_name or os.getenv('DATABASE_NAME')
+        self.collection_name = collection_name or os.getenv('COLLECTION_NAME')
         
         if not all([self.mongo_uri, self.database_name, self.collection_name]):
             raise ValueError("Missing required environment variables for MongoDB connection")
@@ -93,7 +93,9 @@ class BalancePusher:
             # 1. Fetch current portfolio data
             print("1. Fetching portfolio data...")
             print(f"Collection started at: {collection_timestamp.strftime('%Y-%m-%d %H:%M:%S UTC')}")
-            balance_data = aggregator_main()
+            balance_data = aggregator_main(address)
+            if not balance_data:
+                raise Exception("Failed to fetch portfolio data")
             print("✓ Portfolio data fetched successfully\n")
 
             # 2. Prepare data for storage
@@ -158,17 +160,29 @@ class BalancePusher:
 
 def main():
     """CLI entry point for testing balance pushing functionality."""
-    test_address = os.getenv('DEFAULT_USER_ADDRESS')
+    # Configuration for multiple addresses and databases
+    configurations = [
+        {
+            'address': '0xc6835323372A4393B90bCc227c58e82D45CE4b7d',
+            'database_name': 'detrade-core-usdc',
+            'collection_name': 'oracle'
+        },
+        {
+            'address': '0xAbD81C60a18A34567151eA70374eA9c839a41cF5',  # Replace with your second address
+            'database_name': 'dev-detrade-core-usdc',
+            'collection_name': 'oracle'
+        }
+    ]
     
-    if not test_address:
-        print("Error: DEFAULT_USER_ADDRESS not found in .env")
-        exit(1)
-    
-    pusher = BalancePusher()
-    try:
-        pusher.push_balance_data(test_address)
-    finally:
-        pusher.close()
+    for config in configurations:
+        pusher = BalancePusher(
+            database_name=config['database_name'],
+            collection_name=config['collection_name']
+        )
+        try:
+            pusher.push_balance_data(config['address'])
+        finally:
+            pusher.close()
 
 if __name__ == "__main__":
     main()
