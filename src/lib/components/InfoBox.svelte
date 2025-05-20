@@ -10,7 +10,7 @@
       </div>
       <div class="info-content">
         <p>
-          Our oracle service ensures transparent valuation events for vaults, updated every 30 minutes. It collects data across protocols, converts it into the liquid value in the underlying token—reflecting what the protocol would return if positions were liquidated—and aggregates it into a clear, unified total. Each snapshot includes a detailed breakdown of all positions and a clear explanation of the calculation method, making the fund's valuation process fully transparent and precise.
+          Our oracle service ensures transparent valuation events for vaults, updated every 60 minutes. It collects data across protocols, converts it into the liquid value in the underlying token—reflecting what the protocol would return if positions were liquidated—and aggregates it into a clear, unified total. Each snapshot includes a detailed breakdown of all positions and a clear explanation of the calculation method, making the fund's valuation process fully transparent and precise.
         </p>
       </div>
     </div>

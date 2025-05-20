@@ -9,9 +9,9 @@
 
 <svelte:head>
   <title>Oracle – DeTrade</title>
-  <meta name="description" content="Our oracle service ensures transparent valuation events for our vaults, updated every 30 minutes." />
+  <meta name="description" content="Our oracle service ensures transparent valuation events for our vaults, updated every 60 minutes." />
   <meta property="og:title" content="Oracle – DeTrade" />
-  <meta property="og:description" content="Our oracle service ensures transparent valuation events for our vaults, updated every 30 minutes" />
+  <meta property="og:description" content="Our oracle service ensures transparent valuation events for our vaults, updated every 60 minutes" />
   <meta property="og:image" content="https://oracle.detrade.fund/detrade-logo-text.webp" />
   <meta property="og:url" content="https://oracle.detrade.fund" />
   <meta property="og:type" content="website" />
