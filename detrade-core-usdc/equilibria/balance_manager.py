@@ -216,37 +216,52 @@ class BalanceManager:
             if not balance_str.isdigit():
                 raise ValueError(f"Invalid balance_wei value: {balance_str}")
             
+            # Format parameters to match browser request
             params = {
-                "receiver": ZERO_ADDRESS,  # Use ZERO_ADDRESS for API calls
+                "receiver": ZERO_ADDRESS,
                 "slippage": "0.01",
                 "enableAggregator": "true",
                 "amountIn": balance_str,
                 "tokenOut": USDC_ADDRESS,
-                "txOrigin": PRODUCTION_ADDRESS  # Using checksummed address
+                "txOrigin": self.w3.to_checksum_address(PRODUCTION_ADDRESS),  # Ensure address is checksummed
+                "chainId": "1"
             }
             
-            # Add headers for better API compatibility
+            # Add headers to match browser request
             headers = {
                 "Accept": "application/json",
-                "Content-Type": "application/json"
+                "Content-Type": "application/json",
+                "User-Agent": "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36",
+                "Origin": "https://app.pendle.finance",
+                "Referer": "https://app.pendle.finance/"
             }
             
             print(f"\nMaking Pendle API request:")
             print(f"URL: {url}")
+            print(f"Headers: {json.dumps(headers, indent=2)}")
             print(f"Params: {json.dumps(params, indent=2)}")
+            print(f"txOrigin address (checksum): {params['txOrigin']}")
             
             # Add a delay to allow the page to load
             print("Waiting for API to be ready (5 seconds)...")
             time.sleep(5)
             
-            response = APIRetry.get(url, params=params, headers=headers)
-            response.raise_for_status()
-            
-            data = response.json()['data']
-            amount_out = int(data['amountOut'])
-            price_impact = float(data['priceImpact'])
-            
-            return amount_out, price_impact
+            try:
+                response = APIRetry.get(url, params=params, headers=headers)
+                response.raise_for_status()
+                
+                data = response.json()['data']
+                amount_out = int(data['amountOut'])
+                price_impact = float(data['priceImpact'])
+                
+                return amount_out, price_impact
+            except requests.exceptions.RequestException as e:
+                print(f"Error fetching remove liquidity data: {e}")
+                if hasattr(e, 'response') and e.response is not None:
+                    print(f"Response status: {e.response.status_code}")
+                    print(f"Response headers: {json.dumps(dict(e.response.headers), indent=2)}")
+                    print(f"Response body: {e.response.text}")
+                return 0, 0
             
         except Exception as e:
             print(f"Error fetching remove liquidity data: {e}")
