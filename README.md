@@ -215,7 +215,7 @@ npm install
 2. Configure environment:
 ```bash
 # .env
-PUBLIC_MONGODB_URI=your_mongodb_uri
+MONGO_URI=your_mongodb_uri
 ```
 
 3. Run development server:

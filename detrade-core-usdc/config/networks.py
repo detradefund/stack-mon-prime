@@ -47,23 +47,25 @@ NETWORK_TOKENS = {
                 }
             }
         },
-        "PT-eUSDE-29MAY2025": {
-            "address": "0x50D2C7992b802Eef16c04FeADAB310f31866a545",
+
+        "PT-csUSDL-31JUL2025": {
+            "address": "0xf10A134A987E22ffa9463570A6D1eb92a63Fc178",
             "decimals": 18,
-            "name": "Pendle PT Ethereal eUSDE 29MAY2025",
-            "symbol": "PT-eUSDE-29MAY2025",
+            "name": "PT Coinshift USDL 31JUL2025",
+            "symbol": "PT-csUSDL-31JUL2025",
             "protocol": "pendle",
-            "market": "0x85667e484a32d884010cf16427d90049ccf46e97",
+            "market": "0x08bf93c8f85977c64069dd34c5da7b1c636e104f",
             "underlying": {
-                "eUSDe": {
-                    "address": "0x90d2af7d622ca3141efa4d8f1f24d86e5974cc8f",
+                "wUSDL": {
+                    "address": "0x7751E2F4b8ae93EF6B79d86419d42FE3295A4559",
                     "decimals": 18,
-                    "name": "Ethereal Pre-deposit Vault",
-                    "symbol": "eUSDe"
+                    "name": "Wrapped USDL",
+                    "symbol": "wUSDL"
                 }
             },
-            "expiry": 1748476800
+            "expiry": 1753920000
         },
+
         "PT-cUSDO-19JUN2025": {
             "address": "0x933B9FfEE0Ad3Ef8E4DBb52688ea905826D73755",
             "decimals": 18,
@@ -80,6 +82,21 @@ NETWORK_TOKENS = {
                 }
             },
             "expiry":1750291200
+        },
+        "SY-eUSDE": {
+            "address": "0x7ac8ca87959b1d5EDfe2df5325A37c304DCea4D0",
+            "decimals": 18,
+            "name": "SY Ethereal eUSDE",
+            "symbol": "SY-eUSDE",
+            "protocol": "ethereal",
+            "underlying": {
+                "USDe": {
+                    "address": "0x4c9edd5852cd905f086c759e8383e09bff1e68b3",
+                    "decimals": 18,
+                    "name": "USDe",
+                    "symbol": "USDe"
+                }
+            }
         },
         "scrvUSD": {
             "address": "0x0655977FEb2f289A4aB78af67BAB0d17aAb84367",

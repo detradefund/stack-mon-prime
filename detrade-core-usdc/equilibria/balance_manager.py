@@ -207,15 +207,35 @@ class BalanceManager:
 
             # If not expired, use existing code for Pendle API
             url = f"{PENDLE_API_BASE}/{MARKET_ADDRESS}/remove-liquidity"
+            
+            # Validate and format parameters
+            if not isinstance(balance_wei, (int, str)):
+                raise ValueError(f"Invalid balance_wei type: {type(balance_wei)}")
+            
+            balance_str = str(balance_wei)
+            if not balance_str.isdigit():
+                raise ValueError(f"Invalid balance_wei value: {balance_str}")
+            
             params = {
                 "receiver": ZERO_ADDRESS,  # Use ZERO_ADDRESS for API calls
                 "slippage": "0.01",
                 "enableAggregator": "true",
-                "amountIn": str(balance_wei),
-                "tokenOut": USDC_ADDRESS
+                "amountIn": balance_str,
+                "tokenOut": USDC_ADDRESS,
+                "txOrigin": PRODUCTION_ADDRESS  # Add txOrigin parameter
             }
             
-            response = APIRetry.get(url, params=params)
+            # Add headers for better API compatibility
+            headers = {
+                "Accept": "application/json",
+                "Content-Type": "application/json"
+            }
+            
+            print(f"\nMaking Pendle API request:")
+            print(f"URL: {url}")
+            print(f"Params: {json.dumps(params, indent=2)}")
+            
+            response = APIRetry.get(url, params=params, headers=headers)
             response.raise_for_status()
             
             data = response.json()['data']
@@ -226,6 +246,9 @@ class BalanceManager:
             
         except Exception as e:
             print(f"Error fetching remove liquidity data: {e}")
+            if hasattr(e, 'response') and e.response is not None:
+                print(f"Response status: {e.response.status_code}")
+                print(f"Response body: {e.response.text}")
             return 0, 0
 
     def get_earned_rewards(self, address=None):
@@ -438,20 +461,22 @@ class BalanceManager:
                             }
                         }
                     }
+                }
+            }
+
+            # Add network-level USDC totals
+            result["equilibria"]["ethereum"]["usdc_totals"] = {
+                "lp_tokens_total": {
+                    "wei": lp_total,
+                    "formatted": f"{lp_total/1e6:.6f}"
                 },
-                "usdc_totals": {
-                    "lp_tokens_total": {
-                        "wei": lp_total,
-                        "formatted": f"{lp_total/1e6:.6f}"
-                    },
-                    "rewards_total": {
-                        "wei": rewards_total,
-                        "formatted": f"{rewards_total/1e6:.6f}"
-                    },
-                    "total": {
-                        "wei": total,
-                        "formatted": f"{total/1e6:.6f}"
-                    }
+                "rewards_total": {
+                    "wei": rewards_total,
+                    "formatted": f"{rewards_total/1e6:.6f}"
+                },
+                "total": {
+                    "wei": total,
+                    "formatted": f"{total/1e6:.6f}"
                 }
             }
 
@@ -467,6 +492,14 @@ class BalanceManager:
             print(f"✗ Error fetching Equilibria positions: {str(e)}")
             # In case of error, return a valid but empty structure
             return {"equilibria": {
+                "ethereum": {
+                    "usdc_totals": {
+                        "total": {
+                            "wei": 0,
+                            "formatted": "0.000000"
+                        }
+                    }
+                },
                 "usdc_totals": {
                     "total": {
                         "wei": 0,
