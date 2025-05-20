@@ -218,33 +218,22 @@ class BalanceManager:
             
             # Format parameters to match browser request
             params = {
-                "receiver": ZERO_ADDRESS,
+                "receiver": self.w3.to_checksum_address(PRODUCTION_ADDRESS),
                 "slippage": "0.01",
                 "enableAggregator": "true",
                 "amountIn": balance_str,
-                "tokenOut": USDC_ADDRESS,
-                "txOrigin": self.w3.to_checksum_address(PRODUCTION_ADDRESS),  # Ensure address is checksummed
-                "chainId": "1"
+                "tokenOut": USDC_ADDRESS
             }
             
             # Add headers to match browser request
             headers = {
-                "Accept": "application/json",
-                "Content-Type": "application/json",
-                "User-Agent": "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36",
-                "Origin": "https://app.pendle.finance",
-                "Referer": "https://app.pendle.finance/"
+                "accept": "application/json"
             }
             
             print(f"\nMaking Pendle API request:")
             print(f"URL: {url}")
             print(f"Headers: {json.dumps(headers, indent=2)}")
             print(f"Params: {json.dumps(params, indent=2)}")
-            print(f"txOrigin address (checksum): {params['txOrigin']}")
-            
-            # Add a delay to allow the page to load
-            print("Waiting for API to be ready (5 seconds)...")
-            time.sleep(5)
             
             try:
                 response = APIRetry.get(url, params=params, headers=headers)
