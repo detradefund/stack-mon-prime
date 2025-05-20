@@ -21,7 +21,7 @@ ETHEREUM_RPC = os.getenv('ETHEREUM_RPC')
 ZERO_ADDRESS = "0x0000000000000000000000000000000000000000"
 
 # Production addresses
-PRODUCTION_ADDRESS = "0xc6835323372A4393B90bCc227c58e82D45CE4b7d"
+PRODUCTION_ADDRESS = Web3.to_checksum_address("0xc6835323372A4393B90bCc227c58e82D45CE4b7d")
 
 # Contract addresses
 BASE_REWARD_POOL_ADDRESS = '0xC565b6781e629f29600741543c2403dbD49391F2'
@@ -222,7 +222,7 @@ class BalanceManager:
                 "enableAggregator": "true",
                 "amountIn": balance_str,
                 "tokenOut": USDC_ADDRESS,
-                "txOrigin": PRODUCTION_ADDRESS  # Add txOrigin parameter
+                "txOrigin": PRODUCTION_ADDRESS  # Using checksummed address
             }
             
             # Add headers for better API compatibility
@@ -234,6 +234,10 @@ class BalanceManager:
             print(f"\nMaking Pendle API request:")
             print(f"URL: {url}")
             print(f"Params: {json.dumps(params, indent=2)}")
+            
+            # Add a delay to allow the page to load
+            print("Waiting for API to be ready (5 seconds)...")
+            time.sleep(5)
             
             response = APIRetry.get(url, params=params, headers=headers)
             response.raise_for_status()
