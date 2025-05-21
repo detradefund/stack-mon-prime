@@ -1,5 +1,6 @@
 <script lang="ts">
   import { fade } from 'svelte/transition';
+  import { onMount } from 'svelte';
   
   let documents: any[] = [];
   let loading = true;
@@ -13,19 +14,26 @@
     if (loading || !hasMore) return;
 
     try {
+      console.log('ETH Box - Loading more documents, page:', currentPage + 1);
       loading = true;
-      const response = await fetch(`/api/oracle/detrade-core-usdc?page=${currentPage + 1}&limit=5`);
+      const response = await fetch(`/api/oracle/detrade-core-eth?page=${currentPage + 1}&limit=5`);
       
       if (!response.ok) {
         throw new Error(`HTTP error! status: ${response.status}`);
       }
       
       const data = await response.json();
+      console.log('ETH Box - Received data:', {
+        documentsCount: data.documents?.length,
+        total: data.total,
+        hasMore: data.hasMore
+      });
+
       documents = [...documents, ...data.documents];
       hasMore = data.hasMore;
       currentPage += 1;
     } catch (err) {
-      console.error('Error fetching more documents:', err);
+      console.error('ETH Box - Error fetching more documents:', err);
       error = 'Failed to load more documents. Please try again later.';
     } finally {
       loading = false;
@@ -43,13 +51,21 @@
 
   async function fetchInitialDocuments() {
     try {
-      const response = await fetch(`/api/oracle/detrade-core-usdc?page=1&limit=5`);
+      console.log('ETH Box - Fetching initial documents');
+      const response = await fetch(`/api/oracle/detrade-core-eth?page=1&limit=5`);
       
       if (!response.ok) {
         throw new Error(`HTTP error! status: ${response.status}`);
       }
       
       const data = await response.json();
+      console.log('ETH Box - Initial data received:', {
+        documentsCount: data.documents?.length,
+        total: data.total,
+        hasMore: data.hasMore,
+        error: data.error
+      });
+
       if (data.error) {
         throw new Error(data.error);
       }
@@ -59,7 +75,7 @@
       error = null;
       showError = false;
     } catch (err) {
-      console.error('Error fetching oracle documents:', err);
+      console.error('ETH Box - Error fetching oracle documents:', err);
       error = 'Failed to load documents. Please try again later.';
       documents = [];
       setTimeout(() => {
@@ -77,7 +93,6 @@
     try {
       let date;
       if (typeof timestamp === 'string' && timestamp.includes('UTC')) {
-        // Convertir le timestamp UTC en objet Date
         const [datePart, timePart] = timestamp.split(' UTC')[0].split(' ');
         date = new Date(`${datePart}T${timePart}Z`);
       } else {
@@ -114,18 +129,20 @@
   }
 
   function getDocumentLink(doc: any) {
-    return `/detrade-core-usdc/oracle/${doc._id}`;
+    return `/detrade-core-eth/oracle/${doc._id}`;
   }
 
-  // Charger les documents au montage du composant
-  fetchInitialDocuments();
+  onMount(() => {
+    console.log('ETH Box - Component mounted');
+    fetchInitialDocuments();
+  });
 </script>
 
 <div class="wrapper" in:fade={{ duration: 200 }}>
   <div class="container">
     <div class="info-box">
       <div class="info-header">
-        <h3>DeTrade Core USDC</h3>
+        <h3>DeTrade Core ETH</h3>
       </div>
       <div class="info-content" on:scroll={handleScroll}>
         {#if loading && initialLoad}
@@ -146,9 +163,8 @@
                       {#if doc.timestamp}
                         {(() => {
                           try {
-                            // Convertir le timestamp UTC en objet Date
                             const [datePart, timePart] = doc.timestamp.split(' UTC')[0].split(' ');
-                            const utcDate = new Date(`${datePart}T${timePart}Z`);  // Le Z à la fin indique UTC
+                            const utcDate = new Date(`${datePart}T${timePart}Z`);
                             
                             if (!isNaN(utcDate.getTime())) {
                               return utcDate.toLocaleString(undefined, {
@@ -172,7 +188,9 @@
                     </span>
                     <p class="nav-info">
                       <span class="nav-label">NAV: </span>
-                      <span class="nav-value">{doc.nav?.usdc ?? 'N/A'} {doc.nav?.usdc ? 'USDC' : ''}</span>
+                      <span class="nav-value">
+                        {doc.nav?.weth ? Number(doc.nav.weth).toFixed(6) : 'N/A'} {doc.nav?.weth ? 'WETH' : ''}
+                      </span>
                     </p>
                   </div>
                   <a 
@@ -293,17 +311,20 @@
     color: #64748b;
   }
 
-  .network {
+  .nav-info {
+    margin: 0;
     font-size: 0.875rem;
-    color: #38bdf8;
+    color: #94a3b8;
   }
 
-  .document-details {
-    font-size: 0.875rem;
-  }
-
-  .document-details p {
-    margin: 0.25rem 0;
+  .nav-value {
+    font-weight: 600;
+    background: linear-gradient(135deg, #fff 0%, var(--color-accent) 100%);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+    text-fill-color: transparent;
+    font-family: 'Roboto Mono', monospace;
   }
 
   .loading {
@@ -406,10 +427,13 @@
       font-size: 1.25rem;
     }
 
+    .info-content {
+      max-height: 400px;
+    }
+
     .document-item {
       padding: 1rem;
       text-align: center;
-      background: rgba(255, 255, 255, 0.03);
     }
 
     .document-header {
@@ -425,7 +449,6 @@
 
     .timestamp {
       font-size: 0.8rem;
-      color: #64748b;
       order: 2;
     }
 
@@ -482,21 +505,5 @@
     .container {
       padding-inline: 0.75rem;
     }
-  }
-
-  .nav-info {
-    margin: 0;
-    font-size: 0.875rem;
-    color: #94a3b8;
-  }
-
-  .nav-value {
-    font-weight: 600;
-    background: linear-gradient(135deg, #fff 0%, var(--color-accent) 100%);
-    -webkit-background-clip: text;
-    -webkit-text-fill-color: transparent;
-    background-clip: text;
-    text-fill-color: transparent;
-    font-family: 'Roboto Mono', monospace;
   }
 </style> 

@@ -26,12 +26,12 @@
 
   const rightLinks = [
     {
-      name: 'Documentation',
+      name: 'Docs',
       url: 'https://docs.detrade.fund'
     },
     {
-      name: 'App',
-      url: 'https://app.detrade.fund'
+      name: 'Vaults',
+      url: 'https://app2-gules-sigma.vercel.app/'
     },
     {
       name: 'Website',
@@ -41,58 +41,49 @@
 </script>
 
 <footer class="footer">
-  <div class="footer-content">
-    <div class="social-links">
-      {#each socialLinks.filter(link => !link.isImage) as link}
-        <a 
-          href={link.url}
-          target="_blank"
-          rel="noopener noreferrer"
-          class="social-link"
-          aria-label={link.name}
-        >
-          {@html link.icon}
-        </a>
-      {/each}
-    </div>
-
-    <div class="lagoon-container">
+  <div class="social-links">
+    {#each socialLinks.slice(0, 2) as social}
       <a 
-        href="https://lagoon.finance"
+        href={social.url}
         target="_blank"
         rel="noopener noreferrer"
-        class="lagoon-link"
-        aria-label="Powered by Lagoon"
+        class="social-link"
+        aria-label={social.name}
       >
-        <img src="/white_horizontal_powered_by_lagoon.svg" alt="Powered by Lagoon" class="lagoon-logo" />
+        {@html social.icon}
       </a>
-    </div>
+    {/each}
+  </div>
 
-    <div class="right-links">
-      {#each rightLinks as link}
-        <a href={link.url} target="_blank" rel="noopener noreferrer" class="right-link">
-          {link.name}
-        </a>
-      {/each}
-    </div>
+  <div class="lagoon-container">
+    <a 
+      href="https://lagoon.finance"
+      target="_blank"
+      rel="noopener noreferrer"
+      class="lagoon-link"
+      aria-label="Powered by Lagoon"
+    >
+      <img src="/white_horizontal_powered_by_lagoon.svg" alt="Powered by Lagoon" class="lagoon-logo" />
+    </a>
+  </div>
+
+  <div class="right-links">
+    {#each rightLinks as link}
+      <a href={link.url} target="_blank" rel="noopener noreferrer" class="right-link">
+        {link.name}
+      </a>
+    {/each}
   </div>
 </footer>
 
 <style>
   .footer {
     width: 100%;
-    padding: 1.65rem 0;
+    padding: 1rem 0;
     margin-top: auto;
-    position: absolute;
-    bottom: 0;
-    left: 0;
-    background: transparent;
-  }
-
-  .footer-content {
-    max-width: 1200px;
+    max-width: 1800px;
     margin: 0 auto;
-    padding: 0 2rem;
+    padding: 1rem clamp(2.5rem, 10vw, 5rem);
     display: flex;
     justify-content: space-between;
     align-items: center;
@@ -173,10 +164,10 @@
   }
 
   @media (max-width: 768px) {
-    .footer-content {
+    .footer {
       flex-direction: column;
       gap: 1.5rem;
-      padding: 0 1rem;
+      padding: 0 clamp(1rem, 5vw, 2rem);
     }
 
     .lagoon-container {

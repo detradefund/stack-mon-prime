@@ -19,44 +19,51 @@
 
 <style>
   .wrapper {
-    width: 100vw;
+    width: 100%;
     background: transparent;
-    padding-top: 2rem;
+    padding-top: 0;
     position: relative;
-    left: 50%;
-    right: 50%;
-    margin-left: -50vw;
-    margin-right: -50vw;
+    margin-bottom: 1.5rem;
   }
 
   .container {
-    max-width: 1200px;
     width: 100%;
-    margin: 0 auto;
-    padding-inline: 2rem;
+    margin: 0;
+    padding: 0;
   }
 
   .info-box {
-    background: rgba(255, 255, 255, 0.02);
-    border: 1px solid rgba(255, 255, 255, 0.05);
-    border-radius: 16px;
-    padding: 1.5rem;
     width: 100%;
+    background: rgba(10, 34, 58, 0.503);
+    border-radius: 0.75rem;
+    box-shadow: 0 0 0 rgba(25, 62, 182, 0.264);
+    padding: 2rem;
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+    border: 1px solid rgba(255, 255, 255, 0.05);
   }
 
   .info-header {
-    margin-bottom: 1rem;
+    margin-bottom: 1.5rem;
+    width: 100%;
   }
 
   .info-header h3 {
     color: #ffffff;
     margin: 0;
-    font-size: 1.25rem;
+    font-size: 1.5rem;
     font-weight: 500;
+    background: linear-gradient(135deg, #fff 0%, var(--color-accent) 100%);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+    text-fill-color: transparent;
   }
 
   .info-content {
     color: #94a3b8;
+    width: 100%;
   }
 
   .info-content p {
@@ -76,18 +83,15 @@
 
     .info-box {
       padding: 1.5rem;
+    }
+
+    .info-header h3 {
+      font-size: 1.25rem;
       text-align: center;
     }
 
-    .info-header {
-      display: flex;
-      justify-content: center;
-    }
-
     .info-content {
-      display: flex;
-      flex-direction: column;
-      align-items: center;
+      text-align: center;
     }
 
     .info-content p {
