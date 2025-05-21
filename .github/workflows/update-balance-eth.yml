@@ -26,10 +26,10 @@ jobs:
           BASE_RPC: ${{ secrets.BASE_RPC }}
           ETHEREUM_RPC: ${{ secrets.ETHEREUM_RPC }}
           PYTHONPATH: ${{ github.workspace }}/detrade-core-eth
+        working-directory: ./detrade-core-eth/builder
         run: |
-          cd ${{ github.workspace }}/detrade-core-eth
-          ls -la  # Debug: afficher le contenu du répertoire
           python -m pip install --upgrade pip
-          pip install -r ${{ github.workspace }}/detrade-core-eth/requirements.txt
+          cd ..
+          pip install -r requirements.txt
           cd builder
           python pusher.py 
