@@ -28,7 +28,8 @@ jobs:
           PYTHONPATH: ${{ github.workspace }}/detrade-core-eth
         run: |
           cd ${{ github.workspace }}/detrade-core-eth
+          ls -la  # Debug: afficher le contenu du répertoire
           python -m pip install --upgrade pip
-          pip install -r requirements.txt
+          pip install -r ${{ github.workspace }}/detrade-core-eth/requirements.txt
           cd builder
           python pusher.py 
