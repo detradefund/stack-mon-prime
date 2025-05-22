@@ -118,24 +118,14 @@ class SpotBalanceManager:
         print("  - Converting non-USDC tokens to USDC via CoWSwap")
         
         checksum_address = Web3.to_checksum_address(address)
-        result = {
-            "usdc_totals": {
-                "total": {
-                    "wei": 0,
-                    "formatted": "0.000000"
-                }
-            }
-        }
+        result = {"spot": {}}
         total_usdc_wei = 0
         
         try:
-            total_usdc_value = Decimal('0')
-            
             # Process each network
             for network in self.get_supported_networks():
                 print(f"\nProcessing network: {network}")
                 network_has_balance = False
-                network_balances = {}
                 network_total = 0
                 
                 # Process each token type
@@ -161,7 +151,12 @@ class SpotBalanceManager:
                         usdc_normalized = Decimal(usdc_amount) / Decimal(10**6)
                         network_total += int(usdc_amount)
                         
-                        network_balances[token_symbol] = {
+                        # Initialize network structure if not exists
+                        if network not in result["spot"]:
+                            result["spot"][network] = {}
+                        
+                        # Add token data
+                        result["spot"][network][token_symbol] = {
                             "amount": str(balance),
                             "decimals": decimals,
                             "value": {
@@ -170,89 +165,48 @@ class SpotBalanceManager:
                                     "decimals": 6,
                                     "conversion_details": conversion_details
                                 }
+                            },
+                            "totals": {
+                                "wei": int(usdc_amount),
+                                "formatted": f"{int(usdc_amount)/1e6:.6f}"
                             }
                         }
                         
-                        total_usdc_value += usdc_normalized
+                        total_usdc_wei += int(usdc_amount)
                     else:
                         print("  → Balance is 0, skipping conversion")
                 
-                print(f"\nNetwork {network} processing complete")
-                # Only add network to result if it has balances
+                # Add network totals if it has balances
                 if network_has_balance:
-                    # Save current totals
-                    current_totals = result["usdc_totals"]
-                    
-                    # Add network
-                    result[network] = network_balances
-                    result[network]["usdc_totals"] = {
-                        "total": {
-                            "wei": network_total,
-                            "formatted": f"{network_total/1e6:.6f}"
-                        }
+                    result["spot"][network]["totals"] = {
+                        "wei": network_total,
+                        "formatted": f"{network_total/1e6:.6f}"
                     }
-                    
-                    # Restore totals
-                    result["usdc_totals"] = current_totals
             
-            # Sort tokens by USDC value for each network
-            for network in self.get_supported_networks():
-                if network in result:
-                    tokens = [(k, v) for k, v in result[network].items() if k != "usdc_totals"]
-                    sorted_tokens = sorted(
-                        tokens,
-                        key=lambda x: int(x[1].get('value', {}).get('USDC', {}).get('amount', '0')),
-                        reverse=True
-                    )
-                    result[network].update(dict(sorted_tokens))
-            
-            # Calculate global total at the end
-            total_usdc_wei = sum(
-                network_data["usdc_totals"]["total"]["wei"]
-                for network_data in result.values()
-                if isinstance(network_data, dict) and "usdc_totals" in network_data
-                and network_data != result["usdc_totals"]  # Exclude global total
-            )
-
-            # Update global total
-            result["usdc_totals"] = {
-                "total": {
+            # Add protocol total
+            if total_usdc_wei > 0:
+                result["spot"]["totals"] = {
                     "wei": total_usdc_wei,
                     "formatted": f"{total_usdc_wei/1e6:.6f}"
                 }
-            }
 
             # Display summary
             print("\n[Spot] Calculation complete")
             
             # Display positions by network and token
-            for network in result:
-                if network != "usdc_totals":
-                    for token_symbol, token_data in result[network].items():
-                        if token_symbol != "usdc_totals":
-                            amount = int(token_data["value"]["USDC"]["amount"])
+            for network in result["spot"]:
+                if network != "totals":
+                    for token_symbol, token_data in result["spot"][network].items():
+                        if token_symbol != "totals":
+                            amount = int(token_data["totals"]["wei"])
                             if amount > 0:
                                 print(f"spot.{network}.{token_symbol}: {amount/1e6:.6f} USDC")
 
-            # Move usdc_totals to the end
-            final_result = {}
-            for network in result:
-                if network != "usdc_totals":
-                    final_result[network] = result[network]
-            final_result["usdc_totals"] = result["usdc_totals"]
-
         except Exception as e:
             print(f"\n✗ Error getting spot token balances: {str(e)}")
-            return {
-                "usdc_totals": {
-                    "total": {
-                        "wei": 0,
-                        "formatted": "0.000000"
-                    }
-                }
-            }
+            return {"spot": {}}
         
-        return final_result
+        return result
 
     def format_balance(self, balance: int, decimals: int) -> str:
         """Format raw balance to human readable format"""
@@ -308,7 +262,9 @@ def main():
     manager = SpotBalanceManager()
     balances = manager.get_balances(test_address)
     
-    print("\nSpot balances:")
+    print("\n" + "="*80)
+    print("FINAL RESULT:")
+    print("="*80 + "\n")
     print(json.dumps(balances, indent=2))
 
 if __name__ == "__main__":

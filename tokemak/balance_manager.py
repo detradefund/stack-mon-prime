@@ -74,16 +74,7 @@ class BalanceManager:
         print("\nProcessing network: ethereum")
         
         checksum_address = Web3.to_checksum_address(address)
-        result = {
-            "tokemak": {
-                "usdc_totals": {
-                    "total": {
-                        "wei": 0,
-                        "formatted": "0.000000"
-                    }
-                }
-            }
-        }
+        result = {"tokemak": {}}
         
         try:
             # Contract information
@@ -164,6 +155,7 @@ class BalanceManager:
             print(f"  Rewards: {toke_in_usdc/1e6:.6f} USDC")
             print(f"  Total: {total_usdc_value/1e6:.6f} USDC")
 
+            # Initialize network structure
             result["tokemak"]["ethereum"] = {
                 "autoUSD": {
                     "amount": str(shares),
@@ -181,42 +173,35 @@ class BalanceManager:
                                 "note": "Direct conversion using autoUSD contract"
                             }
                         }
-                    }
-                },
-                "rewards": {
-                    "TOKE": {
-                        "amount": str(earned),
-                        "decimals": 18,
-                        "value": {
-                            "USDC": {
-                                "amount": str(toke_in_usdc),
-                                "decimals": 6,
-                                "conversion_details": conversion_details
+                    },
+                    "rewards": {
+                        "TOKE": {
+                            "amount": str(earned),
+                            "decimals": 18,
+                            "value": {
+                                "USDC": {
+                                    "amount": str(toke_in_usdc),
+                                    "decimals": 6,
+                                    "conversion_details": conversion_details
+                                }
                             }
                         }
-                    }
-                },
-                "usdc_totals": {
-                    "lp_tokens_total": {
-                        "wei": assets,
-                        "formatted": f"{assets/1e6:.6f}"
                     },
-                    "rewards_total": {
-                        "wei": toke_in_usdc,
-                        "formatted": f"{toke_in_usdc/1e6:.6f}"
-                    },
-                    "total": {
+                    "totals": {
                         "wei": total_usdc_value,
                         "formatted": f"{total_usdc_value/1e6:.6f}"
                     }
-                }
-            }
-
-            result["tokemak"]["usdc_totals"] = {
-                "total": {
+                },
+                "totals": {
                     "wei": total_usdc_value,
                     "formatted": f"{total_usdc_value/1e6:.6f}"
                 }
+            }
+
+            # Add protocol total
+            result["tokemak"]["totals"] = {
+                "wei": total_usdc_value,
+                "formatted": f"{total_usdc_value/1e6:.6f}"
             }
 
             print("\n[Tokemak] Calculation complete")
