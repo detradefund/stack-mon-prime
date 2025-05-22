@@ -56,4 +56,14 @@ htmlcov/
 # Cache et temporaires
 .cache/
 temp/
-tmp/ 
+tmp/
+
+# Node.js (ajouté depuis la version distante)
+node_modules/
+.npm
+.yarn/
+.pnp.*
+.next/
+out/
+.nuxt/
+dist/
