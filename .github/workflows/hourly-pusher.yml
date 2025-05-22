@@ -1,6 +1,9 @@
 name: Push NAV for Detrade Core USDC and dev DeTrade Core USDC
 
 on:
+  push:
+    branches:
+      - main
   schedule:
     - cron: '0 * * * *'  # Runs every hour
   workflow_dispatch:  # Allows manual triggering
