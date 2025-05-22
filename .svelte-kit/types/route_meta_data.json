@@ -1,0 +1,17 @@
+{
+	"/": [],
+	"/admin": [],
+	"/admin/login": [],
+	"/api/admin/trigger-nav": [
+		"src/routes/api/admin/trigger-nav/+server.ts"
+	],
+	"/api/admin/verify": [
+		"src/routes/api/admin/verify/+server.ts"
+	],
+	"/api/oracle/[id]": [
+		"src/routes/api/oracle/[id]/+server.ts"
+	],
+	"/api/update-balance": [
+		"src/routes/api/update-balance/+server.ts"
+	]
+}
