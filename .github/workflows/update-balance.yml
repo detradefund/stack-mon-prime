@@ -30,4 +30,5 @@ jobs:
           MONGO_URI: ${{ secrets.MONGO_URI }}
           BASE_RPC: ${{ secrets.BASE_RPC }}
           ETHEREUM_RPC: ${{ secrets.ETHEREUM_RPC }}
+          PYTHONPATH: ${{ github.workspace }}
         run: python builder/pusher.py 
