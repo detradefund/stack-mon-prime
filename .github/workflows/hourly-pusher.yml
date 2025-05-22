@@ -26,4 +26,8 @@ jobs:
         pip install -r requirements.txt
         
     - name: Run pusher
+      env:
+        MONGO_URI: ${{ secrets.MONGO_URI }}
+        DATABASE_NAME: ${{ secrets.DATABASE_NAME }}
+        COLLECTION_NAME: ${{ secrets.COLLECTION_NAME }}
       run: python -m builder.pusher 
