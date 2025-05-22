@@ -1,1 +1,0 @@
-# detrade-core-usdc
