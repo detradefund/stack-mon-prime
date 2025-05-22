@@ -11,6 +11,9 @@ on:
 jobs:
   run-pusher:
     runs-on: ubuntu-latest
+    env:
+      ETHEREUM_RPC: ${{ secrets.ETHEREUM_RPC }}
+      BASE_RPC: ${{ secrets.BASE_RPC }}
     
     steps:
     - uses: actions/checkout@v3
