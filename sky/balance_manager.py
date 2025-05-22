@@ -63,7 +63,7 @@ class BalanceManager:
         print("="*80)
         
         checksum_address = Web3.to_checksum_address(address)
-        balances = {"sky": {}}  # Renamed to avoid confusion with get_quote result
+        balances = {"sky": {}}
         total_usdc_wei = 0
 
         # Process each network
@@ -139,13 +139,21 @@ class BalanceManager:
                             }
                         }
                         
-                        # Add network totals
-                        balances["sky"][network]["usdc_totals"] = {
-                            "total": {
-                                "wei": usdc_amount,
-                                "formatted": f"{usdc_amount/1e6:.6f}"
-                            }
+                        # Add position totals
+                        balances["sky"][network]["sUSDS"]["totals"] = {
+                            "wei": usdc_amount,
+                            "formatted": f"{usdc_amount/1e6:.6f}"
                         }
+                        
+                        # Add network totals
+                        if "totals" not in balances["sky"][network]:
+                            balances["sky"][network]["totals"] = {
+                                "wei": 0,
+                                "formatted": "0.000000"
+                            }
+                        balances["sky"][network]["totals"]["wei"] += usdc_amount
+                        balances["sky"][network]["totals"]["formatted"] = f"{balances['sky'][network]['totals']['wei']/1e6:.6f}"
+                        
                         total_usdc_wei += usdc_amount
 
             except Exception as e:
@@ -154,11 +162,9 @@ class BalanceManager:
 
         # Add protocol total
         if total_usdc_wei > 0:
-            balances["sky"]["usdc_totals"] = {
-                "total": {
-                    "wei": total_usdc_wei,
-                    "formatted": f"{total_usdc_wei/1e6:.6f}"
-                }
+            balances["sky"]["totals"] = {
+                "wei": total_usdc_wei,
+                "formatted": f"{total_usdc_wei/1e6:.6f}"
             }
             
         print("\n[Sky] Calculation complete")
@@ -167,7 +173,7 @@ class BalanceManager:
         if balances["sky"]:
             for network in ["ethereum", "base"]:
                 if network in balances["sky"] and "sUSDS" in balances["sky"][network]:
-                    usdc_value = int(balances["sky"][network]["sUSDS"]["value"]["USDC"]["amount"])
+                    usdc_value = int(balances["sky"][network]["sUSDS"]["totals"]["wei"])
                     print(f"sky.{network}.sUSDS: {usdc_value/1e6:.6f} USDC")
 
         return balances
