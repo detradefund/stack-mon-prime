@@ -14,7 +14,7 @@ from cowswap.cow_client import get_quote
 from utils.retry import Web3Retry, APIRetry
 
 # Production address
-PRODUCTION_ADDRESS = "0xc6835323372A4393B90bCc227c58e82D45CE4b7d"
+PRODUCTION_ADDRESS = "0x66DbceE7feA3287B3356227d6F3DfF3CeFbC6F3C"
 
 class SpotBalanceManager:
     """Manages spot token balances across networks"""
@@ -46,15 +46,12 @@ class SpotBalanceManager:
         
         # Initialize contracts for each network
         for network, w3 in self.connections.items():
-            # Get all spot tokens (those without 'protocol' key)
-            spot_tokens = {
-                symbol: token_data  # Keep original case
-                for symbol, token_data in NETWORK_TOKENS[network].items()
-                if "protocol" not in token_data
-            }
-            
-            # Initialize contract for each token
-            for symbol, token_data in spot_tokens.items():
+            # Get all tokens for the network
+            for symbol, token_data in NETWORK_TOKENS[network].items():
+                # Skip yield-bearing tokens
+                if token_data.get("type") == "yield-bearing":
+                    continue
+                    
                 if symbol not in contracts:
                     contracts[symbol] = {}
                 
@@ -114,19 +111,58 @@ class SpotBalanceManager:
         print("="*80)
         
         print("\nProcessing method:")
+        print("  - Querying native ETH balance")
         print("  - Querying balanceOf(address) for each token")
-        print("  - Converting non-USDC tokens to USDC via CoWSwap")
+        print("  - Converting non-WETH tokens to WETH via CoWSwap")
         
         checksum_address = Web3.to_checksum_address(address)
-        result = {"spot": {}}
-        total_usdc_wei = 0
+        result = {}
+        total_weth_wei = 0
         
         try:
             # Process each network
             for network in self.get_supported_networks():
                 print(f"\nProcessing network: {network}")
-                network_has_balance = False
                 network_total = 0
+                
+                # Initialize network structure
+                network_result = {}
+                
+                try:
+                    # Check native ETH balance first
+                    native_balance = self.connections[network].eth.get_balance(checksum_address)
+                    
+                    print(f"\nProcessing native ETH:")
+                    print(f"  Amount: {Decimal(native_balance) / Decimal(10**18):.6f} ETH")
+                    
+                    if native_balance > 0:
+                        # Native ETH is already in WETH terms
+                        network_total += native_balance
+                        total_weth_wei += native_balance
+                        
+                        # Add native ETH data
+                        network_result["ETH"] = {
+                            "amount": str(native_balance),
+                            "decimals": 18,
+                            "value": {
+                                "WETH": {
+                                    "amount": str(native_balance),
+                                    "decimals": 18,
+                                    "conversion_details": {
+                                        "source": "Direct",
+                                        "price_impact": "0.0000%",
+                                        "rate": "1.000000",
+                                        "fee_percentage": "0.0000%",
+                                        "fallback": False,
+                                        "note": "Direct 1:1 conversion (ETH = WETH)"
+                                    }
+                                }
+                            }
+                        }
+                    else:
+                        print("  → Balance is 0, skipping")
+                except Exception as e:
+                    print(f"Error checking native ETH balance: {str(e)}")
                 
                 # Process each token type
                 for token_type, network_contracts in self.contracts.items():
@@ -146,67 +182,96 @@ class SpotBalanceManager:
                     print(f"  Amount: {balance_normalized:.6f} {token_symbol}")
                     
                     if balance > 0:
-                        network_has_balance = True
-                        usdc_amount, conversion_details = self._get_usdc_value(network, token_symbol, str(balance))
-                        usdc_normalized = Decimal(usdc_amount) / Decimal(10**6)
-                        network_total += int(usdc_amount)
+                        if token_symbol == "WETH":
+                            # WETH is already in WETH terms
+                            weth_amount = balance
+                            conversion_details = {
+                                "source": "Direct",
+                                "price_impact": "0.0000%",
+                                "rate": "1.000000",
+                                "fee_percentage": "0.0000%",
+                                "fallback": False,
+                                "note": "Direct 1:1 conversion (WETH)"
+                            }
+                        else:
+                            # Convert other tokens to WETH via CoWSwap
+                            weth_amount, conversion_details = self._get_weth_value(network, token_symbol, str(balance))
                         
-                        # Initialize network structure if not exists
-                        if network not in result["spot"]:
-                            result["spot"][network] = {}
+                        network_total += int(weth_amount)
+                        total_weth_wei += int(weth_amount)
                         
                         # Add token data
-                        result["spot"][network][token_symbol] = {
+                        network_result[token_symbol] = {
                             "amount": str(balance),
                             "decimals": decimals,
                             "value": {
-                                "USDC": {
-                                    "amount": usdc_amount,
-                                    "decimals": 6,
+                                "WETH": {
+                                    "amount": str(weth_amount),
+                                    "decimals": 18,
                                     "conversion_details": conversion_details
                                 }
-                            },
-                            "totals": {
-                                "wei": int(usdc_amount),
-                                "formatted": f"{int(usdc_amount)/1e6:.6f}"
                             }
                         }
-                        
-                        total_usdc_wei += int(usdc_amount)
                     else:
-                        print("  → Balance is 0, skipping conversion")
+                        print("  → Balance is 0, skipping")
                 
-                # Add network totals if it has balances
-                if network_has_balance:
-                    result["spot"][network]["totals"] = {
+                # Add network totals only if there are balances
+                if network_total > 0:
+                    network_result["totals"] = {
                         "wei": network_total,
-                        "formatted": f"{network_total/1e6:.6f}"
+                        "formatted": f"{network_total/1e18:.6f}"
                     }
+                    # Only add network to result if it has balances
+                    result[network] = network_result
             
-            # Add protocol total
-            if total_usdc_wei > 0:
-                result["spot"]["totals"] = {
-                    "wei": total_usdc_wei,
-                    "formatted": f"{total_usdc_wei/1e6:.6f}"
+            # Add protocol total only if there are balances
+            if total_weth_wei > 0:
+                result["totals"] = {
+                    "wei": total_weth_wei,
+                    "formatted": f"{total_weth_wei/1e18:.6f}"
                 }
 
-            # Display summary
             print("\n[Spot] Calculation complete")
+            return result
             
-            # Display positions by network and token
-            for network in result["spot"]:
-                if network != "totals":
-                    for token_symbol, token_data in result["spot"][network].items():
-                        if token_symbol != "totals":
-                            amount = int(token_data["totals"]["wei"])
-                            if amount > 0:
-                                print(f"spot.{network}.{token_symbol}: {amount/1e6:.6f} USDC")
+        except Exception as e:
+            print(f"\nError processing spot balances: {str(e)}")
+            return result
+
+    def _get_weth_value(self, network: str, token_symbol: str, amount: str) -> tuple[str, dict]:
+        """
+        Get WETH value for a given token amount using CoWSwap
+        Returns (weth_amount, conversion_details)
+        """
+        try:
+            # Get token contract address and decimals
+            token_address = NETWORK_TOKENS[network][token_symbol]["address"]
+            token_decimals = NETWORK_TOKENS[network][token_symbol]["decimals"]
+
+            # Get quote from CoW Protocol
+            result = get_quote(
+                network=network,
+                sell_token=token_address,
+                buy_token=NETWORK_TOKENS[network]["WETH"]["address"],
+                amount=amount,
+                token_decimals=token_decimals,
+                token_symbol=token_symbol
+            )
+
+            if result["quote"]:
+                return result["quote"]["quote"]["buyAmount"], result["conversion_details"]
+
+            return "0", result["conversion_details"]
 
         except Exception as e:
-            print(f"\n✗ Error getting spot token balances: {str(e)}")
-            return {"spot": {}}
-        
-        return result
+            return "0", {
+                "source": "Error",
+                "price_impact": "N/A",
+                "rate": "0",
+                "fee_percentage": "N/A",
+                "fallback": True,
+                "note": f"Technical error: {str(e)[:200]}"
+            }
 
     def format_balance(self, balance: int, decimals: int) -> str:
         """Format raw balance to human readable format"""

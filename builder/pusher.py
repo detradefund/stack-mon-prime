@@ -165,7 +165,7 @@ class BalancePusher:
             logger.info("SUMMARY")
             logger.info("="*80)
             logger.info(f"Address: {address}")
-            logger.info(f"Total Value: {overview['nav']['usdc']} USDC")
+            logger.info(f"Total Value: {overview['nav']['eth']} WETH")
             logger.info(f"Collection started at: {prepared_data['timestamp']}")
             logger.info(f"Pushed at: {push_timestamp.strftime('%Y-%m-%d %H:%M:%S UTC')}")
             logger.info(f"Collection duration: {collection_duration:.2f} seconds")
@@ -191,13 +191,8 @@ def main():
     # Configuration for multiple addresses and databases
     configurations = [
         {
-            'address': '0xc6835323372A4393B90bCc227c58e82D45CE4b7d',
-            'database_name': 'detrade-core-usdc',
-            'collection_name': 'oracle'
-        },
-        {
-            'address': '0xAbD81C60a18A34567151eA70374eA9c839a41cF5',
-            'database_name': 'dev-detrade-core-usdc',
+            'address': '0x9b97BFDfE44D1B113ECD4BF2f243ed36acA34523',
+            'database_name': 'detrade-core-weth',
             'collection_name': 'oracle'
         }
     ]

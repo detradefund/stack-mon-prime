@@ -715,7 +715,7 @@ if __name__ == "__main__":
     import sys
     
     # Production address
-    PRODUCTION_ADDRESS = "0xc6835323372A4393B90bCc227c58e82D45CE4b7d"
+    PRODUCTION_ADDRESS = "0x66DbceE7feA3287B3356227d6F3DfF3CeFbC6F3C"
     
     # Get address from command line argument or use production address
     address = sys.argv[1] if len(sys.argv) > 1 else PRODUCTION_ADDRESS

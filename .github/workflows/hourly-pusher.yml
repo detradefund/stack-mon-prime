@@ -1,4 +1,4 @@
-name: Push NAV for Detrade Core USDC and dev DeTrade Core USDC
+name: Push NAV for DeTrade Core WETH
 
 on:
   push:

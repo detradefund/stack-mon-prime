@@ -31,17 +31,9 @@ sys.path.append(root_path)
 
 from config.networks import RPC_URLS
 
-# Contract mapping based on user address
-CONTRACT_MAPPING = {
-    "0xc6835323372A4393B90bCc227c58e82D45CE4b7d": {
-        "address": "0x8092cA384D44260ea4feaf7457B629B8DC6f88F0",
-        "name": "DTUSDC"
-    },
-    "0xAbD81C60a18A34567151eA70374eA9c839a41cF5": {
-        "address": "0xBC29B6c682c447Ddc3143B3D8ba781163FC8A6f2",
-        "name": "devDTUSDC"
-    }
-}
+# Contract configuration
+CONTRACT_ADDRESS = "0x9b97BFDfE44D1B113ECD4BF2f243ed36acA34523"
+CONTRACT_NAME = "dtWETH"
 
 class SupplyReader:
     """
@@ -52,16 +44,12 @@ class SupplyReader:
         logger.info("\n=== Supply Reader Initialization ===")
         
         # Use provided address or default to production address
-        self.user_address = address or '0xc6835323372A4393B90bCc227c58e82D45CE4b7d'
+        self.user_address = address or '0x66DbceE7feA3287B3356227d6F3DfF3CeFbC6F3C'
         logger.info(f"User Address: {self.user_address}")
         
-        # Get contract info
-        contract_info = CONTRACT_MAPPING.get(self.user_address)
-        if not contract_info:
-            raise ValueError(f"No contract mapping found for user address: {self.user_address}")
-        
-        self.contract_address = contract_info['address']
-        self.contract_name = contract_info['name']
+        # Use contract configuration
+        self.contract_address = CONTRACT_ADDRESS
+        self.contract_name = CONTRACT_NAME
         logger.info(f"Contract: {self.contract_name} ({self.contract_address})")
         
         # Initialize Web3 connection

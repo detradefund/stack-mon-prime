@@ -56,7 +56,7 @@ class PendleBalanceManager:
     - Smart contract interactions
     - Balance fetching
     - Price discovery
-    - USDC conversion
+    - WETH conversion
     """
     
     API_CONFIG = {
@@ -138,9 +138,9 @@ class PendleBalanceManager:
             print(f"Error getting Pendle balances: {e}")
             return {}
 
-    def _get_usdc_quote(self, network: str, token_symbol: str, amount_in_wei: str) -> Tuple[int, float, Dict]:
+    def _get_weth_quote(self, network: str, token_symbol: str, amount_in_wei: str) -> Tuple[int, float, Dict]:
         """
-        Get USDC conversion quote from Pendle SDK API.
+        Get WETH conversion quote from Pendle SDK API.
         
         Args:
             network: Network identifier (ethereum/base)
@@ -149,7 +149,7 @@ class PendleBalanceManager:
             
         Returns:
             Tuple containing:
-            - USDC amount (6 decimals)
+            - WETH amount (18 decimals)
             - Price impact percentage
             - Conversion details
         """
@@ -163,18 +163,18 @@ class PendleBalanceManager:
                 underlying_token = next(iter(token_data['underlying'].values()))
                 print(f"Converting directly to underlying {underlying_token['symbol']} token (1:1)")
                 
-                print(f"\nConverting {underlying_token['symbol']} to USDC via CoWSwap:")
+                print(f"\nConverting {underlying_token['symbol']} to WETH via CoWSwap:")
                 result = get_quote(
                     network=network,
                     sell_token=underlying_token['address'],
-                    buy_token=NETWORK_TOKENS[network]['USDC']['address'],
+                    buy_token=NETWORK_TOKENS[network]['WETH']['address'],
                     amount=amount_in_wei,
                     token_decimals=underlying_token['decimals'],
                     token_symbol=underlying_token['symbol']
                 )
                 
                 if result["quote"]:
-                    usdc_amount = int(result["quote"]["quote"]["buyAmount"])
+                    weth_amount = int(result["quote"]["quote"]["buyAmount"])
                     price_impact = float(result["conversion_details"].get("price_impact", "0"))
                     if isinstance(price_impact, str) and price_impact == "N/A":
                         price_impact = 0
@@ -182,12 +182,12 @@ class PendleBalanceManager:
                     # Modify conversion details to reflect complete process
                     result["conversion_details"].update({
                         "source": "Matured PT",
-                        "note": f"PT token matured - Direct 1:1 conversion to {underlying_token['symbol']}, then {result['conversion_details']['source']} quote for USDC"
+                        "note": f"PT token matured - Direct 1:1 conversion to {underlying_token['symbol']}, then {result['conversion_details']['source']} quote for WETH"
                     })
                     
-                    return usdc_amount, price_impact/100, result["conversion_details"]
+                    return weth_amount, price_impact/100, result["conversion_details"]
                 
-                raise Exception(f"Failed to convert {underlying_token['symbol']} to USDC")
+                raise Exception(f"Failed to convert {underlying_token['symbol']} to WETH")
 
             # If not expired, use Pendle API
             print(f"Requesting Pendle API quote...")
@@ -198,7 +198,7 @@ class PendleBalanceManager:
                 "slippage": self.API_CONFIG["default_slippage"],
                 "enableAggregator": self.API_CONFIG["enable_aggregator"],
                 "tokenIn": token_data["address"],
-                "tokenOut": NETWORK_TOKENS[network]["USDC"]["address"],
+                "tokenOut": NETWORK_TOKENS[network]["WETH"]["address"],
                 "amountIn": amount_in_wei
             }
             
@@ -207,18 +207,18 @@ class PendleBalanceManager:
             data = response.json()
             
             if 'data' in data and 'amountOut' in data['data']:
-                usdc_amount = int(data['data']['amountOut'])
+                weth_amount = int(data['data']['amountOut'])
                 price_impact = float(data['data'].get('priceImpact', 0))
                 
                 # Calculate rate for monitoring
                 amount_decimal = Decimal(amount_in_wei) / Decimal(10**18)
-                usdc_decimal = Decimal(usdc_amount) / Decimal(10**6)
-                rate = usdc_decimal / amount_decimal if amount_decimal else Decimal('0')
+                weth_decimal = Decimal(weth_amount) / Decimal(10**18)
+                rate = weth_decimal / amount_decimal if amount_decimal else Decimal('0')
                 
                 print(f"✓ Quote successful:")
                 print(f"  - Sell amount: {amount_decimal} {token_symbol}")
-                print(f"  - Buy amount: {usdc_decimal} USDC")
-                print(f"  - Rate: {float(rate):.6f} USDC/{token_symbol}")
+                print(f"  - Buy amount: {weth_decimal} WETH")
+                print(f"  - Rate: {float(rate):.6f} WETH/{token_symbol}")
                 print(f"  - Price impact: {price_impact:.4f}%")
                 
                 conversion_details = {
@@ -230,7 +230,7 @@ class PendleBalanceManager:
                     "note": "Direct Conversion using Pendle SDK"
                 }
                 
-                return usdc_amount, price_impact, conversion_details
+                return weth_amount, price_impact, conversion_details
             
             print(f"✗ Invalid response from Pendle API: {data}")
             raise Exception("Invalid API response format")
@@ -241,130 +241,88 @@ class PendleBalanceManager:
             raise Exception(f"Failed to get Pendle quote: {str(e)}")
 
     def get_balances(self, address: str) -> Dict[str, Any]:
+        """
+        Get Pendle balances and convert to WETH
+        """
         print("\n" + "="*80)
         print("PENDLE BALANCE MANAGER")
         print("="*80)
         
-        checksum_address = Web3.to_checksum_address(address)
-        
-        # Fetch all balances first
-        all_balances = self._get_raw_balances(checksum_address)
-        
-        result = {"pendle": {}}
-        total_usdc_wei = 0
-        
-        # Process each supported network
-        for network in ["ethereum", "base"]:
-            print(f"\nProcessing network: {network}")
-            network_tokens = NETWORK_TOKENS[network]
-            network_result = {}
-            network_total = 0
+        try:
+            # Get raw balances
+            raw_balances = self._get_raw_balances(address)
+            if not raw_balances:
+                print("No Pendle positions found")
+                return {"pendle": {}}
             
-            # Process each Pendle position
-            for token_symbol, token_data in network_tokens.items():
-                if token_data.get("protocol") != "pendle":
-                    continue
+            # Process each network
+            result = {"pendle": {}}
+            total_weth_wei = 0
+            
+            for network, network_balances in raw_balances.items():
+                print(f"\nProcessing network: {network}")
+                network_total = 0
                 
-                balance = int(all_balances[network][token_symbol]['amount']) if network in all_balances and token_symbol in all_balances[network] else 0
-                
-                if balance == 0:
-                    continue
-                
-                print(f"\nProcessing position: {token_symbol}")
-                
-                # Contract information
-                print(f"\nContract information:")
-                print(f"  token: {token_data['address']} ({token_symbol})")
-                print(f"  market: {token_data['market']}")
-                if token_data.get('expiry'):
-                    print(f"  expiry: {token_data['expiry']}")
-                print(f"  underlying: {next(iter(token_data['underlying'].values()))['symbol']}")
-                
-                # Balance information
-                print("\nQuerying balance:")
-                print(f"  Function: balanceOf({checksum_address})")
-                print(f"  Amount: {balance} (decimals: {token_data['decimals']})")
-                print(f"  Formatted: {(Decimal(balance) / Decimal(10**token_data['decimals'])):.6f} {token_symbol}")
-                
-                # Get USDC valuation
-                try:
-                    usdc_amount, price_impact, conversion_details = self._get_usdc_quote(
-                        network=network,
-                        token_symbol=token_symbol,
-                        amount_in_wei=str(balance)
-                    )
-                    usdc_normalized = Decimal(usdc_amount) / Decimal(10**6)
+                for token_symbol, balance_data in network_balances.items():
+                    print(f"\nProcessing token: {token_symbol}")
+                    print(f"  Amount: {Decimal(balance_data['amount']) / Decimal(10**balance_data['decimals']):.6f} {token_symbol}")
                     
-                    # Calculer le rate
-                    rate = Decimal(usdc_amount) / Decimal(balance) * Decimal(10 ** (18 - 6)) if balance > 0 else Decimal('0')
-                    
-                    print(f"✓ Valuation successful:")
-                    print(f"  - USDC value: {usdc_normalized}")
-                    print(f"  - Rate: {float(rate):.6f}")
-                    print(f"  - Price impact: {price_impact:.4f}%")
-                    
-                    fallback = False
-                    source = "Pendle SDK"
-                    note = "Direct Conversion using Pendle SDK"
-                
-                except Exception as e:
-                    print(f"✗ Valuation failed: {str(e)}")
-                    usdc_amount = 0
-                    price_impact = 0
-                    rate = Decimal('0')
-                    fallback = True
-                    source = "Failed"
-                    note = "Failed to get Pendle SDK quote"
-                
-                # Add position to results
-                if usdc_amount > 0:
-                    network_total += usdc_amount
-                    network_result[token_symbol] = {
-                        "amount": str(balance),
-                        "decimals": token_data["decimals"],
-                        "value": {
-                            "USDC": {
-                                "amount": str(usdc_amount),
-                                "decimals": 6,
-                                "conversion_details": conversion_details
+                    try:
+                        # Get WETH quote
+                        weth_amount, price_impact, conversion_details = self._get_weth_quote(
+                            network=network,
+                            token_symbol=token_symbol,
+                            amount_in_wei=balance_data['amount']
+                        )
+                        
+                        if weth_amount > 0:
+                            network_total += weth_amount
+                            total_weth_wei += weth_amount
+                            
+                            # Initialize network structure if not exists
+                            if network not in result["pendle"]:
+                                result["pendle"][network] = {}
+                            
+                            # Add token data
+                            result["pendle"][network][token_symbol] = {
+                                "amount": balance_data['amount'],
+                                "decimals": balance_data['decimals'],
+                                "value": {
+                                    "WETH": {
+                                        "amount": str(weth_amount),
+                                        "decimals": 18,
+                                        "conversion_details": conversion_details
+                                    }
+                                },
+                                "totals": {
+                                    "wei": weth_amount,
+                                    "formatted": f"{weth_amount/1e18:.6f}"
+                                }
                             }
-                        },
-                        "totals": {
-                            "wei": usdc_amount,
-                            "formatted": f"{usdc_amount/1e6:.6f}"
-                        }
+                    except Exception as e:
+                        print(f"Error processing {token_symbol}: {str(e)}")
+                        continue
+                
+                # Add network totals if it has balances
+                if network_total > 0:
+                    result["pendle"][network]["totals"] = {
+                        "wei": network_total,
+                        "formatted": f"{network_total/1e18:.6f}"
                     }
             
-            if network_result:
-                result["pendle"][network] = network_result
-                # Add network-level totals
-                result["pendle"][network]["totals"] = {
-                    "wei": network_total,
-                    "formatted": f"{network_total/1e6:.6f}"
+            # Add protocol total
+            if total_weth_wei > 0:
+                result["pendle"]["totals"] = {
+                    "wei": total_weth_wei,
+                    "formatted": f"{total_weth_wei/1e18:.6f}"
                 }
-                total_usdc_wei += network_total
-        
-        # Add protocol-level totals
-        if total_usdc_wei > 0:
-            result["pendle"]["totals"] = {
-                "wei": total_usdc_wei,
-                "formatted": f"{total_usdc_wei/1e6:.6f}"
-            }
-        
-        # Display detailed summary
-        print("\n[Pendle] Calculation complete")
-        
-        # Display detailed positions
-        for network in result["pendle"]:
-            if network != "totals":
-                for token, data in result["pendle"][network].items():
-                    if token != "totals" and isinstance(data, dict) and "value" in data:
-                        amount = int(data["totals"]["wei"])
-                        if amount > 0:
-                            formatted_amount = amount / 10**6
-                            print(f"pendle.{network}.{token}: {formatted_amount:.6f} USDC")
-        
-        return result
+            
+            print("\n[Pendle] Calculation complete")
+            return result
+            
+        except Exception as e:
+            print(f"Error getting Pendle balances: {str(e)}")
+            return {"pendle": {}}
 
     def _get_failed_position(self, position: Dict) -> Dict:
         """Create position data structure for failed conversions"""
@@ -372,9 +330,9 @@ class PendleBalanceManager:
             "amount": position["amount"],
             "decimals": position["decimals"],
             "value": {
-                "USDC": {
+                "WETH": {
                     "amount": "0",
-                    "decimals": 6,
+                    "decimals": 18,
                     "conversion_details": {
                         "source": "Failed",
                         "price_impact": "0",
@@ -389,7 +347,7 @@ def format_position_data(positions_data):
     result = {"pendle": {}}
     
     # Group by chain
-    total_usdc_wei = 0
+    total_weth_wei = 0
     
     for network, positions in positions_data["pendle"].items():
         if network == "totals":
@@ -403,29 +361,29 @@ def format_position_data(positions_data):
                 continue  # Skip network totals during position processing
                 
             try:
-                usdc_amount = int(position["totals"]["wei"])
-                network_total += usdc_amount
+                weth_amount = int(position["totals"]["wei"])
+                network_total += weth_amount
                 
                 formatted_positions[position_name] = {
                     "amount": position["amount"],
                     "decimals": position["decimals"],
                     "value": {
-                        "USDC": {
-                            "amount": str(usdc_amount),
-                            "decimals": 6,
+                        "WETH": {
+                            "amount": str(weth_amount),
+                            "decimals": 18,
                             "conversion_details": {
-                                "source": position["value"]["USDC"]["conversion_details"]["source"],
-                                "price_impact": position["value"]["USDC"]["conversion_details"]["price_impact"],
-                                "rate": position["value"]["USDC"]["conversion_details"]["rate"],
-                                "fee_percentage": position["value"]["USDC"]["conversion_details"].get("fee_percentage", "0.0000%"),
-                                "fallback": position["value"]["USDC"]["conversion_details"]["fallback"],
-                                "note": position["value"]["USDC"]["conversion_details"]["note"]
+                                "source": position["value"]["WETH"]["conversion_details"]["source"],
+                                "price_impact": position["value"]["WETH"]["conversion_details"]["price_impact"],
+                                "rate": position["value"]["WETH"]["conversion_details"]["rate"],
+                                "fee_percentage": position["value"]["WETH"]["conversion_details"].get("fee_percentage", "0.0000%"),
+                                "fallback": position["value"]["WETH"]["conversion_details"]["fallback"],
+                                "note": position["value"]["WETH"]["conversion_details"]["note"]
                             }
                         }
                     },
                     "totals": {
-                        "wei": usdc_amount,
-                        "formatted": f"{usdc_amount/1e6:.6f}"
+                        "wei": weth_amount,
+                        "formatted": f"{weth_amount/1e18:.6f}"
                     }
                 }
             except Exception as e:
@@ -437,15 +395,15 @@ def format_position_data(positions_data):
             result["pendle"][network] = formatted_positions
             result["pendle"][network]["totals"] = {
                 "wei": network_total,
-                "formatted": f"{network_total/1e6:.6f}"
+                "formatted": f"{network_total/1e18:.6f}"
             }
-            total_usdc_wei += network_total
+            total_weth_wei += network_total
     
     # Add protocol total only if we have positions
-    if total_usdc_wei > 0:
+    if total_weth_wei > 0:
         result["pendle"]["totals"] = {
-            "wei": total_usdc_wei,
-            "formatted": f"{total_usdc_wei/1e6:.6f}"
+            "wei": total_weth_wei,
+            "formatted": f"{total_weth_wei/1e18:.6f}"
         }
     
     return result
@@ -456,7 +414,7 @@ def main():
     Uses production address by default.
     """
     # Production address
-    PRODUCTION_ADDRESS = "0xc6835323372A4393B90bCc227c58e82D45CE4b7d"
+    PRODUCTION_ADDRESS = "0x66DbceE7feA3287B3356227d6F3DfF3CeFbC6F3C"
     
     # Use command line argument if provided, otherwise use production address
     test_address = sys.argv[1] if len(sys.argv) > 1 else PRODUCTION_ADDRESS
