@@ -191,8 +191,8 @@ def main():
     # Configuration for multiple addresses and databases
     configurations = [
         {
-            'address': '0x9b97BFDfE44D1B113ECD4BF2f243ed36acA34523',
-            'database_name': 'detrade-core-weth',
+            'address': '0x66DbceE7feA3287B3356227d6F3DfF3CeFbC6F3C',
+            'database_name': 'detrade-core-eth',
             'collection_name': 'oracle'
         }
     ]
