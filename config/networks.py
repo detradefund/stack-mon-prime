@@ -155,6 +155,12 @@ NETWORK_TOKENS = {
             "name": "Resolv USD",
             "symbol": "USR"
         },
+        "DOLA": {
+            "address": "0x865377367054516e17014CcdED1e7d814EDC9ce4",
+            "decimals": 18,
+            "name": "Dola USD Stablecoin",
+            "symbol": "DOLA"
+        },
 
         # === Protocol & Reward tokens ===
         # Tokens used for protocol governance and rewards

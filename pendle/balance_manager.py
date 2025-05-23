@@ -328,37 +328,38 @@ class PendleBalanceManager:
                                 "decimals": 6,
                                 "conversion_details": conversion_details
                             }
+                        },
+                        "totals": {
+                            "wei": usdc_amount,
+                            "formatted": f"{usdc_amount/1e6:.6f}"
                         }
                     }
             
             if network_result:
                 result["pendle"][network] = network_result
-                # Add network-level USDC totals
-                result["pendle"][network]["usdc_totals"] = {
-                    "total": {
-                        "wei": network_total,
-                        "formatted": f"{network_total/1e6:.6f}"
-                    }
+                # Add network-level totals
+                result["pendle"][network]["totals"] = {
+                    "wei": network_total,
+                    "formatted": f"{network_total/1e6:.6f}"
                 }
                 total_usdc_wei += network_total
         
-        # Add protocol-level USDC totals
-        result["pendle"]["usdc_totals"] = {
-            "total": {
+        # Add protocol-level totals
+        if total_usdc_wei > 0:
+            result["pendle"]["totals"] = {
                 "wei": total_usdc_wei,
                 "formatted": f"{total_usdc_wei/1e6:.6f}"
             }
-        }
         
         # Display detailed summary
         print("\n[Pendle] Calculation complete")
         
         # Display detailed positions
         for network in result["pendle"]:
-            if network != "usdc_totals":
+            if network != "totals":
                 for token, data in result["pendle"][network].items():
-                    if token != "usdc_totals" and isinstance(data, dict) and "value" in data:
-                        amount = int(data["value"]["USDC"]["amount"])
+                    if token != "totals" and isinstance(data, dict) and "value" in data:
+                        amount = int(data["totals"]["wei"])
                         if amount > 0:
                             formatted_amount = amount / 10**6
                             print(f"pendle.{network}.{token}: {formatted_amount:.6f} USDC")
@@ -391,18 +392,18 @@ def format_position_data(positions_data):
     total_usdc_wei = 0
     
     for network, positions in positions_data["pendle"].items():
-        if network == "usdc_totals":
+        if network == "totals":
             continue  # Skip global totals during network processing
             
         formatted_positions = {}
         network_total = 0
         
         for position_name, position in positions.items():
-            if position_name == "usdc_totals":
+            if position_name == "totals":
                 continue  # Skip network totals during position processing
                 
             try:
-                usdc_amount = int(position["value"]["USDC"]["amount"])
+                usdc_amount = int(position["totals"]["wei"])
                 network_total += usdc_amount
                 
                 formatted_positions[position_name] = {
@@ -421,6 +422,10 @@ def format_position_data(positions_data):
                                 "note": position["value"]["USDC"]["conversion_details"]["note"]
                             }
                         }
+                    },
+                    "totals": {
+                        "wei": usdc_amount,
+                        "formatted": f"{usdc_amount/1e6:.6f}"
                     }
                 }
             except Exception as e:
@@ -430,21 +435,17 @@ def format_position_data(positions_data):
         # Add network data with positions and network total
         if formatted_positions:  # Only add network if it has positions
             result["pendle"][network] = formatted_positions
-            result["pendle"][network]["usdc_totals"] = {
-                "total": {
-                    "wei": network_total,
-                    "formatted": f"{network_total/10**6:.6f}"
-                }
+            result["pendle"][network]["totals"] = {
+                "wei": network_total,
+                "formatted": f"{network_total/1e6:.6f}"
             }
             total_usdc_wei += network_total
     
     # Add protocol total only if we have positions
     if total_usdc_wei > 0:
-        result["pendle"]["usdc_totals"] = {
-            "total": {
-                "wei": total_usdc_wei,
-                "formatted": f"{total_usdc_wei/10**6:.6f}"
-            }
+        result["pendle"]["totals"] = {
+            "wei": total_usdc_wei,
+            "formatted": f"{total_usdc_wei/1e6:.6f}"
         }
     
     return result
