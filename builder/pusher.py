@@ -165,7 +165,7 @@ class BalancePusher:
             logger.info("SUMMARY")
             logger.info("="*80)
             logger.info(f"Address: {address}")
-            logger.info(f"Total Value: {overview['nav']['eth']} WETH")
+            logger.info(f"Total Value: {overview['nav']['weth']} WETH")
             logger.info(f"Collection started at: {prepared_data['timestamp']}")
             logger.info(f"Pushed at: {push_timestamp.strftime('%Y-%m-%d %H:%M:%S UTC')}")
             logger.info(f"Collection duration: {collection_duration:.2f} seconds")
