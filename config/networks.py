@@ -23,16 +23,7 @@ CHAIN_IDS = {
 # 3. Other tokens (governance, rewards, etc.)
 NETWORK_TOKENS = {
     "ethereum": {
-        # === Yield-bearing tokens ===
-        "autoETH": {
-            "address": "0x0A2b94F6871c1D7A32Fe58E1ab5e6deA2f114E56",
-            "decimals": 18,
-            "name": "Tokemak autoETH",
-            "symbol": "autoETH",
-            "protocol": "tokemak",
-            "type": "yield-bearing",
-            "rewarder": "0x60882D6f70857606Cdd37729ccCe882015d1755E"
-        },
+
         "PT-pufETH-26JUN2025": {
             "address": "0x9cFc9917C171A384c7168D3529Fc7e851a2E0d6D",
             "decimals": 18,
@@ -50,25 +41,17 @@ NETWORK_TOKENS = {
                 }
             }
         },
-        "sUSDS": {
-            "address": "0xa3931d71877C0E7a3148CB7Eb4463524FEc27fbD",
-            "decimals": 18,
-            "name": "Savings USDS",
-            "symbol": "sUSDS",
-            "type": "yield-bearing"
-        },
-        "USDS": {
-            "address": "0xdC035D45d973E3EC169d2276DDab16f1e407384F",
-            "decimals": 18,
-            "name": "USDS Stablecoin",
-            "symbol": "USDS",
-            "type": "stablecoin"
-        },
         "WETH": {
             "address": "0xC02aaA39b223FE8D0A0e5C4F27eAD9083C756Cc2",
             "decimals": 18,
             "name": "Wrapped Ether",
             "symbol": "WETH"
+        },
+        "stETH": {
+            "address": "0xae7ab96520de3a18e5e111b5eaab095312d7fe84",
+            "decimals": 18,
+            "name": "Lido Staked Ether",
+            "symbol": "stETH"
         },
         "USDC": {
             "address": "0xA0b86991c6218b36c1d19D4a2e9Eb0cE3606eB48",
@@ -110,6 +93,25 @@ NETWORK_TOKENS = {
             "protocol": "tokemak",
             "type": "yield-bearing",
             "rewarder": "0xb592c1539AC22EdD9784eA4d6a22199C16314498"
+        },
+        "cbETH": {
+            "address": "0x2Ae3F1Ec7F1F5012CFEab0185bfc7aa3cf0DEc22",
+            "decimals": 18,
+            "name": "Coinbase Wrapped Staked ETH",
+            "symbol": "cbETH",
+            "type": "yield-bearing"
+        },
+        "CRV": {
+            "address": "0x8Ee73c484A26e0A5df2Ee2a4960B789967dd0415",
+            "decimals": 18,
+            "name": "Curve DAO Token",
+            "symbol": "CRV"
+        },
+        "crvUSD": {
+            "address": "0x417Ac0e078398C154EdFadD9Ef675d30Be60Af93",
+            "decimals": 18,
+            "name": "Curve.Fi USD Stablecoin",
+            "symbol": "crvUSD"
         }
     }
 }
