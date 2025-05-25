@@ -38,7 +38,7 @@ MINIMAL_SUSDS_ABI = [
 ]
 
 # Production address
-PRODUCTION_ADDRESS = "0xc6835323372A4393B90bCc227c58e82D45CE4b7d"
+PRODUCTION_ADDRESS = "0x66DbceE7feA3287B3356227d6F3DfF3CeFbC6F3C"
 
 class BalanceManager:
     def __init__(self):

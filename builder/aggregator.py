@@ -13,6 +13,7 @@ sys.path.append(root_path)
 from pendle.balance_manager import PendleBalanceManager, format_position_data as format_pendle_data
 from tokemak.balance_manager import BalanceManager as TokemakBalanceManager
 from spot.balance_manager import SpotBalanceManager
+from convex.balance_manager import ConvexBalanceManager
 from shares.supply_reader import SupplyReader
 
 class BalanceAggregator:
@@ -22,12 +23,14 @@ class BalanceAggregator:
     - Pendle (Ethereum + Base)
     - Tokemak (Ethereum)
     - Spot (Ethereum + Base)
+    - Convex (Ethereum)
     """
     
     def __init__(self):
         self.pendle_manager = PendleBalanceManager()
         self.tokemak_manager = TokemakBalanceManager()
         self.spot_manager = SpotBalanceManager()
+        self.convex_manager = ConvexBalanceManager()
         
     def get_all_balances(self, address: str) -> Dict[str, Any]:
         """
@@ -47,7 +50,8 @@ class BalanceAggregator:
         result = {
             "protocols": {
                 "pendle": {},
-                "tokemak": {}
+                "tokemak": {},
+                "convex": {}
             },
             "spot": {}
         }
@@ -69,6 +73,15 @@ class BalanceAggregator:
                 print("✓ Tokemak positions fetched successfully")
         except Exception as e:
             print(f"✗ Error fetching Tokemak positions: {str(e)}")
+            
+        # Get Convex balances
+        try:
+            convex_balances = self.convex_manager.get_balances(checksum_address)
+            if convex_balances:
+                result["protocols"]["convex"] = convex_balances.get("convex", {})
+                print("✓ Convex positions fetched successfully")
+        except Exception as e:
+            print(f"✗ Error fetching Convex positions: {str(e)}")
         
         # Get spot balances
         try:
@@ -198,7 +211,7 @@ def build_overview(all_balances: Dict[str, Any], address: str) -> Dict[str, Any]
     
     # Process each protocol's positions
     for protocol_name, protocol_data in all_balances["protocols"].items():
-        # For protocols with direct totals (Pendle, Tokemak)
+        # For protocols with direct totals (Pendle, Tokemak, Convex)
         if "totals" in protocol_data:
             for network, network_data in protocol_data.items():
                 if network == "totals":

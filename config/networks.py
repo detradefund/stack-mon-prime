@@ -50,6 +50,20 @@ NETWORK_TOKENS = {
                 }
             }
         },
+        "sUSDS": {
+            "address": "0xa3931d71877C0E7a3148CB7Eb4463524FEc27fbD",
+            "decimals": 18,
+            "name": "Savings USDS",
+            "symbol": "sUSDS",
+            "type": "yield-bearing"
+        },
+        "USDS": {
+            "address": "0xdC035D45d973E3EC169d2276DDab16f1e407384F",
+            "decimals": 18,
+            "name": "USDS Stablecoin",
+            "symbol": "USDS",
+            "type": "stablecoin"
+        },
         "WETH": {
             "address": "0xC02aaA39b223FE8D0A0e5C4F27eAD9083C756Cc2",
             "decimals": 18,
