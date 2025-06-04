@@ -1,0 +1,22 @@
+{
+    "ethereum": {
+        "chain_id": "1",
+        "markets": [
+            {
+                "address": "0x58612beb0e8a126735b19bb222cbc7fc2c162d2a",
+                "name": "pufETH",
+                "active": true
+            }
+        ]
+    },
+    "base": {
+        "chain_id": "8453",
+        "markets": [
+            {
+                "address": "0xeCc2c994aA0C599a7f69a7Cfb9106fe4dfFb4341",
+                "name": "wsuperOETHb",
+                "active": true
+            }
+        ]
+    }
+} 

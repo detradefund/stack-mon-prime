@@ -1,0 +1,51 @@
+{
+  "last_updated": "2025-06-04T18:09:51.151176",
+  "chain_id": "1",
+  "market_address": "0x58612beb0e8a126735b19bb222cbc7fc2c162d2a",
+  "data": {
+    "timestamp": "2025-06-04T16:00:00.000Z",
+    "liquidity": {
+      "usd": 5067931.945005292,
+      "acc": 1907.3907186149008
+    },
+    "tradingVolume": {
+      "usd": 1077704.4202863579
+    },
+    "underlyingInterestApy": 0.04803144160916095,
+    "underlyingRewardApy": 0,
+    "underlyingApy": 0.04803144160916095,
+    "impliedApy": 0.05110042641317181,
+    "ytFloatingApy": -0.8449615821364721,
+    "swapFeeApy": 0.000621916880550355,
+    "voterApy": 0.03234810645939738,
+    "ptDiscount": 0.0029080793247054926,
+    "pendleApy": 0.0029946794063895566,
+    "arbApy": 0,
+    "lpRewardApy": 0,
+    "aggregatedApy": 0.05285778553924662,
+    "maxBoostedApy": 0.05734980464883095,
+    "estimatedDailyPoolRewards": [
+      {
+        "asset": {
+          "id": "1-0x808507121b80c02388fad14726482e061b8da827",
+          "chainId": 1,
+          "address": "0x808507121b80c02388fad14726482e061b8da827",
+          "symbol": "PENDLE",
+          "decimals": 18,
+          "accentColor": null,
+          "price": {
+            "usd": 4.24937049
+          },
+          "priceUpdatedAt": "2025-06-04T16:09:45.004Z",
+          "name": "PENDLE"
+        },
+        "amount": 10.494787364094211
+      }
+    ],
+    "totalPt": 754.0575877689656,
+    "totalSy": 1100.69245904519,
+    "totalLp": 926.9733422513484,
+    "totalActiveSupply": 397.6061018661153,
+    "assetPriceUsd": 2656.9972767223576
+  }
+}

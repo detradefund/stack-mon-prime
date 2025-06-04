@@ -8,14 +8,15 @@ from datetime import datetime, timezone
 import time
 import os
 
-# Add parent directory to PYTHONPATH
+# Add parent directory and project root to PYTHONPATH
 root_path = str(Path(__file__).parent.parent)
 sys.path.append(root_path)
+sys.path.append(str(Path(__file__).parent.parent))
 
-from pendle.balance_manager import PendleBalanceManager, format_position_data as format_pendle_data
+from pendle.pendle_manager import PendleManager
 from spot.balance_manager import SpotBalanceManager
-from convex.balance_manager import ConvexBalanceManager
-from curve.balance_manager import CurveBalanceManager
+from curve.curve_manager import CurveManager
+from equilibria.equilibria_manager import EquilibriaManager
 from shares.supply_reader import SupplyReader
 
 RPC_URLS = {
@@ -29,15 +30,15 @@ class BalanceAggregator:
     Currently supports:
     - Pendle (Ethereum + Base)
     - Spot (Ethereum + Base)
-    - Convex (Ethereum)
     - Curve (Base)
+    - Equilibria (Ethereum + Base)
     """
     
     def __init__(self):
-        self.pendle_manager = PendleBalanceManager()
+        self.pendle_manager = PendleManager(os.getenv('PRODUCTION_ADDRESS'))
         self.spot_manager = SpotBalanceManager()
-        self.convex_manager = ConvexBalanceManager()
-        self.curve_manager = CurveBalanceManager("base", Web3(Web3.HTTPProvider(RPC_URLS["base"])))
+        self.curve_manager = CurveManager(os.getenv('PRODUCTION_ADDRESS'))
+        self.equilibria_manager = EquilibriaManager(os.getenv('PRODUCTION_ADDRESS'))
         
     def get_all_balances(self, address: str) -> Dict[str, Any]:
         """
@@ -57,38 +58,38 @@ class BalanceAggregator:
         result = {
             "protocols": {
                 "pendle": {},
-                "convex": {},
-                "curve": {}
+                "curve": {},
+                "equilibria": {}
             },
             "spot": {}
         }
         
         # Get pendle balances
         try:
-            pendle_balances = self.pendle_manager.get_balances(checksum_address)
+            pendle_balances = self.pendle_manager.run()
             if pendle_balances:
-                result["protocols"]["pendle"] = pendle_balances.get("pendle", {})
+                result["protocols"]["pendle"] = pendle_balances
                 print("✓ Pendle positions fetched successfully")
         except Exception as e:
             print(f"✗ Error fetching Pendle positions: {str(e)}")
             
-        # Get Convex balances
-        try:
-            convex_balances = self.convex_manager.get_balances(checksum_address)
-            if convex_balances:
-                result["protocols"]["convex"] = convex_balances.get("convex", {})
-                print("✓ Convex positions fetched successfully")
-        except Exception as e:
-            print(f"✗ Error fetching Convex positions: {str(e)}")
-            
         # Get Curve balances
         try:
-            curve_balances = self.curve_manager.get_claimable_rewards("cbeth-f", checksum_address)
+            curve_balances = self.curve_manager.run()
             if curve_balances:
-                result["protocols"]["curve"] = curve_balances.get("curve", {})
+                result["protocols"]["curve"] = curve_balances
                 print("✓ Curve positions fetched successfully")
         except Exception as e:
             print(f"✗ Error fetching Curve positions: {str(e)}")
+            
+        # Get Equilibria balances
+        try:
+            equilibria_balances = self.equilibria_manager.run()
+            if equilibria_balances:
+                result["protocols"]["equilibria"] = equilibria_balances
+                print("✓ Equilibria positions fetched successfully")
+        except Exception as e:
+            print(f"✗ Error fetching Equilibria positions: {str(e)}")
         
         # Get spot balances
         try:
@@ -105,9 +106,9 @@ class BalanceAggregator:
                         "amount": "0",
                         "decimals": 18,
                         "value": {
-                            "USDC": {
+                            "WETH": {
                                 "amount": "0",
-                                "decimals": 6,
+                                "decimals": 18,
                                 "conversion_details": {
                                     "source": "Direct",
                                     "price_impact": "0.0000%",
@@ -123,27 +124,9 @@ class BalanceAggregator:
                         "amount": "0",
                         "decimals": 6,
                         "value": {
-                            "USDC": {
+                            "WETH": {
                                 "amount": "0",
-                                "decimals": 6,
-                                "conversion_details": {
-                                    "source": "Direct",
-                                    "price_impact": "0.0000%",
-                                    "rate": "0",
-                                    "fee_percentage": "0.0000%",
-                                    "fallback": False,
-                                    "note": "Error fetching balances"
-                                }
-                            }
-                        }
-                    },
-                    "PENDLE": {
-                        "amount": "0",
-                        "decimals": 18,
-                        "value": {
-                            "USDC": {
-                                "amount": "0",
-                                "decimals": 6,
+                                "decimals": 18,
                                 "conversion_details": {
                                     "source": "Direct",
                                     "price_impact": "0.0000%",
@@ -165,9 +148,9 @@ class BalanceAggregator:
                         "amount": "0",
                         "decimals": 18,
                         "value": {
-                            "USDC": {
+                            "WETH": {
                                 "amount": "0",
-                                "decimals": 6,
+                                "decimals": 18,
                                 "conversion_details": {
                                     "source": "Direct",
                                     "price_impact": "0.0000%",
@@ -183,9 +166,9 @@ class BalanceAggregator:
                         "amount": "0",
                         "decimals": 6,
                         "value": {
-                            "USDC": {
+                            "WETH": {
                                 "amount": "0",
-                                "decimals": 6,
+                                "decimals": 18,
                                 "conversion_details": {
                                     "source": "Direct",
                                     "price_impact": "0.0000%",
@@ -218,7 +201,7 @@ def build_overview(all_balances: Dict[str, Any], address: str) -> Dict[str, Any]
     
     # Process each protocol's positions
     for protocol_name, protocol_data in all_balances["protocols"].items():
-        # For protocols with direct totals (Pendle, Convex, Curve)
+        # For protocols with direct totals (Pendle, Curve)
         if "totals" in protocol_data:
             for network, network_data in protocol_data.items():
                 if network == "totals":

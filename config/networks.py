@@ -23,24 +23,6 @@ CHAIN_IDS = {
 # 3. Other tokens (governance, rewards, etc.)
 NETWORK_TOKENS = {
     "ethereum": {
-
-        "PT-pufETH-26JUN2025": {
-            "address": "0x9cFc9917C171A384c7168D3529Fc7e851a2E0d6D",
-            "decimals": 18,
-            "name": "PT Puffer ETH 26JUN2025",
-            "symbol": "PT-pufETH-26JUN2025",
-            "protocol": "pendle",
-            "type": "yield-bearing",
-            "expiry": 1750896000,
-            "market": "0x58612beb0e8a126735b19bb222cbc7fc2c162d2a",
-            "underlying": {
-                "pufETH": {
-                    "address": "0xd9a442856c234a39a81a089c06451ebaa4306a72",
-                    "decimals": 18,
-                    "symbol": "pufETH"
-                }
-            }
-        },
         "WETH": {
             "address": "0xC02aaA39b223FE8D0A0e5C4F27eAD9083C756Cc2",
             "decimals": 18,
@@ -52,12 +34,6 @@ NETWORK_TOKENS = {
             "decimals": 18,
             "name": "Lido Staked Ether",
             "symbol": "stETH"
-        },
-        "USDC": {
-            "address": "0xA0b86991c6218b36c1d19D4a2e9Eb0cE3606eB48",
-            "decimals": 6,
-            "name": "USD Coin",
-            "symbol": "USDC"
         },
         "PENDLE": {
             "address": "0x808507121B80c02388fAd14726482e061B8da827",
@@ -79,12 +55,6 @@ NETWORK_TOKENS = {
             "name": "Wrapped Ether",
             "symbol": "WETH"
         },
-        "USDC": {
-            "address": "0x833589fCD6eDb6E08f4c7C32D4f71b54bdA02913",
-            "decimals": 6,
-            "name": "USD Coin",
-            "symbol": "USDC"
-        },
         "baseETH": {
             "address": "0xAADf01DD90aE0A6Bb9Eb908294658037096E0404",
             "decimals": 18,
@@ -101,17 +71,37 @@ NETWORK_TOKENS = {
             "symbol": "cbETH",
             "type": "yield-bearing"
         },
-        "CRV": {
-            "address": "0x8Ee73c484A26e0A5df2Ee2a4960B789967dd0415",
+        "superOETHb": {
+            "address": "0xDBFeFD2e8460a6Ee4955A68582F85708BAEA60A3",
             "decimals": 18,
-            "name": "Curve DAO Token",
-            "symbol": "CRV"
+            "name": "Super OETHb",
+            "symbol": "superOETHb"
         },
-        "crvUSD": {
-            "address": "0x417Ac0e078398C154EdFadD9Ef675d30Be60Af93",
+        "PENDLE": {
+            "address": "0xA99F6e6785Da0F5d6fB42495Fe424BCE029Eeb3E",
             "decimals": 18,
-            "name": "Curve.Fi USD Stablecoin",
-            "symbol": "crvUSD"
+            "name": "Pendle",
+            "symbol": "PENDLE"
+        }
+    }
+}
+
+# Common tokens used across networks
+COMMON_TOKENS = {
+    "ethereum": {
+        "WETH": {
+            "address": "0xC02aaA39b223FE8D0A0e5C4F27eAD9083C756Cc2",
+            "decimals": 18,
+            "name": "Wrapped Ether",
+            "symbol": "WETH"
+        }
+    },
+    "base": {
+        "WETH": {
+            "address": "0x4200000000000000000000000000000000000006",
+            "decimals": 18,
+            "name": "Wrapped Ether",
+            "symbol": "WETH"
         }
     }
 }

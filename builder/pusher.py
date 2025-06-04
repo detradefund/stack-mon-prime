@@ -1,11 +1,16 @@
-import os
+import sys
 from pathlib import Path
+import json
 from datetime import datetime, timezone
 from dotenv import load_dotenv
 from pymongo import MongoClient
 from typing import Dict, Any
 import logging
+import os
 from builder.aggregator import BalanceAggregator, build_overview
+
+# Add parent directory to Python path
+sys.path.append(str(Path(__file__).parent.parent))
 
 # Add parent directory to PYTHONPATH and load environment variables
 root_path = str(Path(__file__).parent.parent)

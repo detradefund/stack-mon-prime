@@ -1,0 +1,8 @@
+{
+  "network": "base",
+  "pool_name": "cbeth-f",
+  "pool_address": "0x11C1fBd4b3De66bC0565779b35171a6CF3E71f59",
+  "lp_token": "0x98244d93D42b42aB3E3A4D12A5dc0B3e7f8F32f9",
+  "gauge": "0xE9c898BA654deC2bA440392028D2e7A194E6dc3e",
+  "abi": "Vyper_contract"
+}

@@ -26,17 +26,61 @@ load_dotenv()
 # Zero address for price quotes
 ZERO_ADDRESS = "0x0000000000000000000000000000000000000000"
 
-def get_quote(network: str, sell_token: str, buy_token: str, amount: str, token_decimals: int = 18, token_symbol: str = "") -> dict:
+def get_quote(
+    network: str,
+    sell_token: str,
+    buy_token: str,
+    amount: str,
+    token_decimals: int = 18,
+    token_symbol: str = None
+) -> dict:
+    """
+    Get a quote from CowSwap.
+    
+    Args:
+        network: The network to use (ethereum, base)
+        sell_token: The token to sell
+        buy_token: The token to buy
+        amount: The amount to sell in wei
+        token_decimals: The number of decimals for the token
+        token_symbol: The symbol of the token (optional)
+        
+    Returns:
+        dict: The quote response
+    """
+    # WETH always has 18 decimals
+    buy_decimals = 18
+    
+    # Get quote from CowSwap
+    quote = get_cowswap_quote(
+        network=network,
+        sell_token=sell_token,
+        buy_token=buy_token,
+        amount=amount,
+        sell_decimals=token_decimals,
+        buy_decimals=buy_decimals
+    )
+    
+    return quote
+
+def get_cowswap_quote(
+    network: str,
+    sell_token: str,
+    buy_token: str,
+    amount: str,
+    sell_decimals: int,
+    buy_decimals: int
+) -> dict:
     """
     Fetches price quote from CoW Protocol API for token conversion with fallback mechanism.
     
     Args:
         network: Network identifier ('ethereum' or 'base')
         sell_token: Address of token to sell
-        buy_token: Address of token to buy (usually USDC)
+        buy_token: Address of token to buy (WETH)
         amount: Amount to sell in wei (as string)
-        token_decimals: Decimals of the sell token (default 18)
-        token_symbol: Symbol of the sell token (default "")
+        sell_decimals: Decimals of the sell token
+        buy_decimals: Decimals of the buy token
     
     Returns:
         Dict containing:
@@ -63,57 +107,24 @@ def get_quote(network: str, sell_token: str, buy_token: str, amount: str, token_
         "kind": "sell"
     }
 
-    # Direct 1:1 conversion for USDC
-    if token_symbol == "USDC":
-        print("✓ Direct 1:1 conversion with USDC")
-        return {
-            "quote": {
-                "quote": {
-                    "buyAmount": amount,
-                    "sellAmount": amount,
-                    "feeAmount": "0"
-                }
-            },
-            "conversion_details": {
-                "source": "Direct",
-                "price_impact": "0",
-                "rate": "1",
-                "fee_percentage": "0.0000%",
-                "fallback": False,
-                "note": "Direct 1:1 conversion"
-            }
-        }
-
     # Try direct quote first
-    print(f"\nAttempting to get quote...")
-    print(f"[Attempt 1/3] Requesting CoWSwap quote...")
-    
     params = {**base_params, "sellAmountBeforeFee": str(amount)}
     quote = make_request(params)
 
     # If successful, return with direct quote details
     if isinstance(quote, dict) and 'quote' in quote:
-        usdc_amount = int(quote['quote']['buyAmount'])
-        buy_decimals = 6 if buy_token == NETWORK_TOKENS[network]["USDC"]["address"] else 18
+        weth_amount = int(quote['quote']['buyAmount'])
         
         # Calculate rate properly considering decimals
         sell_amount = Decimal(quote['quote']['sellAmount'])
         buy_amount = Decimal(quote['quote']['buyAmount'])
         
         # Normalize both amounts to their decimal places
-        sell_normalized = sell_amount / Decimal(10**token_decimals)
+        sell_normalized = sell_amount / Decimal(10**sell_decimals)
         buy_normalized = buy_amount / Decimal(10**buy_decimals)
         
         # Calculate rate as buy/sell
         rate = buy_normalized / sell_normalized
-        
-        if buy_decimals == 6:
-            print("✓ Converted to USDC: {:.6f} USDC".format(usdc_amount/1e6))
-        else:
-            print("✓ Converted to WETH: {:.6f} WETH".format(usdc_amount/1e18))
-        print(f"  Rate: {rate} {'USDC' if buy_decimals == 6 else 'WETH'}/token")
-        print(f"  Source: CoWSwap")
-        print(f"  Note: Direct CoWSwap quote")
         
         return {
             "quote": quote,
@@ -129,36 +140,8 @@ def get_quote(network: str, sell_token: str, buy_token: str, amount: str, token_
 
     # If amount too small, try fallback with reference amount
     if isinstance(quote, str) and "SellAmountDoesNotCoverFee" in quote:
-        print("! Amount too small for direct quote, trying fallback method...")
-        
-        # Special case for stETH - always 1:1 with ETH
-        if token_symbol == "stETH":
-            print("Using 1:1 rate for stETH (known to be pegged to ETH)")
-            original_amount = Decimal(amount)
-            estimated_value = int(original_amount)  # Same amount since 1:1
-            
-            return {
-                "quote": {
-                    "quote": {
-                        "buyAmount": str(estimated_value),
-                        "sellAmount": amount,
-                        "feeAmount": "0"
-                    }
-                },
-                "conversion_details": {
-                    "source": "Direct",
-                    "price_impact": "0.0000%",
-                    "rate": "1.000000",
-                    "fee_percentage": "0.0000%",
-                    "fallback": True,
-                    "note": "Direct 1:1 conversion (stETH = ETH)"
-                }
-            }
-            
-        print("Requesting quote with reference amount (1000 tokens)...")
-        
         # Use 1000 tokens as reference
-        reference_amount = str(1000 * 10**token_decimals)
+        reference_amount = str(1000 * 10**sell_decimals)
         params = {**base_params, "sellAmountBeforeFee": reference_amount}
         fallback_quote = make_request(params)
 
@@ -167,20 +150,16 @@ def get_quote(network: str, sell_token: str, buy_token: str, amount: str, token_
             sell_amount = Decimal(fallback_quote['quote']['sellAmount'])
             buy_amount = Decimal(fallback_quote['quote']['buyAmount'])
             
-            # Normalize amounts based on token decimals (always 18 for ETH/WETH)
-            sell_normalized = sell_amount / Decimal(10**token_decimals)
-            buy_normalized = buy_amount / Decimal(10**18)  # Always 18 decimals for ETH/WETH
+            # Normalize amounts based on token decimals
+            sell_normalized = sell_amount / Decimal(10**sell_decimals)
+            buy_normalized = buy_amount / Decimal(10**buy_decimals)
             
             # Calculate rate as buy/sell
             rate = buy_normalized / sell_normalized
             
             # Apply rate to original amount
-            original_amount_normalized = Decimal(amount) / Decimal(10**token_decimals)
-            estimated_value = int(original_amount_normalized * rate * Decimal(10**18))
-
-            print("✓ Fallback successful:")
-            print(f"  - Discovered rate: {rate:.6f} WETH/token")
-            print(f"  - Estimated value: {estimated_value/1e18:.6f} WETH")
+            original_amount_normalized = Decimal(amount) / Decimal(10**sell_decimals)
+            estimated_value = int(original_amount_normalized * rate * Decimal(10**buy_decimals))
 
             return {
                 "quote": {
