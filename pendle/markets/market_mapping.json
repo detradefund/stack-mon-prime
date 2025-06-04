@@ -1,5 +1,5 @@
 {
-  "last_updated": "2025-06-04T18:09:52.576532",
+  "last_updated": "2025-06-04T18:20:26.962773",
   "markets": {
     "0x58612beb0e8a126735b19bb222cbc7fc2c162d2a": {
       "name": "pufETH",
@@ -7,16 +7,16 @@
       "network": "ethereum",
       "chain_id": "1",
       "total_supply": 397.6061018661153,
-      "total_assets": 1100.69245904519,
-      "apy": 0.05285778553924662,
-      "implied_apy": 0.05110042641317181,
-      "utilization_rate": 0.36123269365452354,
-      "total_volume_24h": 1077704.4202863579,
-      "tvl": 5067931.945005292,
-      "price": 2656.9972767223576,
-      "underlying_price": 2656.9972767223576,
-      "pt_price": 0.0029080793247054926,
-      "yt_price": -0.8449615821364721,
+      "total_assets": 1124.3603156489407,
+      "apy": 0.0526262398051585,
+      "implied_apy": 0.05039636966363137,
+      "utilization_rate": 0.35362872233411335,
+      "total_volume_24h": 1143605.6837075672,
+      "tvl": 5062678.777517883,
+      "price": 2654.19935004611,
+      "underlying_price": 2654.19935004611,
+      "pt_price": 0.00286810440682872,
+      "yt_price": -0.7982689073666694,
       "expiry": "2025-06-26T00:00:00.000Z",
       "tokens": {
         "pt": "1-0x9cfc9917c171a384c7168d3529fc7e851a2e0d6d",
@@ -25,22 +25,22 @@
         "underlyingAsset": "1-0xd9a442856c234a39a81a089c06451ebaa4306a72"
       },
       "details": {
-        "liquidity": 5067931.945005292,
-        "pendleApy": 0.0029946794063895566,
-        "impliedApy": 0.05122514191698202,
+        "liquidity": 5062678.777517883,
+        "pendleApy": 0.002997675200947322,
+        "impliedApy": 0.05084656548491884,
         "feeRate": 0.0004999999993486881,
         "movement10Percent": {
-          "ptMovementUpUsd": 565176.5684246357,
-          "ptMovementDownUsd": 1008877.9516251048,
-          "ytMovementUpUsd": 1842.0945798532505,
-          "ytMovementDownUsd": 2957.5159023062106
+          "ptMovementUpUsd": 563584.6458930994,
+          "ptMovementDownUsd": 1006193.3761972369,
+          "ytMovementUpUsd": 1836.2896235142985,
+          "ytMovementDownUsd": 2939.199351001832
         },
         "yieldRange": {
           "min": 0.03155402137136303,
           "max": 0.08162925186754992
         },
-        "aggregatedApy": 0.052906941498907255,
-        "maxBoostedApy": 0.05739896060849159
+        "aggregatedApy": 0.05279782398876564,
+        "maxBoostedApy": 0.057294336790186626
       }
     },
     "0xeCc2c994aA0C599a7f69a7Cfb9106fe4dfFb4341": {
@@ -48,17 +48,17 @@
       "address": "0xeCc2c994aA0C599a7f69a7Cfb9106fe4dfFb4341",
       "network": "base",
       "chain_id": "8453",
-      "total_supply": 39.485424267023205,
+      "total_supply": 39.43153924972029,
       "total_assets": 118.25241022652474,
-      "apy": 0.0873181581184512,
-      "implied_apy": 0.04545283579786186,
-      "utilization_rate": 0.33390798708783004,
+      "apy": 0.08738974256242701,
+      "implied_apy": 0.045452835789649315,
+      "utilization_rate": 0.33345230912575136,
       "total_volume_24h": 677.0009170499119,
-      "tvl": 362831.36815061053,
-      "price": 2665.7823508145448,
-      "underlying_price": 2665.7823508145448,
-      "pt_price": 0.002594035971873576,
-      "yt_price": 0.021253437221965488,
+      "tvl": 362260.5441114087,
+      "price": 2661.5882401460067,
+      "underlying_price": 2661.5882401460067,
+      "pt_price": 0.0025931924622689673,
+      "yt_price": 0.0212452722417924,
       "expiry": "2025-06-26T00:00:00.000Z",
       "tokens": {
         "pt": "8453-0x25d2b7e3b71f4edcc366e79134570704a079923a",
@@ -67,22 +67,22 @@
         "underlyingAsset": "8453-0x7fcd174e80f264448ebee8c88a7c4476aaf58ea6"
       },
       "details": {
-        "liquidity": 362831.36815061053,
-        "pendleApy": 0.039550281000590104,
-        "impliedApy": 0.0454528862351693,
+        "liquidity": 362260.5441114087,
+        "pendleApy": 0.039621865594452466,
+        "impliedApy": 0.04545296192953496,
         "feeRate": 0.000999999999916401,
         "movement10Percent": {
-          "ptMovementUpUsd": 7054.76850271225,
-          "ptMovementDownUsd": 5740.606867310367,
-          "ytMovementUpUsd": 20.552486550719244,
-          "ytMovementDownUsd": 14.928574912608616
+          "ptMovementUpUsd": 7035.210728645325,
+          "ptMovementDownUsd": 5724.768888514614,
+          "ytMovementUpUsd": 20.488838721822223,
+          "ytMovementDownUsd": 14.882552942992541
         },
         "yieldRange": {
           "min": 0.050642207533795364,
           "max": 0.1306909757702026
         },
-        "aggregatedApy": 0.08731816192869898,
-        "maxBoostedApy": 0.14664358342958414
+        "aggregatedApy": 0.0873897521341042,
+        "maxBoostedApy": 0.1468225505257829
       }
     }
   }

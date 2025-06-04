@@ -1,12 +1,12 @@
 {
-  "last_updated": "2025-06-04T18:09:51.719254",
+  "last_updated": "2025-06-04T18:20:25.725260",
   "chain_id": "8453",
   "market_address": "0xeCc2c994aA0C599a7f69a7Cfb9106fe4dfFb4341",
   "data": {
     "timestamp": "2025-06-04T16:00:00.000Z",
     "liquidity": {
-      "usd": 362831.36815061053,
-      "acc": 136.10689861448944
+      "usd": 362260.5441114087,
+      "acc": 136.10690738982834
     },
     "tradingVolume": {
       "usd": 677.0009170499119
@@ -14,16 +14,16 @@
     "underlyingInterestApy": 0.04783121303734661,
     "underlyingRewardApy": 0,
     "underlyingApy": 0.04783121303734661,
-    "impliedApy": 0.04545283579786186,
-    "ytFloatingApy": 0.021253437221965488,
-    "swapFeeApy": 0.00011798438016819013,
-    "voterApy": 0.00032965621614897947,
-    "ptDiscount": 0.002594035971873576,
-    "pendleApy": 0.039550281000590104,
+    "impliedApy": 0.045452835789649315,
+    "ytFloatingApy": 0.0212452722417924,
+    "swapFeeApy": 0.00011798437256049787,
+    "voterApy": 0.000329510283465444,
+    "ptDiscount": 0.0025931924622689673,
+    "pendleApy": 0.039621865594452466,
     "arbApy": 0,
     "lpRewardApy": 0,
-    "aggregatedApy": 0.0873181581184512,
-    "maxBoostedApy": 0.14664357961933636,
+    "aggregatedApy": 0.08738974256242701,
+    "maxBoostedApy": 0.1468225409541057,
     "estimatedDailyPoolRewards": [
       {
         "asset": {
@@ -34,9 +34,9 @@
           "decimals": 18,
           "accentColor": "",
           "price": {
-            "usd": 4.24937049
+            "usd": 4.24445024
           },
-          "priceUpdatedAt": "2025-06-04T16:09:45.004Z",
+          "priceUpdatedAt": "2025-06-04T16:20:15.307Z",
           "name": "PENDLE"
         },
         "amount": 13.79987441935295
@@ -45,7 +45,7 @@
     "totalPt": 10.40336570480233,
     "totalSy": 118.25241022652474,
     "totalLp": 66.19807579842832,
-    "totalActiveSupply": 39.485424267023205,
-    "assetPriceUsd": 2665.7823508145448
+    "totalActiveSupply": 39.43153924972029,
+    "assetPriceUsd": 2661.5882401460067
   }
 }
