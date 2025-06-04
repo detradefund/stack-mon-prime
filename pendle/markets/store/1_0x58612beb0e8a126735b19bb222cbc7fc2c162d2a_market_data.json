@@ -1,12 +1,12 @@
 {
-  "last_updated": "2025-06-04T18:20:25.158282",
+  "last_updated": "2025-06-04T18:24:44.768135",
   "chain_id": "1",
   "market_address": "0x58612beb0e8a126735b19bb222cbc7fc2c162d2a",
   "data": {
     "timestamp": "2025-06-04T16:00:00.000Z",
     "liquidity": {
-      "usd": 5062678.777517883,
-      "acc": 1907.4222052800715
+      "usd": 5058312.058252691,
+      "acc": 1907.4052736405317
     },
     "tradingVolume": {
       "usd": 1143605.6837075672
@@ -14,16 +14,16 @@
     "underlyingInterestApy": 0.048124777438175004,
     "underlyingRewardApy": 0,
     "underlyingApy": 0.048124777438175004,
-    "impliedApy": 0.05039636966363137,
-    "ytFloatingApy": -0.7982689073666694,
-    "swapFeeApy": 0.0006379301312879893,
-    "voterApy": 0.03332063941752509,
-    "ptDiscount": 0.00286810440682872,
-    "pendleApy": 0.002997675200947322,
+    "impliedApy": 0.050823686552565084,
+    "ytFloatingApy": -0.8248187578512907,
+    "swapFeeApy": 0.0006379357958317122,
+    "voterApy": 0.033254581390899055,
+    "ptDiscount": 0.002891325837454106,
+    "pendleApy": 0.003003656547078584,
     "arbApy": 0,
     "lpRewardApy": 0,
-    "aggregatedApy": 0.0526262398051585,
-    "maxBoostedApy": 0.05712275260657949,
+    "aggregatedApy": 0.052795091282477724,
+    "maxBoostedApy": 0.0573005761030956,
     "estimatedDailyPoolRewards": [
       {
         "asset": {
@@ -34,9 +34,9 @@
           "decimals": 18,
           "accentColor": null,
           "price": {
-            "usd": 4.24445024
+            "usd": 4.23827582
           },
-          "priceUpdatedAt": "2025-06-04T16:20:15.307Z",
+          "priceUpdatedAt": "2025-06-04T16:24:30.041Z",
           "name": "PENDLE"
         },
         "amount": 10.494787364094211
@@ -46,6 +46,6 @@
     "totalSy": 1124.3603156489407,
     "totalLp": 926.9733422513484,
     "totalActiveSupply": 397.6061018661153,
-    "assetPriceUsd": 2654.19935004611
+    "assetPriceUsd": 2651.93356029589
   }
 }

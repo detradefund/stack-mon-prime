@@ -1,5 +1,5 @@
 {
-  "last_updated": "2025-06-04T18:20:26.953207",
+  "last_updated": "2025-06-04T18:24:46.656406",
   "markets": {
     "ethereum": {
       "markets": [
@@ -12,22 +12,22 @@
           "sy": "1-0xcbc72d92b2dc8187414f6734718563898740c0bc",
           "underlyingAsset": "1-0x7f39c581f595b53c5cb19bd0b3f8da6c935e2ca0",
           "details": {
-            "liquidity": 46773766.17305058,
-            "pendleApy": 0.016408144097564557,
-            "impliedApy": 0.027756647789609623,
+            "liquidity": 46627977.713391446,
+            "pendleApy": 0.016478063184991478,
+            "impliedApy": 0.02775664778996001,
             "feeRate": 0.0004999999993486881,
             "movement10Percent": {
-              "ptMovementUpUsd": 856718.048453331,
-              "ptMovementDownUsd": 772982.2544285381,
-              "ytMovementUpUsd": 14693.832436918063,
-              "ytMovementDownUsd": 11858.162199803446
+              "ptMovementUpUsd": 854047.0153093338,
+              "ptMovementDownUsd": 770572.3040395562,
+              "ytMovementUpUsd": 14647.51627658302,
+              "ytMovementDownUsd": 11820.793565457609
             },
             "yieldRange": {
               "min": 0.020025835637069615,
               "max": 0.09502844668653525
             },
-            "aggregatedApy": 0.04488750162413949,
-            "maxBoostedApy": 0.06949971777048633
+            "aggregatedApy": 0.04495742069024718,
+            "maxBoostedApy": 0.0696745154677344
           },
           "isNew": false,
           "isPrime": false,
@@ -42,22 +42,22 @@
           "sy": "1-0xcbc72d92b2dc8187414f6734718563898740c0bc",
           "underlyingAsset": "1-0x7f39c581f595b53c5cb19bd0b3f8da6c935e2ca0",
           "details": {
-            "liquidity": 997378.4912848031,
-            "pendleApy": 0.011576679755183231,
-            "impliedApy": 0.03601649614661917,
+            "liquidity": 994269.7917494253,
+            "pendleApy": 0.011626010627330673,
+            "impliedApy": 0.036016496146640486,
             "feeRate": 0.0004999999993486881,
             "movement10Percent": {
-              "ptMovementUpUsd": 47263.68933916092,
-              "ptMovementDownUsd": 37687.02319768852,
-              "ytMovementUpUsd": 4988.507408684067,
-              "ytMovementDownUsd": 3551.899505348035
+              "ptMovementUpUsd": 47116.54037237167,
+              "ptMovementDownUsd": 37569.39425744265,
+              "ytMovementUpUsd": 4972.939537213351,
+              "ytMovementDownUsd": 3540.786809939447
             },
             "yieldRange": {
               "min": 0.029978328225930276,
               "max": 0.07247767045580256
             },
-            "aggregatedApy": 0.04129953321751484,
-            "maxBoostedApy": 0.05866455285028968
+            "aggregatedApy": 0.041348864344871596,
+            "maxBoostedApy": 0.05878788028586761
           },
           "isNew": false,
           "isPrime": false,
@@ -72,22 +72,22 @@
           "sy": "1-0x730a5e2acebccaa5e9095723b3cb862739da793c",
           "underlyingAsset": "1-0xa1290d69c65a6fe4df752f95823fae25cb99e5a7",
           "details": {
-            "liquidity": 6164508.381935716,
-            "pendleApy": 0.004704464106848876,
-            "impliedApy": 0.039280321175963806,
+            "liquidity": 6158162.14090867,
+            "pendleApy": 0.004714638841396342,
+            "impliedApy": 0.03928032122128777,
             "feeRate": 0.0004999999993486881,
             "movement10Percent": {
-              "ptMovementUpUsd": 493613.07173967356,
-              "ptMovementDownUsd": 448040.2393736717,
-              "ytMovementUpUsd": 1235.734527736628,
-              "ytMovementDownUsd": 1009.4717819348151
+              "ptMovementUpUsd": 493118.53945255274,
+              "ptMovementDownUsd": 447591.199270304,
+              "ytMovementUpUsd": 1234.0940098499527,
+              "ytMovementDownUsd": 1008.1379449229014
             },
             "yieldRange": {
               "min": 0.0212099403484523,
               "max": 0.07126903621720145
             },
-            "aggregatedApy": 0.038054971428586805,
-            "maxBoostedApy": 0.04511166758886012
+            "aggregatedApy": 0.03806514678673314,
+            "maxBoostedApy": 0.04513710504882765
           },
           "isNew": false,
           "isPrime": false,
@@ -102,22 +102,22 @@
           "sy": "1-0xac0047886a985071476a1186be89222659970d65",
           "underlyingAsset": "1-0xcd5fe23c85820f7b72d0926fc9b05b43e359b7ee",
           "details": {
-            "liquidity": 7330780.254768814,
-            "pendleApy": 0.0012087423946000775,
-            "impliedApy": 0.03655106867769686,
+            "liquidity": 7322989.528565794,
+            "pendleApy": 0.0012113969761112888,
+            "impliedApy": 0.03655106871981695,
             "feeRate": 0.0004999999993486881,
             "movement10Percent": {
-              "ptMovementUpUsd": 809583.9797324111,
-              "ptMovementDownUsd": 473669.6100408937,
-              "ytMovementUpUsd": 1837.7815795760685,
-              "ytMovementDownUsd": 994.3181470625632
+              "ptMovementUpUsd": 808778.1430501174,
+              "ptMovementDownUsd": 473198.21985591797,
+              "ytMovementUpUsd": 1835.3541078232174,
+              "ytMovementDownUsd": 993.0113547532736
             },
             "yieldRange": {
               "min": 0.020023374205911118,
               "max": 0.07002451597930219
             },
-            "aggregatedApy": 0.033292406005486476,
-            "maxBoostedApy": 0.040010264081076205
+            "aggregatedApy": 0.033295060990108837,
+            "maxBoostedApy": 0.040016900508860954
           },
           "isNew": false,
           "isPrime": false,
@@ -132,22 +132,22 @@
           "sy": "1-0xb1b9150f2085f6a553b547099977181ca802752a",
           "underlyingAsset": "1-0xe1b4d34e8754600962cd944b535180bd758e6c2e",
           "details": {
-            "liquidity": 7067340.535151154,
-            "pendleApy": 0.011130847255582596,
-            "impliedApy": 0.04194193488385323,
+            "liquidity": 7060064.424959268,
+            "pendleApy": 0.011154921527067584,
+            "impliedApy": 0.04194193493230802,
             "feeRate": 0.000999999999916401,
             "movement10Percent": {
-              "ptMovementUpUsd": 287341.8852686882,
-              "ptMovementDownUsd": 243975.94871946677,
-              "ytMovementUpUsd": 774.8400683382308,
-              "ytMovementDownUsd": 586.2170962070678
+              "ptMovementUpUsd": 287054.106593132,
+              "ptMovementDownUsd": 243731.85450708226,
+              "ytMovementUpUsd": 773.8116977752652,
+              "ytMovementDownUsd": 585.4435320685235
             },
             "yieldRange": {
               "min": 0.03182784919685048,
               "max": 0.101951508443352
             },
-            "aggregatedApy": 0.02957221795314132,
-            "maxBoostedApy": 0.046268488836515215
+            "aggregatedApy": 0.029596293524354673,
+            "maxBoostedApy": 0.04632867581495605
           },
           "isNew": false,
           "isPrime": false,
@@ -162,22 +162,22 @@
           "sy": "1-0xc430db19339a3051192233b4c49f9ab3dc6d16b7",
           "underlyingAsset": "1-0xf1376bcef0f78459c0ed0ba5ddce976f1ddf51f4",
           "details": {
-            "liquidity": 3245836.8277923996,
-            "pendleApy": 0.01903017686001128,
-            "impliedApy": 0.03821790892527055,
+            "liquidity": 3243600.046166386,
+            "pendleApy": 0.019064839458298326,
+            "impliedApy": 0.038217908969348846,
             "feeRate": 0.0004999999993486881,
             "movement10Percent": {
-              "ptMovementUpUsd": 165384.26280021667,
-              "ptMovementDownUsd": 133283.4573945287,
-              "ytMovementUpUsd": 403.15733645481623,
-              "ytMovementDownUsd": 292.31988825258816
+              "ptMovementUpUsd": 165290.1992201805,
+              "ptMovementDownUsd": 133207.99325747826,
+              "ytMovementUpUsd": 402.7968021947584,
+              "ytMovementDownUsd": 292.06106360113216
             },
             "yieldRange": {
               "min": 0.03155395107977902,
               "max": 0.08162917817276255
             },
-            "aggregatedApy": 0.06456297335812433,
-            "maxBoostedApy": 0.09310823864814126
+            "aggregatedApy": 0.06458082504682873,
+            "maxBoostedApy": 0.09317808423427623
           },
           "isNew": false,
           "isPrime": false,
@@ -192,22 +192,22 @@
           "sy": "1-0x253008ba4ae2f3e6488dc998a5321d4eb1a0c905",
           "underlyingAsset": "1-0xd9a442856c234a39a81a089c06451ebaa4306a72",
           "details": {
-            "liquidity": 5062678.777517883,
-            "pendleApy": 0.002997675200947322,
-            "impliedApy": 0.05084656548491884,
+            "liquidity": 5058312.058252691,
+            "pendleApy": 0.003003656547078584,
+            "impliedApy": 0.05033047135451896,
             "feeRate": 0.0004999999993486881,
             "movement10Percent": {
-              "ptMovementUpUsd": 563584.6458930994,
-              "ptMovementDownUsd": 1006193.3761972369,
-              "ytMovementUpUsd": 1836.2896235142985,
-              "ytMovementDownUsd": 2939.199351001832
+              "ptMovementUpUsd": 553396.4169794064,
+              "ptMovementDownUsd": 991923.5522069234,
+              "ytMovementUpUsd": 1781.3833422128357,
+              "ytMovementDownUsd": 2857.34896760544
             },
             "yieldRange": {
               "min": 0.03155402137136303,
               "max": 0.08162925186754992
             },
-            "aggregatedApy": 0.05279782398876564,
-            "maxBoostedApy": 0.057294336790186626
+            "aggregatedApy": 0.052607110832674144,
+            "maxBoostedApy": 0.05711259565329202
           },
           "isNew": false,
           "isPrime": false,
@@ -222,22 +222,22 @@
           "sy": "1-0x7786729eee8b9d30fe7d91fdff23a0f1d0c615d9",
           "underlyingAsset": "1-0xfae103dc9cf190ed75350761e95403b7b8afa6c0",
           "details": {
-            "liquidity": 8510669.59799603,
-            "pendleApy": 0.02017462820812539,
-            "impliedApy": 0.030431722600442246,
+            "liquidity": 8504804.43727068,
+            "pendleApy": 0.020211375991184884,
+            "impliedApy": 0.03043172263540761,
             "feeRate": 0.0004999999993486881,
             "movement10Percent": {
-              "ptMovementUpUsd": 227488.57736587524,
-              "ptMovementDownUsd": 184688.77652808806,
-              "ytMovementUpUsd": 444.6420093138438,
-              "ytMovementDownUsd": 323.70475629014214
+              "ptMovementUpUsd": 227359.1235280037,
+              "ptMovementDownUsd": 184583.50582758037,
+              "ytMovementUpUsd": 444.2442594321177,
+              "ytMovementDownUsd": 323.4169337695102
             },
             "yieldRange": {
               "min": 0.03033005583428557,
               "max": 0.08034603518597465
             },
-            "aggregatedApy": 0.04705753469720038,
-            "maxBoostedApy": 0.07731947700938846
+            "aggregatedApy": 0.04709428256429464,
+            "maxBoostedApy": 0.07741134655107196
           },
           "isNew": false,
           "isPrime": false,
@@ -252,22 +252,22 @@
           "sy": "1-0x52453825c287ddef62d647ce51c0979d27c461f7",
           "underlyingAsset": "1-0x35d8949372d46b7a3d5a56006ae77b215fc69bc0",
           "details": {
-            "liquidity": 13358060.558744458,
-            "pendleApy": 0.019973039368226708,
-            "impliedApy": 0.1480610558931037,
+            "liquidity": 13359008.067259274,
+            "pendleApy": 0.019994212170098655,
+            "impliedApy": 0.14806105607253106,
             "feeRate": 0.0019999999993256523,
             "movement10Percent": {
-              "ptMovementUpUsd": 1166255.8428334482,
-              "ptMovementDownUsd": 1064009.0486245106,
-              "ytMovementUpUsd": 10414.981660242169,
-              "ytMovementDownUsd": 8610.853570527512
+              "ptMovementUpUsd": 1166286.3275530757,
+              "ptMovementDownUsd": 1064036.7932446706,
+              "ytMovementUpUsd": 10411.850100729685,
+              "ytMovementDownUsd": 8608.321067646124
             },
             "yieldRange": {
               "min": 0.07394291008902727,
               "max": 0.2545991632254762
             },
-            "aggregatedApy": 0.11457457307944835,
-            "maxBoostedApy": 0.19157175913943475
+            "aggregatedApy": 0.11459576952260553,
+            "maxBoostedApy": 0.19162469396522402
           },
           "isNew": false,
           "isPrime": false,
@@ -282,22 +282,22 @@
           "sy": "1-0x59e5a339701797a55465c590b2fe484855be1a7b",
           "underlyingAsset": "1-0x2f1abb81ed86be95bcf8178ba62c8e72d6834775",
           "details": {
-            "liquidity": 756468.0644585255,
-            "pendleApy": 3.783772040844381e-05,
-            "impliedApy": 0.01164182215854348,
+            "liquidity": 756774.7860950108,
+            "pendleApy": 3.786516472689491e-05,
+            "impliedApy": 0.011641822171797322,
             "feeRate": 0.000999999999916401,
             "movement10Percent": {
-              "ptMovementUpUsd": 1731.325553520831,
-              "ptMovementDownUsd": 1616.9741169252388,
-              "ytMovementUpUsd": 1.3881848267596617,
-              "ytMovementDownUsd": 1.0937452519925006
+              "ptMovementUpUsd": 1731.3267673592165,
+              "ptMovementDownUsd": 1616.9759536882464,
+              "ytMovementUpUsd": 1.3872081492344719,
+              "ytMovementDownUsd": 1.0933968986211358
             },
             "yieldRange": {
               "min": 0.031586152740540344,
               "max": 0.1016935154201827
             },
-            "aggregatedApy": 0.007606235606975178,
-            "maxBoostedApy": 0.01237776600202518
+            "aggregatedApy": 0.0076052530847853985,
+            "maxBoostedApy": 0.012376824636419672
           },
           "isNew": false,
           "isPrime": false,
@@ -312,22 +312,22 @@
           "sy": "1-0x292e67fe392b811d486c81eceb25ea96af57c2fc",
           "underlyingAsset": "1-0x0655977feb2f289a4ab78af67bab0d17aab84367",
           "details": {
-            "liquidity": 199516.43536328932,
-            "pendleApy": 0.012233852072271605,
-            "impliedApy": 0.08408609747255191,
+            "liquidity": 199516.6253390434,
+            "pendleApy": 0.012247677825332974,
+            "impliedApy": 0.08408609757162555,
             "feeRate": 0.0019999999993256523,
             "movement10Percent": {
               "ptMovementUpUsd": 8640.81084728241,
-              "ptMovementDownUsd": 7603.940660320538,
-              "ytMovementUpUsd": 45.769713090660474,
-              "ytMovementDownUsd": 35.93392498256832
+              "ptMovementDownUsd": 7603.939250533748,
+              "ytMovementUpUsd": 45.754752995979054,
+              "ytMovementDownUsd": 35.92243075087654
             },
             "yieldRange": {
               "min": 0.053739075628591565,
               "max": 0.20426867523530823
             },
-            "aggregatedApy": 0.07922284133912642,
-            "maxBoostedApy": 0.09757361944753383
+            "aggregatedApy": 0.07925002701190412,
+            "maxBoostedApy": 0.09762154374990359
           },
           "isNew": false,
           "isPrime": false,
@@ -342,22 +342,22 @@
           "sy": "1-0x0a26e7ab5c554232314a8d459eff0ede72333f08",
           "underlyingAsset": "1-0xdcee70654261af21c44c093c300ed3bb97b78192",
           "details": {
-            "liquidity": 348665.7391474824,
-            "pendleApy": 0.0004322396931087081,
-            "impliedApy": 0.03645137908860363,
+            "liquidity": 348425.476052966,
+            "pendleApy": 0.00043302698483457087,
+            "impliedApy": 0.03645137908906504,
             "feeRate": 0.0004999999993486881,
             "movement10Percent": {
-              "ptMovementUpUsd": 18782.91368484497,
-              "ptMovementDownUsd": 16648.474722193063,
-              "ytMovementUpUsd": 420.5308992357387,
-              "ytMovementDownUsd": 334.61995485878583
+              "ptMovementUpUsd": 18772.6691365242,
+              "ptMovementDownUsd": 16638.204458012948,
+              "ytMovementUpUsd": 420.28797415383065,
+              "ytMovementDownUsd": 334.402279436025
             },
             "yieldRange": {
               "min": 0.020183461441510422,
               "max": 0.0801941174755152
             },
-            "aggregatedApy": 0.04156316188991111,
-            "maxBoostedApy": 0.04221152142957417
+            "aggregatedApy": 0.0415639486832795,
+            "maxBoostedApy": 0.04221348916053135
           },
           "isNew": false,
           "isPrime": false,
@@ -372,22 +372,22 @@
           "sy": "1-0x773f0d42e418df4165a0a5bb754dc447b652538c",
           "underlyingAsset": "1-0x98c23e9d8f34fefb1b7bd6a91b7ff122f4e16f5c",
           "details": {
-            "liquidity": 210501.38187916944,
-            "pendleApy": 0.004204597978988943,
-            "impliedApy": 0.04601983755423911,
+            "liquidity": 210500.89114139604,
+            "pendleApy": 0.004209363511578908,
+            "impliedApy": 0.04601983760751094,
             "feeRate": 0.0019999999993256523,
             "movement10Percent": {
-              "ptMovementUpUsd": 2017.244693712202,
-              "ptMovementDownUsd": 1874.5225268797847,
-              "ytMovementUpUsd": 6.062690595399514,
-              "ytMovementDownUsd": 4.932337879837411
+              "ptMovementUpUsd": 2017.2446942977504,
+              "ptMovementDownUsd": 1874.5222998854033,
+              "ytMovementUpUsd": 6.060713206033559,
+              "ytMovementDownUsd": 4.93076181345272
             },
             "yieldRange": {
               "min": 0.043030541050135054,
               "max": 0.25363469451358894
             },
-            "aggregatedApy": 0.045634952815805103,
-            "maxBoostedApy": 0.05194184978428852
+            "aggregatedApy": 0.04564097554656213,
+            "maxBoostedApy": 0.0519550208139305
           },
           "isNew": false,
           "isPrime": false,
@@ -402,22 +402,22 @@
           "sy": "1-0x60ac70d1646c7b49840313ef8008bd78f8901d75",
           "underlyingAsset": "1-0x23878914efe38d27c4d67ab83ed1b93a74d4086a",
           "details": {
-            "liquidity": 138088.20179863152,
-            "pendleApy": 0.001242431144465458,
-            "impliedApy": 0.06655808489592929,
+            "liquidity": 138088.85437988976,
+            "pendleApy": 0.001243830550241754,
+            "impliedApy": 0.0665580849737204,
             "feeRate": 0.0019999999993256523,
             "movement10Percent": {
-              "ptMovementUpUsd": 3118.067976640066,
-              "ptMovementDownUsd": 2794.3848126100547,
-              "ytMovementUpUsd": 13.258728915655437,
-              "ytMovementDownUsd": 10.535207075861765
+              "ptMovementUpUsd": 3118.0679758645897,
+              "ptMovementDownUsd": 2794.384389486953,
+              "ytMovementUpUsd": 13.254398674880388,
+              "ytMovementDownUsd": 10.531838763718293
             },
             "yieldRange": {
               "min": 0.047795818944339055,
               "max": 0.22325948777953314
             },
-            "aggregatedApy": 0.04501476141939619,
-            "maxBoostedApy": 0.04687840813609438
+            "aggregatedApy": 0.0450186546052895,
+            "maxBoostedApy": 0.046884400430652125
           },
           "isNew": false,
           "isPrime": false,
@@ -432,22 +432,22 @@
           "sy": "1-0xf3a4aae37b90810c263c99538a47ad6f31837e19",
           "underlyingAsset": "1-0x9fb7b4477576fe5b32be4c1843afb1e55f251b33",
           "details": {
-            "liquidity": 196732.02053409332,
-            "pendleApy": 0.0029545210163526093,
-            "impliedApy": 0.07792852620462432,
+            "liquidity": 196731.5534581263,
+            "pendleApy": 0.002957869826324181,
+            "impliedApy": 0.07792852629618396,
             "feeRate": 0.0019999999993256523,
             "movement10Percent": {
-              "ptMovementUpUsd": 40502.8546177656,
-              "ptMovementDownUsd": 3726.3738180105142,
-              "ytMovementUpUsd": 198.33140472263506,
-              "ytMovementDownUsd": 16.365105307772424
+              "ptMovementUpUsd": 40503.04057503543,
+              "ptMovementDownUsd": 3726.3732173383346,
+              "ytMovementUpUsd": 198.2677515302054,
+              "ytMovementDownUsd": 16.359871450619142
             },
             "yieldRange": {
               "min": 0.0544530827389492,
               "max": 0.2753746021319763
             },
-            "aggregatedApy": 0.06333330718876228,
-            "maxBoostedApy": 0.09789082552369305
+            "aggregatedApy": 0.06333675928133979,
+            "maxBoostedApy": 0.0978992992941908
           },
           "isNew": false,
           "isPrime": false,
@@ -462,22 +462,22 @@
           "sy": "1-0xff11b91362b1949890ea653011728976ea5f6fe8",
           "underlyingAsset": "1-0x5c20b550819128074fd538edf79791733ccedd18",
           "details": {
-            "liquidity": 231406.79798166343,
-            "pendleApy": 0.009835741592335582,
-            "impliedApy": 0.06698026852869399,
+            "liquidity": 231407.87762012842,
+            "pendleApy": 0.009846820621698648,
+            "impliedApy": 0.06698026860699735,
             "feeRate": 0.0019999999993256523,
             "movement10Percent": {
-              "ptMovementUpUsd": 3578.1413295800294,
-              "ptMovementDownUsd": 3254.6870300047194,
-              "ytMovementUpUsd": 15.305737824615044,
-              "ytMovementDownUsd": 12.34608957978543
+              "ptMovementUpUsd": 3578.1413284733094,
+              "ptMovementDownUsd": 3254.686545344763,
+              "ytMovementUpUsd": 15.300739996251071,
+              "ytMovementDownUsd": 12.342142250923795
             },
             "yieldRange": {
               "min": 0.054453317906287664,
               "max": 0.27537488598827564
             },
-            "aggregatedApy": 0.07552572384732227,
-            "maxBoostedApy": 0.12976483014140283
+            "aggregatedApy": 0.07553919228460167,
+            "maxBoostedApy": 0.12979491604142257
           },
           "isNew": false,
           "isPrime": false,
@@ -492,22 +492,22 @@
           "sy": "1-0x7acdf2012aac69d70b86677fe91eb66e08961880",
           "underlyingAsset": "1-0x657e8c867d8b37dcc18fa4caead9c45eb088c642",
           "details": {
-            "liquidity": 8038477.6953040315,
-            "pendleApy": 0.004579393680338269,
-            "impliedApy": 0.023223143014271974,
+            "liquidity": 8041736.884727348,
+            "pendleApy": 0.0045827152666712955,
+            "impliedApy": 0.02322314304085893,
             "feeRate": 0.0014999999992630908,
             "movement10Percent": {
-              "ptMovementUpUsd": 516151.4975438444,
-              "ptMovementDownUsd": 64759.808321601515,
-              "ytMovementUpUsd": 782.7016278667517,
-              "ytMovementDownUsd": 86.90459076874683
+              "ptMovementUpUsd": 516179.9008756281,
+              "ptMovementDownUsd": 64763.53034474244,
+              "ytMovementUpUsd": 782.5052666685797,
+              "ytMovementDownUsd": 86.88183850321246
             },
             "yieldRange": {
               "min": 0.03021206116725497,
               "max": 0.1102284691354342
             },
-            "aggregatedApy": 0.0065374607729488405,
-            "maxBoostedApy": 0.013406551293456245
+            "aggregatedApy": 0.006540782623835778,
+            "maxBoostedApy": 0.013414855523842723
           },
           "isNew": false,
           "isPrime": true,
@@ -522,22 +522,22 @@
           "sy": "1-0xffc374d301f2ea381ee313da0324ea7bf0dbfddf",
           "underlyingAsset": "1-0x7223442cad8e9ca474fc40109ab981608f8c4273",
           "details": {
-            "liquidity": 2655290.8229937074,
-            "pendleApy": 0.0005797737683640141,
-            "impliedApy": 0.05303350032825471,
+            "liquidity": 2653461.063511205,
+            "pendleApy": 0.00058082978598664,
+            "impliedApy": 0.053033500389849,
             "feeRate": 0.0014999999992630908,
             "movement10Percent": {
-              "ptMovementUpUsd": 80052.76322364807,
-              "ptMovementDownUsd": 70439.59609271256,
-              "ytMovementUpUsd": 272.57728938175376,
-              "ytMovementDownUsd": 212.9131941874687
+              "ptMovementUpUsd": 80007.12841749191,
+              "ptMovementDownUsd": 70399.5265640556,
+              "ytMovementUpUsd": 272.3331183538712,
+              "ytMovementDownUsd": 212.72409239698757
             },
             "yieldRange": {
               "min": 0.037254242744167415,
               "max": 0.15250328649723804
             },
-            "aggregatedApy": 0.03581216476931796,
-            "maxBoostedApy": 0.036681825421863976
+            "aggregatedApy": 0.035813221976623996,
+            "maxBoostedApy": 0.03668446665560395
           },
           "isNew": false,
           "isPrime": false,
@@ -552,22 +552,22 @@
           "sy": "1-0x012badcc6e824c2ea32bd5367ebda3be3402c9c5",
           "underlyingAsset": "1-0x917cee801a67f933f2e6b33fc0cd1ed2d5909d88",
           "details": {
-            "liquidity": 12177743.66660186,
-            "pendleApy": 0.0011376246987394802,
-            "impliedApy": 0.050817755242176244,
+            "liquidity": 12169351.879211636,
+            "pendleApy": 0.0011396968134319357,
+            "impliedApy": 0.05081775530113353,
             "feeRate": 0.0006729999999999237,
             "movement10Percent": {
-              "ptMovementUpUsd": 332075.17117261887,
-              "ptMovementDownUsd": 1071005.3395924761,
-              "ytMovementUpUsd": 1069.821266655569,
-              "ytMovementDownUsd": 3105.834054748401
+              "ptMovementUpUsd": 331885.1813673973,
+              "ptMovementDownUsd": 1070645.2469258583,
+              "ytMovementUpUsd": 1068.860551422129,
+              "ytMovementDownUsd": 3103.7977401750104
             },
             "yieldRange": {
               "min": 0.03725438438832824,
               "max": 0.15250344379302685
             },
-            "aggregatedApy": 0.033126187614266535,
-            "maxBoostedApy": 0.03483262466237576
+            "aggregatedApy": 0.03312826085459934,
+            "maxBoostedApy": 0.03483780607474725
           },
           "isNew": false,
           "isPrime": false,
@@ -582,22 +582,22 @@
           "sy": "1-0x18c11b1dc74cab82ad18d5034fde93fe90a41d99",
           "underlyingAsset": "1-0x43e54c2e7b3e294de3a155785f52ab49d87b9922",
           "details": {
-            "liquidity": 990744.490570256,
-            "pendleApy": 0.07151221370067301,
-            "impliedApy": 0.1881660421886464,
+            "liquidity": 987429.1148849739,
+            "pendleApy": 0.07183347924918947,
+            "impliedApy": 0.18816604242052382,
             "feeRate": 0.002594999999999903,
             "movement10Percent": {
-              "ptMovementUpUsd": 36361.62728071213,
-              "ptMovementDownUsd": 33590.152325635674,
-              "ytMovementUpUsd": 407.1044158596989,
-              "ytMovementDownUsd": 339.7110957959292
+              "ptMovementUpUsd": 36241.48666858673,
+              "ptMovementDownUsd": 33478.26204093091,
+              "ytMovementUpUsd": 405.62703010004543,
+              "ytMovementDownUsd": 338.4710136394925
             },
             "yieldRange": {
               "min": 0.08244322081362603,
               "max": 0.5173749300448789
             },
-            "aggregatedApy": 0.23412858542598047,
-            "maxBoostedApy": 0.34139690597699
+            "aggregatedApy": 0.2344498593601495,
+            "maxBoostedApy": 0.3422000782339337
           },
           "isNew": false,
           "isPrime": false,
@@ -612,22 +612,22 @@
           "sy": "1-0xba04c9a4297484aa671fd3425364994cf2ac8037",
           "underlyingAsset": "1-0xc372ccdd24bb0753ceb78bbac4d24eb7de4abe4e",
           "details": {
-            "liquidity": 6566104.327102416,
-            "pendleApy": 0.05415174233512325,
-            "impliedApy": 0.0897840922593629,
+            "liquidity": 6565939.578599345,
+            "pendleApy": 0.0542143523439767,
+            "impliedApy": 0.08978409227455963,
             "feeRate": 0.0011229999999999851,
             "movement10Percent": {
-              "ptMovementUpUsd": 58141.5370106697,
-              "ptMovementDownUsd": 54995.20800846537,
-              "ytMovementUpUsd": 860.3277474751319,
-              "ytMovementDownUsd": 733.4824547020647
+              "ptMovementUpUsd": 58140.6056880951,
+              "ptMovementDownUsd": 54994.26763250972,
+              "ytMovementUpUsd": 860.2077188750985,
+              "ytMovementDownUsd": 733.3808053830953
             },
             "yieldRange": {
               "min": 0.07000000000000002,
               "max": 0.58
             },
-            "aggregatedApy": 0.0684450184985027,
-            "maxBoostedApy": 0.14967263200118758
+            "aggregatedApy": 0.06851231574069012,
+            "maxBoostedApy": 0.1498338442566552
           },
           "isNew": false,
           "isPrime": false,
@@ -642,22 +642,22 @@
           "sy": "1-0xc781c0cc527cb8c351be3a64c690216c535c6f36",
           "underlyingAsset": "1-0x8236a87084f8b84306f72007f36f2618a5634494",
           "details": {
-            "liquidity": 6095674.1397598935,
-            "pendleApy": 0.001019531686343016,
-            "impliedApy": 0.016697207421360494,
+            "liquidity": 6098145.590396867,
+            "pendleApy": 0.0010202711918625208,
+            "impliedApy": 0.01669720744041525,
             "feeRate": 0.00020700000000006824,
             "movement10Percent": {
-              "ptMovementUpUsd": 1593935.3866103126,
-              "ptMovementDownUsd": 33594.5710034929,
-              "ytMovementUpUsd": 1412.906173666847,
-              "ytMovementDownUsd": 32.51551174978408
+              "ptMovementUpUsd": 1594023.7087687887,
+              "ptMovementDownUsd": 33596.43287436132,
+              "ytMovementUpUsd": 1412.5405833699253,
+              "ytMovementDownUsd": 32.506932813710854
             },
             "yieldRange": {
               "min": 0.024999999999999994,
               "max": 0.10499999999999998
             },
-            "aggregatedApy": 0.0025712873052624497,
-            "maxBoostedApy": 0.004100584834776974
+            "aggregatedApy": 0.002572026935585173,
+            "maxBoostedApy": 0.004102433723378954
           },
           "isNew": false,
           "isPrime": true,
@@ -672,22 +672,22 @@
           "sy": "1-0xd5cf704dc17403343965b4f9cd4d7b5e9b20cc52",
           "underlyingAsset": "1-0xd9d920aa40f578ab794426f5c90f6c731d159def",
           "details": {
-            "liquidity": 20082136.19162413,
-            "pendleApy": 0.019335063409623963,
-            "impliedApy": 0.01744124347663978,
+            "liquidity": 20089107.92749135,
+            "pendleApy": 0.019350215192202862,
+            "impliedApy": 0.017441243496550518,
             "feeRate": 0.00019999999999997797,
             "movement10Percent": {
-              "ptMovementUpUsd": 1744799.001056151,
-              "ptMovementDownUsd": 91372.14794596282,
-              "ytMovementUpUsd": 1848.8329176156146,
-              "ytMovementDownUsd": 92.34570815803319
+              "ptMovementUpUsd": 1745594.3705644337,
+              "ptMovementDownUsd": 91413.12902788432,
+              "ytMovementUpUsd": 1849.070922470013,
+              "ytMovementDownUsd": 92.35763133826836
             },
             "yieldRange": {
               "min": 0.030000000000000002,
               "max": 0.11499999999999999
             },
-            "aggregatedApy": 0.020279127228688198,
-            "maxBoostedApy": 0.04928172234312414
+            "aggregatedApy": 0.020294279129498213,
+            "maxBoostedApy": 0.049319601917802505
           },
           "isNew": false,
           "isPrime": true,
@@ -702,22 +702,22 @@
           "sy": "1-0x87b8e462080fa443a06d2bb119adb3828c407d78",
           "underlyingAsset": "1-0x004e9c3ef86bc1ca1f0bb5c7662861ee93350568",
           "details": {
-            "liquidity": 57931120.052862905,
-            "pendleApy": 0.0128267289444086,
-            "impliedApy": 0.01020240636996017,
+            "liquidity": 57954607.53730445,
+            "pendleApy": 0.012836032731221827,
+            "impliedApy": 0.010202406381567108,
             "feeRate": 0.00019999999999997797,
             "movement10Percent": {
-              "ptMovementUpUsd": 165439.2067556453,
-              "ptMovementDownUsd": 157454.7439045883,
-              "ytMovementUpUsd": 109.63395053279919,
-              "ytMovementDownUsd": 93.40415170580309
+              "ptMovementUpUsd": 165448.51919692478,
+              "ptMovementDownUsd": 157463.1230070676,
+              "ytMovementUpUsd": 109.60419011759706,
+              "ytMovementDownUsd": 93.37930706244771
             },
             "yieldRange": {
               "min": 0.023,
               "max": 0.10499999999999998
             },
-            "aggregatedApy": 0.013428074201514234,
-            "maxBoostedApy": 0.03266816761812713
+            "aggregatedApy": 0.013437378027533491,
+            "maxBoostedApy": 0.032691427124366235
           },
           "isNew": false,
           "isPrime": true,
@@ -732,22 +732,22 @@
           "sy": "1-0xb47cbf6697a6518222c7af4098a43aefe2739c8c",
           "underlyingAsset": "1-0x4c9edd5852cd905f086c759e8383e09bff1e68b3",
           "details": {
-            "liquidity": 10673567.419617124,
-            "pendleApy": 0.0281001910022136,
-            "impliedApy": 0.07445981346047903,
+            "liquidity": 10673291.825080488,
+            "pendleApy": 0.028132700844948726,
+            "impliedApy": 0.07445981347299413,
             "feeRate": 0.0010619999999998964,
             "movement10Percent": {
-              "ptMovementUpUsd": 1353717.4864140376,
-              "ptMovementDownUsd": 9558792.937554616,
-              "ytMovementUpUsd": 16510.165969918475,
-              "ytMovementDownUsd": 106457.00860205306
+              "ptMovementUpUsd": 1353724.0826519672,
+              "ptMovementDownUsd": 9559419.853143513,
+              "ytMovementUpUsd": 16509.21198170653,
+              "ytMovementDownUsd": 106457.39335389348
             },
             "yieldRange": {
               "min": 0.05000000000000001,
               "max": 0.26999999999999996
             },
-            "aggregatedApy": 0.04190673420719247,
-            "maxBoostedApy": 0.08405702071051288
+            "aggregatedApy": 0.04193924917796226,
+            "maxBoostedApy": 0.08413830044538535
           },
           "isNew": false,
           "isPrime": true,
@@ -762,22 +762,22 @@
           "sy": "1-0x378fa6c08c86d76f0c2511a8addd9464d3dfc723",
           "underlyingAsset": "1-0xc824a08db624942c5e5f330d56530cd1598859fd",
           "details": {
-            "liquidity": 5948239.57636088,
-            "pendleApy": 0.004396116414544341,
-            "impliedApy": 0.059214517537382605,
+            "liquidity": 5944140.6591226,
+            "pendleApy": 0.004404123626552486,
+            "impliedApy": 0.05921451760635432,
             "feeRate": 0.0007980000000000764,
             "movement10Percent": {
-              "ptMovementUpUsd": 372441.58628776995,
-              "ptMovementDownUsd": 116519.46485683459,
-              "ytMovementUpUsd": 1323.914659953088,
-              "ytMovementDownUsd": 392.15486535208936
+              "ptMovementUpUsd": 372229.1969230685,
+              "ptMovementDownUsd": 116452.372710294,
+              "ytMovementUpUsd": 1322.729614216685,
+              "ytMovementDownUsd": 391.80381956188864
             },
             "yieldRange": {
               "min": 0.04000000000000001,
               "max": 0.21
             },
-            "aggregatedApy": 0.06384238331816436,
-            "maxBoostedApy": 0.07043655793998088
+            "aggregatedApy": 0.06385039052336398,
+            "maxBoostedApy": 0.07045657596319271
           },
           "isNew": false,
           "isPrime": false,
@@ -792,22 +792,22 @@
           "sy": "1-0xaa68ca9c69a4ff22203ce189ce4448d7401875e8",
           "underlyingAsset": "1-0xf951e335afb289353dc249e82926178eac7ded78",
           "details": {
-            "liquidity": 3172241.6108398875,
-            "pendleApy": 0.027943861303080044,
-            "impliedApy": 0.028990979312240928,
+            "liquidity": 3169579.4513284867,
+            "pendleApy": 0.027998964788672247,
+            "impliedApy": 0.028990979345527412,
             "feeRate": 0.00037599999999993194,
             "movement10Percent": {
-              "ptMovementUpUsd": 393442.8095817566,
-              "ptMovementDownUsd": 275132.4295853004,
-              "ytMovementUpUsd": 730.8494801722692,
-              "ytMovementDownUsd": 459.7067262707851
+              "ptMovementUpUsd": 393133.61048698425,
+              "ptMovementDownUsd": 274917.2402180919,
+              "ytMovementUpUsd": 730.0370353178708,
+              "ytMovementDownUsd": 459.200490122353
             },
             "yieldRange": {
               "min": 0.024999999999999994,
               "max": 0.04499999999999999
             },
-            "aggregatedApy": 0.0640994694559053,
-            "maxBoostedApy": 0.10601526141052536
+            "aggregatedApy": 0.06415457261092189,
+            "maxBoostedApy": 0.10615301979393027
           },
           "isNew": false,
           "isPrime": false,
@@ -822,22 +822,22 @@
           "sy": "1-0x6c78661c00d797c9c7fcbe4bcacbd9612a61c07f",
           "underlyingAsset": "1-0x1202f5c7b4b9e47a1a484e8b270be34dbbc75055",
           "details": {
-            "liquidity": 54484276.44425314,
-            "pendleApy": 0.007088680578168392,
-            "impliedApy": 0.07569084951270377,
+            "liquidity": 54483719.987645805,
+            "pendleApy": 0.007096770894284528,
+            "impliedApy": 0.07569084951590455,
             "feeRate": 0.0010390000000000121,
             "movement10Percent": {
-              "ptMovementUpUsd": 1008389.4478049296,
-              "ptMovementDownUsd": 690487.9675681888,
-              "ytMovementUpUsd": 25132.663020508837,
-              "ytMovementDownUsd": 15640.355003611721
+              "ptMovementUpUsd": 1008383.3732756814,
+              "ptMovementDownUsd": 690482.2759699001,
+              "ytMovementUpUsd": 25130.943069624478,
+              "ytMovementDownUsd": 15639.269834133584
             },
             "yieldRange": {
               "min": 0.055000000000000014,
               "max": 0.35
             },
-            "aggregatedApy": 0.0811622272133918,
-            "maxBoostedApy": 0.09179524808064438
+            "aggregatedApy": 0.0811703176066214,
+            "maxBoostedApy": 0.09181547394804819
           },
           "isNew": false,
           "isPrime": true,
@@ -852,22 +852,22 @@
           "sy": "1-0xf541aa4d6f29ec2423a0d306dbc677021a02dbc0",
           "underlyingAsset": "1-0x9d39a5de30e57443bff2a8307a4256c8797a3497",
           "details": {
-            "liquidity": 115386868.37825063,
-            "pendleApy": 0.028248277433375747,
-            "impliedApy": 0.08433410157484578,
+            "liquidity": 115386942.88430607,
+            "pendleApy": 0.028280210118074352,
+            "impliedApy": 0.08433410158908528,
             "feeRate": 0.0012579999999999814,
             "movement10Percent": {
-              "ptMovementUpUsd": 7628681.718419916,
-              "ptMovementDownUsd": 202058175.42579687,
-              "ytMovementUpUsd": 105798.57882536805,
-              "ytMovementDownUsd": 2539082.8025829163
+              "ptMovementUpUsd": 7628679.5030345665,
+              "ptMovementDownUsd": 200644473.47111222,
+              "ytMovementUpUsd": 105792.02179518715,
+              "ytMovementDownUsd": 2521152.859040799
             },
             "yieldRange": {
               "min": 0.07,
               "max": 0.19999999999999998
             },
-            "aggregatedApy": 0.09983333542549036,
-            "maxBoostedApy": 0.14220575157555398
+            "aggregatedApy": 0.09986311935483248,
+            "maxBoostedApy": 0.142283434531944
           },
           "isNew": false,
           "isPrime": true,
@@ -882,22 +882,22 @@
           "sy": "1-0xfcaae839cfc7e3627741bd9914f661fd75cc3cbf",
           "underlyingAsset": "1-0xad55aebc9b8c03fc43cd9f62260391c13c23e7c0",
           "details": {
-            "liquidity": 25600932.029436048,
-            "pendleApy": 0.011455539789944952,
-            "impliedApy": 0.13575397027369362,
+            "liquidity": 25600869.799339958,
+            "pendleApy": 0.011468524752157134,
+            "impliedApy": 0.13575397063646966,
             "feeRate": 0.0018579999999999153,
             "movement10Percent": {
-              "ptMovementUpUsd": 1155151.559492057,
-              "ptMovementDownUsd": 4601188.829729605,
-              "ytMovementUpUsd": 6387.397667817341,
-              "ytMovementDownUsd": 23026.205338659453
+              "ptMovementUpUsd": 1176880.0861932936,
+              "ptMovementDownUsd": 4602035.130533145,
+              "ytMovementUpUsd": 6499.371057878964,
+              "ytMovementDownUsd": 23024.84559334031
             },
             "yieldRange": {
               "min": 0.07000000000000002,
               "max": 0.35
             },
-            "aggregatedApy": 0.07768220065948284,
-            "maxBoostedApy": 0.09486551034440026
+            "aggregatedApy": 0.07769085877130766,
+            "maxBoostedApy": 0.09489364589954336
           },
           "isNew": false,
           "isPrime": true,
@@ -912,22 +912,22 @@
           "sy": "1-0x9a68bba8074f78727a7b129e30175388e02a5b9d",
           "underlyingAsset": "1-0x80e1048ede66ec4c364b4f22c8768fc657ff6a42",
           "details": {
-            "liquidity": 1903776.4325603712,
-            "pendleApy": 0.0030773497166139184,
-            "impliedApy": 0.11357735887539233,
+            "liquidity": 1903655.7203159388,
+            "pendleApy": 0.0030810257904504415,
+            "impliedApy": 0.11774944720750358,
             "feeRate": 0.0013929999999999776,
             "movement10Percent": {
-              "ptMovementUpUsd": 101993.79175385395,
-              "ptMovementDownUsd": 160865.85858462352,
-              "ytMovementUpUsd": 946.5448352544962,
-              "ytMovementDownUsd": 1347.463259545971
+              "ptMovementUpUsd": 101994.72307741546,
+              "ptMovementDownUsd": 160884.34199863308,
+              "ytMovementUpUsd": 946.321020442419,
+              "ytMovementDownUsd": 1347.293194345255
             },
             "yieldRange": {
               "min": 0.08,
               "max": 0.24999999999999997
             },
-            "aggregatedApy": 0.15393577045829993,
-            "maxBoostedApy": 0.1585517950332208
+            "aggregatedApy": 0.15412199064520932,
+            "maxBoostedApy": 0.15874352933088498
           },
           "isNew": false,
           "isPrime": false,
@@ -942,22 +942,22 @@
           "sy": "1-0xa36ecca8b7624d224f01cd6649c8afad3da12c3d",
           "underlyingAsset": "1-0x8be3460a480c80728a8c4d7a5d5303c85ba7b3b9",
           "details": {
-            "liquidity": 16054209.637020173,
-            "pendleApy": 0.028349952744822663,
-            "impliedApy": 0.26842499736434,
+            "liquidity": 16029835.807241013,
+            "pendleApy": 0.028425174374468544,
+            "impliedApy": 0.26842499737663794,
             "feeRate": 0.0037439999999999696,
             "movement10Percent": {
-              "ptMovementUpUsd": 1280578.5452764847,
-              "ptMovementDownUsd": 897313.8565841095,
-              "ytMovementUpUsd": 105264.04837574226,
-              "ytMovementDownUsd": 67610.58368462832
+              "ptMovementUpUsd": 1281967.8500947405,
+              "ptMovementDownUsd": 898295.1891446,
+              "ytMovementUpUsd": 105371.49430655107,
+              "ytMovementDownUsd": 67680.29952954709
             },
             "yieldRange": {
               "min": 0.050000000000000024,
               "max": 0.62
             },
-            "aggregatedApy": 0.13685242519341223,
-            "maxBoostedApy": 0.17937735431064622
+            "aggregatedApy": 0.13692382300543263,
+            "maxBoostedApy": 0.17956158456713545
           },
           "isNew": false,
           "isPrime": false,
@@ -972,22 +972,22 @@
           "sy": "1-0x0a91166428d71777e1a9b338b84eb9452e520b78",
           "underlyingAsset": "1-0xf7de3c70f2db39a188a81052d2f3c8e3e217822a",
           "details": {
-            "liquidity": 8707612.115428766,
-            "pendleApy": 0.009782327840133673,
-            "impliedApy": 0.0832259076335835,
+            "liquidity": 8707593.619078841,
+            "pendleApy": 0.009793413198022606,
+            "impliedApy": 0.08322590764762827,
             "feeRate": 0.0010859999999999204,
             "movement10Percent": {
-              "ptMovementUpUsd": 182972.84075145956,
-              "ptMovementDownUsd": 141385.26468509572,
-              "ytMovementUpUsd": 2511.776140665847,
-              "ytMovementDownUsd": 1752.646103794255
+              "ptMovementUpUsd": 182973.9265602976,
+              "ptMovementDownUsd": 141386.17506609557,
+              "ytMovementUpUsd": 2511.4796526205987,
+              "ytMovementDownUsd": 1752.444592287379
             },
             "yieldRange": {
               "min": 0.05000000000000002,
               "max": 0.35
             },
-            "aggregatedApy": 0.08288627551607929,
-            "maxBoostedApy": 0.0975597672762798
+            "aggregatedApy": 0.08289416914352543,
+            "maxBoostedApy": 0.09758428894055933
           },
           "isNew": false,
           "isPrime": false,
@@ -1002,22 +1002,22 @@
           "sy": "1-0xc9e9c85b33e87fde85c44dbf72b4b842a071551d",
           "underlyingAsset": "1-0x80ac24aa929eaf5013f6436cda2a7ba190f5cc0b",
           "details": {
-            "liquidity": 12932025.408085553,
-            "pendleApy": 0.006767091657639023,
-            "impliedApy": 0.09579726344105888,
+            "liquidity": 12931998.014528804,
+            "pendleApy": 0.006774760102618328,
+            "impliedApy": 0.09579726344831152,
             "feeRate": 0.0012779999999998903,
             "movement10Percent": {
-              "ptMovementUpUsd": 454430.88735938317,
-              "ptMovementDownUsd": 2494747.538304695,
-              "ytMovementUpUsd": 10699.89135907,
-              "ytMovementDownUsd": 53208.46580331634
+              "ptMovementUpUsd": 454432.24379090767,
+              "ptMovementDownUsd": 2494935.8896872546,
+              "ytMovementUpUsd": 10699.032577672935,
+              "ytMovementDownUsd": 53208.149201506094
             },
             "yieldRange": {
               "min": 0.05000000000000001,
               "max": 0.3
             },
-            "aggregatedApy": 0.08303323066726093,
-            "maxBoostedApy": 0.09318386815371946
+            "aggregatedApy": 0.08303881686499756,
+            "maxBoostedApy": 0.09320095701892504
           },
           "isNew": false,
           "isPrime": true,
@@ -1032,22 +1032,22 @@
           "sy": "1-0x14ff57675c9c34eeb9e1516ffda7cac6ed1b9748",
           "underlyingAsset": "1-0x7c1156e515aa1a2e851674120074968c905aaf37",
           "details": {
-            "liquidity": 6145736.530282676,
-            "pendleApy": 0.034062063868672623,
-            "impliedApy": 0.07755145341929248,
+            "liquidity": 6145720.358683858,
+            "pendleApy": 0.03410068037863747,
+            "impliedApy": 0.07755145342257475,
             "feeRate": 0.0010689999999999866,
             "movement10Percent": {
               "ptMovementUpUsd": 103184.95333194733,
-              "ptMovementDownUsd": 146473.83109168737,
-              "ytMovementUpUsd": 2661.417778396086,
-              "ytMovementDownUsd": 3397.240955406949
+              "ptMovementDownUsd": 146478.18024905986,
+              "ytMovementUpUsd": 2661.250855426943,
+              "ytMovementDownUsd": 3397.13403245177
             },
             "yieldRange": {
               "min": 0.05500000000000001,
               "max": 0.31999999999999995
             },
-            "aggregatedApy": 0.049388699799004614,
-            "maxBoostedApy": 0.10048179560201353
+            "aggregatedApy": 0.049427321149787956,
+            "maxBoostedApy": 0.10057834171774416
           },
           "isNew": false,
           "isPrime": true,
@@ -1062,22 +1062,22 @@
           "sy": "1-0x0a9b2c09f8756c743b0702973ed33970d16cf6f9",
           "underlyingAsset": "1-0x4737d9b4592b40d51e110b94c9c043c6654067ae",
           "details": {
-            "liquidity": 12474593.934452277,
-            "pendleApy": 0.013571442670927032,
-            "impliedApy": 0.09673702850849808,
+            "liquidity": 12474595.659698255,
+            "pendleApy": 0.013586791123401484,
+            "impliedApy": 0.09673702851262789,
             "feeRate": 0.0012140000000000484,
             "movement10Percent": {
-              "ptMovementUpUsd": 1494450.7312911912,
-              "ptMovementDownUsd": 559543.2370889426,
-              "ytMovementUpUsd": 45649.14303645099,
-              "ytMovementDownUsd": 16087.153126398442
+              "ptMovementUpUsd": 1494452.8069445274,
+              "ptMovementDownUsd": 559561.9206760251,
+              "ytMovementUpUsd": 45646.3511527324,
+              "ytMovementDownUsd": 16086.703930519396
             },
             "yieldRange": {
               "min": 0.06500000000000002,
               "max": 0.32999999999999996
             },
-            "aggregatedApy": 0.10750425976417674,
-            "maxBoostedApy": 0.1278614237705673
+            "aggregatedApy": 0.10751960841731971,
+            "maxBoostedApy": 0.12789979510242194
           },
           "isNew": false,
           "isPrime": true,
@@ -1092,22 +1092,22 @@
           "sy": "1-0x8946f653aed1af1f82a8de6d7f54088afff5a14e",
           "underlyingAsset": "1-0x2b66aade1e9c062ff411bd47c44e0ad696d43bd9",
           "details": {
-            "liquidity": 66197874.52577488,
-            "pendleApy": 0.02781160244783195,
-            "impliedApy": 0.05873832075942853,
+            "liquidity": 66196749.739670284,
+            "pendleApy": 0.027843532577741956,
+            "impliedApy": 0.058738320763800145,
             "feeRate": 0.0007999999999999119,
             "movement10Percent": {
-              "ptMovementUpUsd": 694933.3474040031,
-              "ptMovementDownUsd": 655595.6554395125,
-              "ytMovementUpUsd": 10242.291771531483,
-              "ytMovementDownUsd": 8689.603088516218
+              "ptMovementUpUsd": 694470.4800844193,
+              "ptMovementDownUsd": 655159.0791224565,
+              "ytMovementUpUsd": 10234.621800741135,
+              "ytMovementDownUsd": 8683.11201873186
             },
             "yieldRange": {
               "min": 0.03500000000000001,
               "max": 0.35
             },
-            "aggregatedApy": 0.07104094102686129,
-            "maxBoostedApy": 0.11275834469860921
+            "aggregatedApy": 0.07107287051706476,
+            "maxBoostedApy": 0.1128381693836777
           },
           "isNew": false,
           "isPrime": false,
@@ -1122,22 +1122,22 @@
           "sy": "1-0x13945b761b2ed3219a497a46d15a8923f418d2ab",
           "underlyingAsset": "1-0x7743e50f534a7f9f1791dde7dcd89f7783eefc39",
           "details": {
-            "liquidity": 4765648.388197475,
-            "pendleApy": 0.02549729876869969,
-            "impliedApy": 0.08632270579027268,
+            "liquidity": 4765636.066761346,
+            "pendleApy": 0.02552620414569469,
+            "impliedApy": 0.08632270579240453,
             "feeRate": 0.0010669999999999291,
             "movement10Percent": {
-              "ptMovementUpUsd": 92064.96179103851,
-              "ptMovementDownUsd": 348876.3063082855,
-              "ytMovementUpUsd": 3464.0935141609334,
-              "ytMovementDownUsd": 11830.91234844839
+              "ptMovementUpUsd": 92064.9617910385,
+              "ptMovementDownUsd": 348889.81040610233,
+              "ytMovementUpUsd": 3463.9268855825503,
+              "ytMovementDownUsd": 11830.815712721716
             },
             "yieldRange": {
               "min": 0.03500000000000002,
               "max": 0.35
             },
-            "aggregatedApy": 0.14027239219453383,
-            "maxBoostedApy": 0.17851834034758335
+            "aggregatedApy": 0.14030129418086434,
+            "maxBoostedApy": 0.17859060039940639
           },
           "isNew": false,
           "isPrime": false,
@@ -1152,22 +1152,22 @@
           "sy": "1-0x43d6651ff941776976ae8e5b11ef513e054a7931",
           "underlyingAsset": "1-0x09d4214c03d01f49544c0448dbe3a27f768f2b34",
           "details": {
-            "liquidity": 8062889.781239129,
-            "pendleApy": 0.004581064929651264,
-            "impliedApy": 0.07420610938369343,
+            "liquidity": 8862601.798758423,
+            "pendleApy": 0.00417304167490791,
+            "impliedApy": 0.07420610939616501,
             "feeRate": 0.0011609999999999676,
             "movement10Percent": {
-              "ptMovementUpUsd": 127310.8646273613,
-              "ptMovementDownUsd": 123873.7946858239,
-              "ytMovementUpUsd": 1572.3499648636841,
-              "ytMovementDownUsd": 1374.2436376248113
+              "ptMovementUpUsd": 139917.24699735641,
+              "ptMovementDownUsd": 135668.51549101082,
+              "ytMovementUpUsd": 1727.8312473903275,
+              "ytMovementDownUsd": 1504.908094569215
             },
             "yieldRange": {
               "min": 0.03500000000000001,
               "max": 0.35
             },
-            "aggregatedApy": 0.017574490053332524,
-            "maxBoostedApy": 0.02444608744780942
+            "aggregatedApy": 0.01710982539019023,
+            "maxBoostedApy": 0.023369387902552094
           },
           "isNew": false,
           "isPrime": false,
@@ -1182,22 +1182,22 @@
           "sy": "1-0xa780d7f775b4eff6846a8c28981f086bc6a7d637",
           "underlyingAsset": "1-0xc8cf6d7991f15525488b2a83df53468d682ba4b0",
           "details": {
-            "liquidity": 19760169.669804305,
-            "pendleApy": 0.031456741007706485,
-            "impliedApy": 0.10984874062505856,
+            "liquidity": 19760132.871093955,
+            "pendleApy": 0.03149237961611736,
+            "impliedApy": 0.10984874062977523,
             "feeRate": 0.001479000000000008,
             "movement10Percent": {
-              "ptMovementUpUsd": 914365.2562487626,
-              "ptMovementDownUsd": 873595.975563042,
-              "ytMovementUpUsd": 32427.083649968732,
-              "ytMovementDownUsd": 28386.479067316784
+              "ptMovementUpUsd": 914369.3171008779,
+              "ptMovementDownUsd": 873624.6999652106,
+              "ytMovementUpUsd": 32425.189766900203,
+              "ytMovementDownUsd": 28385.670385086476
             },
             "yieldRange": {
               "min": 0.07,
               "max": 0.35
             },
-            "aggregatedApy": 0.12563351394917976,
-            "maxBoostedApy": 0.1728186254607395
+            "aggregatedApy": 0.12566852049188088,
+            "maxBoostedApy": 0.1729070899160569
           },
           "isNew": false,
           "isPrime": false,
@@ -1212,22 +1212,22 @@
           "sy": "1-0x8077b6f34e9193d5bbb0ef06a73119060534d130",
           "underlyingAsset": "1-0xbeefc011e94f43b8b7b455ebab290c7ab4e216f1",
           "details": {
-            "liquidity": 26327478.22864671,
-            "pendleApy": 0.013859915544000562,
-            "impliedApy": 0.09909321476856325,
+            "liquidity": 26327413.103201866,
+            "pendleApy": 0.01387562648394466,
+            "impliedApy": 0.09909321478540467,
             "feeRate": 0.0013090000000000046,
             "movement10Percent": {
-              "ptMovementUpUsd": 2364781.083598665,
-              "ptMovementDownUsd": 841684.9492662053,
-              "ytMovementUpUsd": 37420.19103616479,
-              "ytMovementDownUsd": 12342.649628190535
+              "ptMovementUpUsd": 2206023.7442463194,
+              "ptMovementDownUsd": 841697.1291839397,
+              "ytMovementUpUsd": 34963.15736762418,
+              "ytMovementDownUsd": 12341.328058919335
             },
             "yieldRange": {
               "min": 0.03500000000000001,
               "max": 0.30999999999999994
             },
-            "aggregatedApy": 0.06674562653549351,
-            "maxBoostedApy": 0.08753549985149436
+            "aggregatedApy": 0.06676314970528677,
+            "maxBoostedApy": 0.08757658943120375
           },
           "isNew": false,
           "isPrime": false,
@@ -1242,22 +1242,22 @@
           "sy": "1-0xa0a2c8c94bf30227f84af6e054025945a51d0eff",
           "underlyingAsset": "1-0xe24a3dc889621612422a64e6388927901608b91d",
           "details": {
-            "liquidity": 2356658.987424817,
-            "pendleApy": 0.09364924779056044,
-            "impliedApy": 0.07982635906320756,
+            "liquidity": 2356669.3361828956,
+            "pendleApy": 0.093754760492696,
+            "impliedApy": 0.07982635907665747,
             "feeRate": 0.0009339999999999904,
             "movement10Percent": {
               "ptMovementUpUsd": 32067.298889160156,
-              "ptMovementDownUsd": 39139.52730961598,
-              "ytMovementUpUsd": 423.4220878668865,
-              "ytMovementDownUsd": 466.1127090725459
+              "ptMovementDownUsd": 39140.71770781106,
+              "ytMovementUpUsd": 423.3694379849377,
+              "ytMovementDownUsd": 466.0702927431951
             },
             "yieldRange": {
               "min": 0.05000000000000002,
               "max": 0.39999999999999997
             },
-            "aggregatedApy": 0.16183272049908182,
-            "maxBoostedApy": 0.3023065921849225
+            "aggregatedApy": 0.16193823411740377,
+            "maxBoostedApy": 0.3025703748564478
           },
           "isNew": false,
           "isPrime": false,
@@ -1272,22 +1272,22 @@
           "sy": "1-0x2c452bdd2192a197fb085a7c73fe6c82782401dc",
           "underlyingAsset": "1-0xda67b4284609d2d48e5d10cfac411572727dc1ed",
           "details": {
-            "liquidity": 521961.1845821799,
-            "pendleApy": 0.0036853409337011473,
-            "impliedApy": 0.09626569804144935,
+            "liquidity": 521963.50078690343,
+            "pendleApy": 0.003689492961822624,
+            "impliedApy": 0.09626569805779073,
             "feeRate": 0.0013410000000000366,
             "movement10Percent": {
               "ptMovementUpUsd": 9901.821613311768,
-              "ptMovementDownUsd": 9175.820898456754,
-              "ytMovementUpUsd": 156.8728557664202,
-              "ytMovementDownUsd": 130.8647458410797
+              "ptMovementDownUsd": 9175.819371101243,
+              "ytMovementUpUsd": 156.85333185615602,
+              "ytMovementDownUsd": 130.84882183853003
             },
             "yieldRange": {
               "min": 0.05000000000000002,
               "max": 0.39999999999999997
             },
-            "aggregatedApy": 0.02840241938500528,
-            "maxBoostedApy": 0.033930430785557
+            "aggregatedApy": 0.028406579723235768,
+            "maxBoostedApy": 0.03394081916596971
           },
           "isNew": false,
           "isPrime": false,
@@ -1302,22 +1302,22 @@
           "sy": "1-0x90a7e3396403634942acc24906fbda19f1418a41",
           "underlyingAsset": "1-0xb45ad160634c528cc3d2926d9807104fa3157305",
           "details": {
-            "liquidity": 666902.0130614676,
-            "pendleApy": 0.006809231795161435,
-            "impliedApy": 0.07705001302935655,
+            "liquidity": 666912.4219210136,
+            "pendleApy": 0.0068168271575095975,
+            "impliedApy": 0.07705001303193382,
             "feeRate": 0.0009999999999998899,
             "movement10Percent": {
-              "ptMovementUpUsd": 43165.961034960754,
-              "ptMovementDownUsd": 12988.754774234414,
-              "ytMovementUpUsd": 1200.4229097022824,
-              "ytMovementDownUsd": 337.0378482317356
+              "ptMovementUpUsd": 43166.62486285136,
+              "ptMovementDownUsd": 12988.752024039888,
+              "ytMovementUpUsd": 1200.3735442084117,
+              "ytMovementDownUsd": 337.01945681266733
             },
             "yieldRange": {
               "min": 0.03000000000000001,
               "max": 0.3
             },
-            "aggregatedApy": 0.08464490956775185,
-            "maxBoostedApy": 0.094858757260494
+            "aggregatedApy": 0.08465119259393032,
+            "maxBoostedApy": 0.09487643333019471
           },
           "isNew": false,
           "isPrime": false,
@@ -1332,22 +1332,22 @@
           "sy": "1-0xb5130e951e5d8d77ac2fd1ca40982d03b2483782",
           "underlyingAsset": "1-0xbb51e2a15a9158ebe2b0ceb8678511e063ab7a55",
           "details": {
-            "liquidity": 11933450.66155221,
-            "pendleApy": 0.04752233842403076,
-            "impliedApy": 0.09550842066548437,
+            "liquidity": 11933453.411714012,
+            "pendleApy": 0.047576078830752,
+            "impliedApy": 0.0955084206816923,
             "feeRate": 0.0012810000000000876,
             "movement10Percent": {
-              "ptMovementUpUsd": 446440.679675571,
-              "ptMovementDownUsd": 408962.782005,
-              "ytMovementUpUsd": 7010.7293328930555,
-              "ytMovementDownUsd": 5788.531544772312
+              "ptMovementUpUsd": 446440.6874537689,
+              "ptMovementDownUsd": 408962.717824,
+              "ytMovementUpUsd": 7009.859973718309,
+              "ytMovementDownUsd": 5787.827216893033
             },
             "yieldRange": {
               "min": 0.035,
               "max": 0.26999999999999996
             },
-            "aggregatedApy": 0.0873411103637182,
-            "maxBoostedApy": 0.15862461799976432
+            "aggregatedApy": 0.08739486100342905,
+            "maxBoostedApy": 0.15875897924955706
           },
           "isNew": false,
           "isPrime": false,
@@ -1362,22 +1362,22 @@
           "sy": "1-0x77891c7f756d4f49d91e6aabae7df5c1169f2aaa",
           "underlyingAsset": "1-0x030b69280892c888670edcdcd8b69fd8026a0bf3",
           "details": {
-            "liquidity": 12287419.024762737,
-            "pendleApy": 0.02494329035807287,
-            "impliedApy": 0.10736109643956859,
+            "liquidity": 12287421.88558485,
+            "pendleApy": 0.02497149729830837,
+            "impliedApy": 0.10736109645788372,
             "feeRate": 0.0014089999999999936,
             "movement10Percent": {
-              "ptMovementUpUsd": 454933.38256766676,
-              "ptMovementDownUsd": 561485.4615544972,
-              "ytMovementUpUsd": 7993.821847,
-              "ytMovementDownUsd": 8890.307256592843
+              "ptMovementUpUsd": 454933.3825670686,
+              "ptMovementDownUsd": 561494.5651105501,
+              "ytMovementUpUsd": 7993.325606,
+              "ytMovementDownUsd": 8889.899890954273
             },
             "yieldRange": {
               "min": 0.05,
               "max": 0.3
             },
-            "aggregatedApy": 0.11766546847706583,
-            "maxBoostedApy": 0.15508040401417514
+            "aggregatedApy": 0.11769367805054023,
+            "maxBoostedApy": 0.1551509239980028
           },
           "isNew": false,
           "isPrime": false,
@@ -1392,22 +1392,22 @@
           "sy": "1-0x87b8e462080fa443a06d2bb119adb3828c407d78",
           "underlyingAsset": "1-0x004e9c3ef86bc1ca1f0bb5c7662861ee93350568",
           "details": {
-            "liquidity": 21950357.293068036,
-            "pendleApy": 0.019264520644533566,
-            "impliedApy": 0.012144809572393944,
+            "liquidity": 21959257.004379816,
+            "pendleApy": 0.019278493867565204,
+            "impliedApy": 0.012144809572556925,
             "feeRate": 0.00019999999999997797,
             "movement10Percent": {
-              "ptMovementUpUsd": 170365.9049368818,
-              "ptMovementDownUsd": 161785.13696886745,
-              "ytMovementUpUsd": 1235.6856667582776,
-              "ytMovementDownUsd": 1053.124223642719
+              "ptMovementUpUsd": 170375.21609387,
+              "ptMovementDownUsd": 161793.52023302414,
+              "ytMovementUpUsd": 1235.7096410243541,
+              "ytMovementDownUsd": 1053.1421927748681
             },
             "yieldRange": {
               "min": 0.008,
               "max": 0.08499999999999999
             },
-            "aggregatedApy": 0.02076498876154661,
-            "maxBoostedApy": 0.04966176972834696
+            "aggregatedApy": 0.02077896210488879,
+            "maxBoostedApy": 0.049696702906236595
           },
           "isNew": false,
           "isPrime": true,
@@ -1422,22 +1422,22 @@
           "sy": "1-0x212670e78cbec6f219204c52889763628bedd15e",
           "underlyingAsset": "1-0xd3fd63209fa2d55b07a0f6db36c2f43900be3094",
           "details": {
-            "liquidity": 1545532.288004474,
-            "pendleApy": 0.0022323561198853204,
-            "impliedApy": 0.09877327392603474,
+            "liquidity": 2342857.317318172,
+            "pendleApy": 0.0015847861680936947,
+            "impliedApy": 0.0987732739428202,
             "feeRate": 0.0013799999999999368,
             "movement10Percent": {
-              "ptMovementUpUsd": 39949.08183813095,
-              "ptMovementDownUsd": 37181.4041019802,
-              "ytMovementUpUsd": 648.7653804638506,
-              "ytMovementDownUsd": 543.5346044557799
+              "ptMovementUpUsd": 60549.00586605072,
+              "ptMovementDownUsd": 56353.7096793361,
+              "ytMovementUpUsd": 983.1819373839137,
+              "ytMovementDownUsd": 823.7039624749684
             },
             "yieldRange": {
               "min": 0.03500000000000001,
               "max": 0.35
             },
-            "aggregatedApy": 0.09199597974558224,
-            "maxBoostedApy": 0.09534451392541023
+            "aggregatedApy": 0.09076636618754115,
+            "maxBoostedApy": 0.09314354543968169
           },
           "isNew": false,
           "isPrime": false,
@@ -1452,22 +1452,22 @@
           "sy": "1-0xd3f2cc98cf302365582757fcd6288efb92e8d254",
           "underlyingAsset": "1-0x19ebd191f7a24ece672ba13a302212b5ef7f35cb",
           "details": {
-            "liquidity": 3314891.661624915,
-            "pendleApy": 0.01718590119882539,
-            "impliedApy": 0.10251968432600522,
+            "liquidity": 3314885.663265113,
+            "pendleApy": 0.017205370890691414,
+            "impliedApy": 0.10251968433981129,
             "feeRate": 0.001266999999999907,
             "movement10Percent": {
-              "ptMovementUpUsd": 91201.6257619158,
-              "ptMovementDownUsd": 207470.1130169373,
-              "ytMovementUpUsd": 1724.4671968276573,
-              "ytMovementDownUsd": 3537.872771027884
+              "ptMovementUpUsd": 91201.6257612359,
+              "ptMovementDownUsd": 207484.13568080185,
+              "ytMovementUpUsd": 1724.2761568029698,
+              "ytMovementDownUsd": 3537.7289338018586
             },
             "yieldRange": {
               "min": 0.03500000000000001,
               "max": 0.35
             },
-            "aggregatedApy": 0.09856488345009173,
-            "maxBoostedApy": 0.12434373524832981
+            "aggregatedApy": 0.09858430314026043,
+            "maxBoostedApy": 0.12439235947629755
           },
           "isNew": false,
           "isPrime": false,
@@ -1482,22 +1482,22 @@
           "sy": "1-0x4726fcb2fbe4398449bb7ce44eb458dbd7141191",
           "underlyingAsset": "1-0x6a29a46e21c730dca1d8b23d637c101cec605c5b",
           "details": {
-            "liquidity": 9225256.418858944,
-            "pendleApy": 0.05693378626395773,
-            "impliedApy": 0.04219551051033821,
+            "liquidity": 9224503.421645192,
+            "pendleApy": 0.057002835464507025,
+            "impliedApy": 0.04219551051732484,
             "feeRate": 0.0005679999999999019,
             "movement10Percent": {
-              "ptMovementUpUsd": 126506.20192289352,
-              "ptMovementDownUsd": 289779.4070501228,
-              "ytMovementUpUsd": 899.4290377849909,
-              "ytMovementDownUsd": 1853.0155426238414
+              "ptMovementUpUsd": 126496.88869714737,
+              "ptMovementDownUsd": 289780.24712056713,
+              "ytMovementUpUsd": 899.2513570226048,
+              "ytMovementDownUsd": 1852.7964677006876
             },
             "yieldRange": {
               "min": 0.030000000000000006,
               "max": 0.19999999999999998
             },
-            "aggregatedApy": 0.10626105575714867,
-            "maxBoostedApy": 0.19166173515308527
+            "aggregatedApy": 0.10633697070232796,
+            "maxBoostedApy": 0.1918412238990885
           },
           "isNew": false,
           "isPrime": false,
@@ -1512,22 +1512,22 @@
           "sy": "1-0xec535ae692f414c45cc4e2610d66ffd1cbddb02b",
           "underlyingAsset": "1-0x004626a008b1acdc4c74ab51644093b155e59a23",
           "details": {
-            "liquidity": 356399.103503199,
-            "pendleApy": 0.0010657931048446412,
-            "impliedApy": 0.025404852514350207,
+            "liquidity": 356476.97751615726,
+            "pendleApy": 0.001066765507040293,
+            "impliedApy": 0.02540485251490554,
             "feeRate": 0.00035600000000002296,
             "movement10Percent": {
-              "ptMovementUpUsd": 12471.340596675873,
-              "ptMovementDownUsd": 11071.81450558119,
-              "ytMovementUpUsd": 147.94096212965982,
-              "ytMovementDownUsd": 117.92508950834444
+              "ptMovementUpUsd": 12473.203241825104,
+              "ptMovementDownUsd": 11074.611857381085,
+              "ytMovementUpUsd": 147.9557336687933,
+              "ytMovementDownUsd": 117.9496543464632
             },
             "yieldRange": {
               "min": 0.014999999999999998,
               "max": 0.06999999999999999
             },
-            "aggregatedApy": 0.030867863365699313,
-            "maxBoostedApy": 0.03246655302296628
+            "aggregatedApy": 0.030868835801451267,
+            "maxBoostedApy": 0.03246898406201171
           },
           "isNew": false,
           "isPrime": false,
@@ -1542,22 +1542,22 @@
           "sy": "1-0x52453825c287ddef62d647ce51c0979d27c461f7",
           "underlyingAsset": "1-0x35d8949372d46b7a3d5a56006ae77b215fc69bc0",
           "details": {
-            "liquidity": 1109938.797062942,
-            "pendleApy": 0.009062679103586468,
-            "impliedApy": 0.09652561086268241,
+            "liquidity": 1110017.2041181817,
+            "pendleApy": 0.009072288806899436,
+            "impliedApy": 0.09652561086437306,
             "feeRate": 0.0012350000000000971,
             "movement10Percent": {
-              "ptMovementUpUsd": 69584.6974849701,
-              "ptMovementDownUsd": 62557.25292366077,
-              "ytMovementUpUsd": 3487.56336417799,
-              "ytMovementDownUsd": 2817.3172929948223
+              "ptMovementUpUsd": 69586.56013011931,
+              "ptMovementDownUsd": 62559.11552631467,
+              "ytMovementUpUsd": 3487.5158955196325,
+              "ytMovementDownUsd": 2817.2897896796107
             },
             "yieldRange": {
               "min": 0.05000000000000001,
               "max": 0.19999999999999998
             },
-            "aggregatedApy": 0.10552583523292276,
-            "maxBoostedApy": 0.17895474054315988
+            "aggregatedApy": 0.1055354433997233,
+            "maxBoostedApy": 0.17897875069508928
           },
           "isNew": false,
           "isPrime": false,
@@ -1572,22 +1572,22 @@
           "sy": "1-0xb2dbc10f4fa6113ac75eea254806f6a2aa4bf20b",
           "underlyingAsset": "1-0xd11c452fc99cf405034ee446803b6f6c1f6d5ed8",
           "details": {
-            "liquidity": 16777451.36126342,
-            "pendleApy": 0.013428445841457384,
-            "impliedApy": 0.04649164525331595,
+            "liquidity": 16759620.074266251,
+            "pendleApy": 0.013457937698722482,
+            "impliedApy": 0.04649164525383398,
             "feeRate": 0.0006829999999999892,
             "movement10Percent": {
-              "ptMovementUpUsd": 380752.7542558328,
-              "ptMovementDownUsd": 178986.9524072165,
-              "ytMovementUpUsd": 11483.333632248263,
-              "ytMovementDownUsd": 4894.047517182242
+              "ptMovementUpUsd": 380373.519153873,
+              "ptMovementDownUsd": 178808.5087353655,
+              "ytMovementUpUsd": 11471.523772378474,
+              "ytMovementDownUsd": 4889.013559931304
             },
             "yieldRange": {
               "min": 0.05000000000000001,
               "max": 0.19999999999999998
             },
-            "aggregatedApy": 0.05935857822708984,
-            "maxBoostedApy": 0.07950124698927592
+            "aggregatedApy": 0.05938807001268649,
+            "maxBoostedApy": 0.07957497656077021
           },
           "isNew": true,
           "isPrime": false,
@@ -1602,22 +1602,22 @@
           "sy": "1-0x6afde97a0c27e57cf0582373f9d7dc2b9f1cc3a3",
           "underlyingAsset": "1-0x66a1e37c9b0eaddca17d3662d6c05f4decf3e110",
           "details": {
-            "liquidity": 27883813.468170665,
-            "pendleApy": 0.0033681030778756546,
-            "impliedApy": 0.06385609511753332,
+            "liquidity": 27883528.548230853,
+            "pendleApy": 0.003371947112981888,
+            "impliedApy": 0.06385609512159585,
             "feeRate": 0.0007820000000000604,
             "movement10Percent": {
-              "ptMovementUpUsd": 409579.835832119,
-              "ptMovementDownUsd": 379727.7108348859,
-              "ytMovementUpUsd": 7087.309812759425,
-              "ytMovementDownUsd": 5916.8728727039415
+              "ptMovementUpUsd": 409577.04186439514,
+              "ptMovementDownUsd": 379724.8714304162,
+              "ytMovementUpUsd": 7086.719052664846,
+              "ytMovementDownUsd": 5916.384922366607
             },
             "yieldRange": {
               "min": 0.04000000000000001,
               "max": 0.3
             },
-            "aggregatedApy": 0.012710287993078679,
-            "maxBoostedApy": 0.01776244260989216
+            "aggregatedApy": 0.012714135731016903,
+            "maxBoostedApy": 0.017772056400489733
           },
           "isNew": false,
           "isPrime": true,
@@ -1632,22 +1632,22 @@
           "sy": "1-0x508defdb5dd2adeefe36f58fdcd75d6efa36697b",
           "underlyingAsset": "1-0xdc035d45d973e3ec169d2276ddab16f1e407384f",
           "details": {
-            "liquidity": 58171960.72860346,
-            "pendleApy": 0.01245365886529453,
-            "impliedApy": 0.08287055785645081,
+            "liquidity": 58171853.09695947,
+            "pendleApy": 0.01246776796679251,
+            "impliedApy": 0.08361218285854233,
             "feeRate": 0.0012700000000001044,
             "movement10Percent": {
-              "ptMovementUpUsd": 6493542.468940492,
-              "ptMovementDownUsd": 4566336.232396258,
-              "ytMovementUpUsd": 107696.9126311065,
-              "ytMovementDownUsd": 70491.91102595403
+              "ptMovementUpUsd": 7139231.379191927,
+              "ptMovementDownUsd": 3803277.269715563,
+              "ytMovementUpUsd": 119048.6330234315,
+              "ytMovementDownUsd": 59217.42621013324
             },
             "yieldRange": {
               "min": 0.03500000000000002,
               "max": 0.35
             },
-            "aggregatedApy": 0.03167638078028154,
-            "maxBoostedApy": 0.050356869078223336
+            "aggregatedApy": 0.03182579184914042,
+            "maxBoostedApy": 0.05052744379932918
           },
           "isNew": false,
           "isPrime": true,
@@ -1662,22 +1662,22 @@
           "sy": "1-0x7ac8ca87959b1d5edfe2df5325a37c304dcea4d0",
           "underlyingAsset": "1-0x90d2af7d622ca3141efa4d8f1f24d86e5974cc8f",
           "details": {
-            "liquidity": 144377934.93777135,
-            "pendleApy": 0.010245304080957465,
-            "impliedApy": 0.0759018366613955,
+            "liquidity": 144380285.67465118,
+            "pendleApy": 0.010256745222634448,
+            "impliedApy": 0.07590183666958428,
             "feeRate": 0.0010490000000000776,
             "movement10Percent": {
-              "ptMovementUpUsd": 12113523.274204567,
-              "ptMovementDownUsd": 16490989.40879907,
-              "ytMovementUpUsd": 186452.34913601345,
-              "ytMovementDownUsd": 233891.10361381626
+              "ptMovementUpUsd": 12113588.712365553,
+              "ptMovementDownUsd": 16491750.455425194,
+              "ytMovementUpUsd": 186444.11189701108,
+              "ytMovementDownUsd": 233890.27774930204
             },
             "yieldRange": {
               "min": 0.05,
               "max": 0.28
             },
-            "aggregatedApy": 0.0247174836600024,
-            "maxBoostedApy": 0.040085439781438595
+            "aggregatedApy": 0.024728300576256003,
+            "maxBoostedApy": 0.04011341841020768
           },
           "isNew": false,
           "isPrime": true,
@@ -1692,22 +1692,22 @@
           "sy": "1-0xf3dbde762e5b67fad09d88da3dfd38a83f753ffe",
           "underlyingAsset": "1-0x4c9edd5852cd905f086c759e8383e09bff1e68b3",
           "details": {
-            "liquidity": 3457398.546058968,
-            "pendleApy": 0.0421169335342746,
-            "impliedApy": 0.0773383465773021,
+            "liquidity": 3457309.3029980413,
+            "pendleApy": 0.042165659370582045,
+            "impliedApy": 0.07733834658057437,
             "feeRate": 0.0010710000000000441,
             "movement10Percent": {
-              "ptMovementUpUsd": 352110.16504453623,
-              "ptMovementDownUsd": 669363.2851396945,
-              "ytMovementUpUsd": 8791.11280636248,
-              "ytMovementDownUsd": 15490.055512199908
+              "ptMovementUpUsd": 352092.62227917096,
+              "ptMovementDownUsd": 669365.9429921124,
+              "ytMovementUpUsd": 8790.12487608689,
+              "ytMovementDownUsd": 15489.169224616802
             },
             "yieldRange": {
               "min": 0.05000000000000001,
               "max": 0.26999999999999996
             },
-            "aggregatedApy": 0.057023148694598125,
-            "maxBoostedApy": 0.12019854899601003
+            "aggregatedApy": 0.05707188020476014,
+            "maxBoostedApy": 0.1203203692606332
           },
           "isNew": false,
           "isPrime": true,
@@ -1722,22 +1722,22 @@
           "sy": "1-0xc01cde799245a25e6eabc550b36a47f6f83cc0f1",
           "underlyingAsset": "1-0x9d39a5de30e57443bff2a8307a4256c8797a3497",
           "details": {
-            "liquidity": 11052443.955166202,
-            "pendleApy": 0.028079122439275236,
-            "impliedApy": 0.0798834360295202,
+            "liquidity": 11052444.241475953,
+            "pendleApy": 0.028110881329352987,
+            "impliedApy": 0.07988343603290415,
             "feeRate": 0.0010149999999999881,
             "movement10Percent": {
-              "ptMovementUpUsd": 293767.94889755524,
-              "ptMovementDownUsd": 77263740.31916064,
-              "ytMovementUpUsd": 7772.169302912289,
-              "ytMovementDownUsd": 1848691.572118589
+              "ptMovementUpUsd": 293767.9574377912,
+              "ptMovementDownUsd": 76504638.28756854,
+              "ytMovementUpUsd": 7771.9265310034325,
+              "ytMovementDownUsd": 1830471.8860973374
             },
             "yieldRange": {
               "min": 0.05000000000000001,
               "max": 0.29
             },
-            "aggregatedApy": 0.0962273385148352,
-            "maxBoostedApy": 0.13834602217374803
+            "aggregatedApy": 0.09625974861942374,
+            "maxBoostedApy": 0.13842607061345324
           },
           "isNew": false,
           "isPrime": true,
@@ -1752,22 +1752,22 @@
           "sy": "1-0xed5cc19927e3a4ac20e4a9e9e433ddd99138504e",
           "underlyingAsset": "1-0xef101508bf4dc6cf0f0a0c135f39a41fab4e4389",
           "details": {
-            "liquidity": 3201893.3211580706,
-            "pendleApy": 0.0007082719175596458,
-            "impliedApy": 0.04227473249721103,
+            "liquidity": 3199687.8565197955,
+            "pendleApy": 0.0007095617731103167,
+            "impliedApy": 0.04227473250421032,
             "feeRate": 0.0006029999999999092,
             "movement10Percent": {
-              "ptMovementUpUsd": 114199.64604940794,
-              "ptMovementDownUsd": 126335.69780948997,
-              "ytMovementUpUsd": 814.0255423991654,
-              "ytMovementDownUsd": 809.3440577198718
+              "ptMovementUpUsd": 114134.39300979195,
+              "ptMovementDownUsd": 126270.33608008132,
+              "ytMovementUpUsd": 813.4596614325357,
+              "ytMovementDownUsd": 808.8273438710289
             },
             "yieldRange": {
               "min": 0.015,
               "max": 0.15
             },
-            "aggregatedApy": 0.03891804997997859,
-            "maxBoostedApy": 0.03998045785631806
+            "aggregatedApy": 0.03892374275219936,
+            "maxBoostedApy": 0.03998808541186484
           },
           "isNew": false,
           "isPrime": false,
@@ -1782,22 +1782,22 @@
           "sy": "1-0x31081a986f55d071bd89e5f66ef5187e77383197",
           "underlyingAsset": "1-0xe0a80d35bb6618cba260120b279d357978c42bce",
           "details": {
-            "liquidity": 49680.228882021234,
+            "liquidity": 49680.120694815574,
             "pendleApy": 0,
-            "impliedApy": 0.06999991514690573,
+            "impliedApy": 0.0699999151478723,
             "feeRate": 0.0006999999999999229,
             "movement10Percent": {
-              "ptMovementUpUsd": 1633.5397933469824,
-              "ptMovementDownUsd": 1460.4495062868175,
-              "ytMovementUpUsd": 66.92527376236625,
-              "ytMovementDownUsd": 53.91569427591625
+              "ptMovementUpUsd": 1633.5397927308086,
+              "ptMovementDownUsd": 1460.4492896719664,
+              "ytMovementUpUsd": 66.92284672413298,
+              "ytMovementDownUsd": 53.91379113786464
             },
             "yieldRange": {
               "min": 0.04000000000000001,
               "max": 0.19999999999999998
             },
-            "aggregatedApy": 0.06999784795143438,
-            "maxBoostedApy": 0.06999784795143438
+            "aggregatedApy": 0.06999560321572232,
+            "maxBoostedApy": 0.06999560321572232
           },
           "isNew": true,
           "isPrime": false,
@@ -1812,22 +1812,22 @@
           "sy": "1-0x4ede9c1dd28dac5356642663bea5a72fe9b6b2a2",
           "underlyingAsset": "1-0xd8b27cf359b7d15710a5be299af6e7bf904984c2",
           "details": {
-            "liquidity": 50719.85063610865,
+            "liquidity": 50684.909210712205,
             "pendleApy": 0,
-            "impliedApy": 0.03000002871887153,
+            "impliedApy": 0.030000028719278093,
             "feeRate": 0.00029999999999996696,
             "movement10Percent": {
-              "ptMovementUpUsd": 1022.5921869277954,
-              "ptMovementDownUsd": 940.4020878823818,
-              "ytMovementUpUsd": 18.156203831392816,
-              "ytMovementDownUsd": 15.04491489409199
+              "ptMovementUpUsd": 1021.6608643531799,
+              "ptMovementDownUsd": 939.4684413025604,
+              "ytMovementUpUsd": 18.138500910465925,
+              "ytMovementDownUsd": 15.029464222950416
             },
             "yieldRange": {
               "min": 0.015000000000000001,
               "max": 0.11499999999999999
             },
-            "aggregatedApy": 0.024326040462728724,
-            "maxBoostedApy": 0.024326040462728724
+            "aggregatedApy": 0.024328685639847445,
+            "maxBoostedApy": 0.024328685639847445
           },
           "isNew": true,
           "isPrime": false,
@@ -1842,22 +1842,22 @@
           "sy": "1-0x690559c7bd75c9a301e15515a8ea3316840f17be",
           "underlyingAsset": "1-0x8aca0841993ef4c87244d519166e767f49362c21",
           "details": {
-            "liquidity": 1259663.4537442224,
-            "pendleApy": 0.0015304309680928946,
-            "impliedApy": 0.02128414086791741,
+            "liquidity": 1259663.4949608063,
+            "pendleApy": 0.0015321619515226905,
+            "impliedApy": 0.02128414087015429,
             "feeRate": 0.00027700000000008274,
             "movement10Percent": {
               "ptMovementUpUsd": 18961.727619171143,
-              "ptMovementDownUsd": 853690.2858759009,
-              "ytMovementUpUsd": 85.72203200561869,
-              "ytMovementDownUsd": 3471.031515352555
+              "ptMovementDownUsd": 853772.5959187066,
+              "ytMovementUpUsd": 85.71355299291577,
+              "ytMovementDownUsd": 3471.029568236241
             },
             "yieldRange": {
               "min": 0.01,
               "max": 0.09999999999999998
             },
-            "aggregatedApy": 0.030040531905252122,
-            "maxBoostedApy": 0.032336178357391464
+            "aggregatedApy": 0.030042262526107692,
+            "maxBoostedApy": 0.032340505453391725
           },
           "isNew": true,
           "isPrime": false,
@@ -1872,22 +1872,22 @@
           "sy": "1-0xa004dd9439c2cf00794786c9662267bee6d9f723",
           "underlyingAsset": "1-0x4956b52ae2ff65d74ca2d61207523288e4528f96",
           "details": {
-            "liquidity": 9037871.426676093,
-            "pendleApy": 0.0074676738756144475,
-            "impliedApy": 0.13061862738809893,
+            "liquidity": 9037216.99388824,
+            "pendleApy": 0.007476661766963768,
+            "impliedApy": 0.1306186273966603,
             "feeRate": 0.0016879999999999118,
             "movement10Percent": {
-              "ptMovementUpUsd": 924255.5453283681,
-              "ptMovementDownUsd": 922395.3278430069,
-              "ytMovementUpUsd": 30899.02741027904,
-              "ytMovementDownUsd": 28694.621053838517
+              "ptMovementUpUsd": 924218.1245578376,
+              "ptMovementDownUsd": 922399.1978382297,
+              "ytMovementUpUsd": 30895.398979274694,
+              "ytMovementDownUsd": 28692.57554986846
             },
             "yieldRange": {
               "min": 0.03000000000000001,
               "max": 0.32999999999999996
             },
-            "aggregatedApy": 0.13556188297866925,
-            "maxBoostedApy": 0.1467633937920909
+            "aggregatedApy": 0.13557087130255502,
+            "maxBoostedApy": 0.14678586395300067
           },
           "isNew": true,
           "isPrime": false,
@@ -1902,22 +1902,22 @@
           "sy": "1-0x20b59becded839835a3ba58629430375dae02720",
           "underlyingAsset": "1-0xad55aebc9b8c03fc43cd9f62260391c13c23e7c0",
           "details": {
-            "liquidity": 17468823.788717777,
-            "pendleApy": 0.01377414531677054,
-            "impliedApy": 0.10238694211519395,
+            "liquidity": 17468779.62139787,
+            "pendleApy": 0.01378975978573774,
+            "impliedApy": 0.10238694211714527,
             "feeRate": 0.0014039999999999608,
             "movement10Percent": {
-              "ptMovementUpUsd": 1381919.7518477966,
-              "ptMovementDownUsd": 799049.2966440561,
-              "ytMovementUpUsd": 68629.25875204333,
-              "ytMovementDownUsd": 36592.47729880719
+              "ptMovementUpUsd": 1381917.7523566762,
+              "ptMovementDownUsd": 799051.2839326129,
+              "ytMovementUpUsd": 68627.70840757735,
+              "ytMovementDownUsd": 36591.79983834672
             },
             "yieldRange": {
               "min": 0.060000000000000005,
               "max": 0.25999999999999995
             },
-            "aggregatedApy": 0.07557226598036423,
-            "maxBoostedApy": 0.09623348395552005
+            "aggregatedApy": 0.0755878866448972,
+            "maxBoostedApy": 0.0962725263235038
           },
           "isNew": true,
           "isPrime": true,
@@ -1932,22 +1932,22 @@
           "sy": "1-0x3d98195b252dbfec41dff573981224e4a4b01aff",
           "underlyingAsset": "1-0x53176cadd446700fa6b89f840357ac586d7e33db",
           "details": {
-            "liquidity": 55117.92158271511,
+            "liquidity": 55140.27307149955,
             "pendleApy": 0,
-            "impliedApy": 0.05000011251255465,
+            "impliedApy": 0.05000011251626146,
             "feeRate": 0.00019999999999997797,
             "movement10Percent": {
               "ptMovementUpUsd": 1685.6938600540159,
-              "ptMovementDownUsd": 1506.7501471764963,
-              "ytMovementUpUsd": 21.040280080406067,
-              "ytMovementDownUsd": 17.060549670690648
+              "ptMovementDownUsd": 1506.7499344039263,
+              "ytMovementUpUsd": 21.038442304923336,
+              "ytMovementDownUsd": 17.059165021802546
             },
             "yieldRange": {
               "min": 0.03,
               "max": 0.15
             },
-            "aggregatedApy": 0.04034364004076998,
-            "maxBoostedApy": 0.04034364004076998
+            "aggregatedApy": 0.040323115774720364,
+            "maxBoostedApy": 0.040323115774720364
           },
           "isNew": true,
           "isPrime": false,
@@ -1962,22 +1962,22 @@
           "sy": "1-0x338e2cafa81e72ff422983e124e265eeccd718cb",
           "underlyingAsset": "1-0xdc45e7027a0489fe6c2e4a0735097d8e6952a340",
           "details": {
-            "liquidity": 60531.59399305306,
+            "liquidity": 60531.87987695607,
             "pendleApy": 0,
-            "impliedApy": 0.1294032478905598,
+            "impliedApy": 0.12940324790485813,
             "feeRate": 0.0008999999999999009,
             "movement10Percent": {
-              "ptMovementUpUsd": 3108.754750937297,
-              "ptMovementDownUsd": 2977.152789246714,
-              "ytMovementUpUsd": 81.17714548242,
-              "ytMovementDownUsd": 70.45816085350613
+              "ptMovementUpUsd": 3108.7547511647244,
+              "ptMovementDownUsd": 2977.152182131238,
+              "ytMovementUpUsd": 81.169014750142,
+              "ytMovementDownUsd": 70.45126231056746
             },
             "yieldRange": {
               "min": 0.030000000000000002,
               "max": 0.3
             },
-            "aggregatedApy": 0.1958063636810302,
-            "maxBoostedApy": 0.1958063636810302
+            "aggregatedApy": 0.19570274134142598,
+            "maxBoostedApy": 0.19570274134142598
           },
           "isNew": true,
           "isPrime": false,
@@ -1992,22 +1992,22 @@
           "sy": "1-0xbdd578ab1a6af894b9abe1c9d97f183005e07b1d",
           "underlyingAsset": "1-0xd5255cc08ebaf6d54ac9448822a18d8a3da29a42",
           "details": {
-            "liquidity": 55151.914904213,
+            "liquidity": 55151.79008941118,
             "pendleApy": 0,
-            "impliedApy": 0.13356465821599905,
+            "impliedApy": 0.1335646582307839,
             "feeRate": 0.0008999999999999009,
             "movement10Percent": {
-              "ptMovementUpUsd": 2952.2925584335726,
-              "ptMovementDownUsd": 2843.837682488361,
-              "ytMovementUpUsd": 79.42398453795275,
-              "ytMovementDownUsd": 69.35734791898194
+              "ptMovementUpUsd": 2952.2925599714968,
+              "ptMovementDownUsd": 2843.8370978495573,
+              "ytMovementUpUsd": 79.4160366400863,
+              "ytMovementDownUsd": 69.35055473591501
             },
             "yieldRange": {
               "min": 0.03000000000000001,
               "max": 0.3
             },
-            "aggregatedApy": 0.0924539399557731,
-            "maxBoostedApy": 0.0924539399557731
+            "aggregatedApy": 0.0924270374530018,
+            "maxBoostedApy": 0.0924270374530018
           },
           "isNew": true,
           "isPrime": false,
@@ -2022,22 +2022,22 @@
           "sy": "1-0x042677ce7e0e63fa5881f44a0f00d33feb5f55da",
           "underlyingAsset": "1-0x83599937c2c9bea0e0e8ac096c6f32e86486b410",
           "details": {
-            "liquidity": 56753.86060650181,
+            "liquidity": 56715.82998075052,
             "pendleApy": 0,
-            "impliedApy": 0.0655907578021242,
+            "impliedApy": 0.06559075780702184,
             "feeRate": 0.0004999999999999449,
             "movement10Percent": {
-              "ptMovementUpUsd": 3008.1719160079956,
-              "ptMovementDownUsd": 2737.662789933213,
-              "ytMovementUpUsd": 49.107957463741954,
-              "ytMovementDownUsd": 40.41494129193853
+              "ptMovementUpUsd": 3006.309270858765,
+              "ptMovementDownUsd": 2735.79652227068,
+              "ytMovementUpUsd": 49.07328773523304,
+              "ytMovementDownUsd": 40.384117848564586
             },
             "yieldRange": {
               "min": 0.029999999999999995,
               "max": 0.15
             },
-            "aggregatedApy": 0.06810333357980236,
-            "maxBoostedApy": 0.06810333357980236
+            "aggregatedApy": 0.06807013175760243,
+            "maxBoostedApy": 0.06807013175760243
           },
           "isNew": true,
           "isPrime": false,
@@ -2056,22 +2056,22 @@
           "sy": "8453-0x75372f72ec752a761e96cbcb3395f4b9586d9afd",
           "underlyingAsset": "8453-0x2ae3f1ec7f1f5012cfeab0185bfc7aa3cf0dec22",
           "details": {
-            "liquidity": 356944.69060150743,
-            "pendleApy": 0.004470016439869005,
-            "impliedApy": 0.03270677218183904,
+            "liquidity": 356215.87118058844,
+            "pendleApy": 0.00448870265771191,
+            "impliedApy": 0.03270676650594573,
             "feeRate": 0.0004999999993486881,
             "movement10Percent": {
-              "ptMovementUpUsd": 41569.58311796188,
-              "ptMovementDownUsd": 38061.18512326347,
-              "ytMovementUpUsd": 837.4409356783812,
-              "ytMovementDownUsd": 687.1007992298935
+              "ptMovementUpUsd": 41484.832763671875,
+              "ptMovementDownUsd": 37983.723588254594,
+              "ytMovementUpUsd": 835.7024557507408,
+              "ytMovementDownUsd": 685.6770457774825
             },
             "yieldRange": {
               "min": 0.02009955215384053,
               "max": 0.050102465833615176
             },
-            "aggregatedApy": 0.034602144747629515,
-            "maxBoostedApy": 0.04130716940743302
+            "aggregatedApy": 0.03462082895221669,
+            "maxBoostedApy": 0.04135388293878456
           },
           "isNew": false,
           "isPrime": false,
@@ -2086,22 +2086,22 @@
           "sy": "8453-0xc40febf5a33b8c92b187d9be0fd3fe0ac2e4b07c",
           "underlyingAsset": "8453-0xedc817a28e8b93b03976fbd4a3ddbc9f7d176c22",
           "details": {
-            "liquidity": 2195906.3425130406,
-            "pendleApy": 0.001121174693952174,
-            "impliedApy": 0.06966878813814703,
+            "liquidity": 2195891.54643783,
+            "pendleApy": 0.0011235703484145417,
+            "impliedApy": 0.06966867081194916,
             "feeRate": 0.0019999999993256523,
             "movement10Percent": {
-              "ptMovementUpUsd": 68342.31316678273,
-              "ptMovementDownUsd": 61322.77914849194,
-              "ytMovementUpUsd": 303.37283041494095,
-              "ytMovementDownUsd": 241.66215951761285
+              "ptMovementUpUsd": 68343.24448795893,
+              "ptMovementDownUsd": 61322.76967107511,
+              "ytMovementUpUsd": 303.27857862906615,
+              "ytMovementDownUsd": 241.58331179943823
             },
             "yieldRange": {
               "min": 0.04183391105589118,
               "max": 0.20211310941204366
             },
-            "aggregatedApy": 0.06374866570990508,
-            "maxBoostedApy": 0.0850197581179446
+            "aggregatedApy": 0.06374423135968016,
+            "maxBoostedApy": 0.08500083474052382
           },
           "isNew": false,
           "isPrime": false,
@@ -2116,22 +2116,22 @@
           "sy": "8453-0x7f5efa1bb887a5080ceacd6f3e2c0fc16bd90c90",
           "underlyingAsset": "8453-0xf877acafa28c19b96727966690b2f44d35ad5976",
           "details": {
-            "liquidity": 2504098.991872098,
-            "pendleApy": 0.001963048985525902,
-            "impliedApy": 0.011121813843432582,
+            "liquidity": 2504638.0977627723,
+            "pendleApy": 0.0019668068152571094,
+            "impliedApy": 0.011121795630103737,
             "feeRate": 0.0004999999993486881,
             "movement10Percent": {
-              "ptMovementUpUsd": 29422.339757912363,
-              "ptMovementDownUsd": 27675.904281577856,
-              "ytMovementUpUsd": 21.769184802381385,
-              "ytMovementDownUsd": 17.889177367851477
+              "ptMovementUpUsd": 29413.957362436635,
+              "ptMovementDownUsd": 27668.450764131867,
+              "ytMovementUpUsd": 21.75586979002735,
+              "ytMovementDownUsd": 17.878534957352766
             },
             "yieldRange": {
               "min": 0.00549981411739976,
               "max": 0.060527032910132
             },
-            "aggregatedApy": 0.006906375276440866,
-            "maxBoostedApy": 0.012610496510703633
+            "aggregatedApy": 0.006907816681337937,
+            "maxBoostedApy": 0.01261442872964168
           },
           "isNew": false,
           "isPrime": false,
@@ -2146,22 +2146,22 @@
           "sy": "8453-0x67507f3e26e7e2fd0a42c48fbc85069ccfcbd2ff",
           "underlyingAsset": "8453-0x7fcd174e80f264448ebee8c88a7c4476aaf58ea6",
           "details": {
-            "liquidity": 362260.5441114087,
-            "pendleApy": 0.039621865594452466,
-            "impliedApy": 0.04545296192953496,
+            "liquidity": 362017.74132539326,
+            "pendleApy": 0.03973289023469428,
+            "impliedApy": 0.04545288624749122,
             "feeRate": 0.000999999999916401,
             "movement10Percent": {
-              "ptMovementUpUsd": 7035.210728645325,
-              "ptMovementDownUsd": 5724.768888514614,
-              "ytMovementUpUsd": 20.488838721822223,
-              "ytMovementDownUsd": 14.882552942992541
+              "ptMovementUpUsd": 7031.485438346864,
+              "ptMovementDownUsd": 5721.041705287631,
+              "ytMovementUpUsd": 20.47140362175793,
+              "ytMovementDownUsd": 14.868015993000297
             },
             "yieldRange": {
               "min": 0.050642207533795364,
               "max": 0.1306909757702026
             },
-            "aggregatedApy": 0.0873897521341042,
-            "maxBoostedApy": 0.1468225505257829
+            "aggregatedApy": 0.08750077093986205,
+            "maxBoostedApy": 0.14710010629190348
           },
           "isNew": false,
           "isPrime": false,
@@ -2176,22 +2176,22 @@
           "sy": "8453-0x02adf72d5d06a9c92136562eb237c07696833a84",
           "underlyingAsset": "8453-0xb909f567c5c2bb1a4271349708cc4637d7318b4a",
           "details": {
-            "liquidity": 308324.02422263863,
-            "pendleApy": 0.005161656742193226,
-            "impliedApy": 0.5607572404241485,
+            "liquidity": 307641.9480476417,
+            "pendleApy": 0.0051841193253937354,
+            "impliedApy": 0.5607561088673592,
             "feeRate": 0.008018999999999998,
             "movement10Percent": {
-              "ptMovementUpUsd": 7630.325853824472,
-              "ptMovementDownUsd": 7259.055745254567,
-              "ytMovementUpUsd": 220.4395170389526,
-              "ytMovementDownUsd": 190.78713514698092
+              "ptMovementUpUsd": 7577.2404670713595,
+              "ptMovementDownUsd": 7208.626194790692,
+              "ytMovementUpUsd": 218.8337078161037,
+              "ytMovementDownUsd": 189.3993832914196
             },
             "yieldRange": {
               "min": 0.27721037800043763,
               "max": 1.859154778599623
             },
-            "aggregatedApy": 0.2743290352064149,
-            "maxBoostedApy": 0.5092243628469054
+            "aggregatedApy": 0.2745838331315975,
+            "maxBoostedApy": 0.5098612079227414
           },
           "isNew": false,
           "isPrime": false,
@@ -2206,22 +2206,22 @@
           "sy": "8453-0xff702347d81725ed8bbe341392af511e29cfed98",
           "underlyingAsset": "8453-0xe31ee12bdfdd0573d634124611e85338e2cbf0cf",
           "details": {
-            "liquidity": 1303504.2670310093,
-            "pendleApy": 0.0002518591719660264,
-            "impliedApy": 0.10241885820250474,
+            "liquidity": 1303493.843054573,
+            "pendleApy": 0.0002523976462908186,
+            "impliedApy": 0.10241882497249577,
             "feeRate": 0.001346999999999987,
             "movement10Percent": {
-              "ptMovementUpUsd": 59349.462389945984,
-              "ptMovementDownUsd": 53665.71805883503,
-              "ytMovementUpUsd": 2002.6824269586393,
-              "ytMovementDownUsd": 1629.355996584343
+              "ptMovementUpUsd": 59350.3937125206,
+              "ptMovementDownUsd": 53665.70632074844,
+              "ytMovementUpUsd": 2002.5909123066638,
+              "ytMovementDownUsd": 1629.2537445078206
             },
             "yieldRange": {
               "min": 0.05000000000000001,
               "max": 0.24999999999999997
             },
-            "aggregatedApy": 0.09197930102201272,
-            "maxBoostedApy": 0.09235708977996177
+            "aggregatedApy": 0.0919798331066586,
+            "maxBoostedApy": 0.09235842957609483
           },
           "isNew": false,
           "isPrime": false,
@@ -2236,22 +2236,22 @@
           "sy": "8453-0x4665d514e82b2f9c78fa2b984e450f33d9efc842",
           "underlyingAsset": "8453-0x35e5db674d8e93a03d814fa0ada70731efe8a4b9",
           "details": {
-            "liquidity": 2875228.5156950313,
-            "pendleApy": 0.00806877293810433,
-            "impliedApy": 0.06879988404370585,
+            "liquidity": 2875088.0506319795,
+            "pendleApy": 0.008086354339843789,
+            "impliedApy": 0.0687998620597905,
             "feeRate": 0.0008760000000000989,
             "movement10Percent": {
-              "ptMovementUpUsd": 48412.15920629501,
-              "ptMovementDownUsd": 32739.154748424167,
-              "ytMovementUpUsd": 1107.5832927130066,
-              "ytMovementDownUsd": 675.7032795735098
+              "ptMovementUpUsd": 48416.7239945553,
+              "ptMovementDownUsd": 32742.888124834586,
+              "ytMovementUpUsd": 1107.675839792207,
+              "ytMovementDownUsd": 675.7852130362927
             },
             "yieldRange": {
               "min": 0.05000000000000001,
               "max": 0.35
             },
-            "aggregatedApy": 0.019699052590458378,
-            "maxBoostedApy": 0.031802211997614876
+            "aggregatedApy": 0.019717238171929018,
+            "maxBoostedApy": 0.0318467696816947
           },
           "isNew": false,
           "isPrime": true,
@@ -2266,22 +2266,22 @@
           "sy": "8453-0x4b272672a58da22b213e733f5aba48cfec534d30",
           "underlyingAsset": "8453-0x548d3b444da39686d1a6f1544781d154e7cd1ef7",
           "details": {
-            "liquidity": 8423704.311760942,
-            "pendleApy": 0.0963514727168344,
-            "impliedApy": 0.6209272007616173,
+            "liquidity": 8430510.86964898,
+            "pendleApy": 0.09647874261285101,
+            "impliedApy": 0.6218668495600554,
             "feeRate": 0.008161000000000085,
             "movement10Percent": {
-              "ptMovementUpUsd": 20368.956029415134,
-              "ptMovementDownUsd": 573218.9843223195,
-              "ytMovementUpUsd": 1616.7589582968099,
-              "ytMovementDownUsd": 44059.01654688165
+              "ptMovementUpUsd": 20267.441868782043,
+              "ptMovementDownUsd": 570413.0008336713,
+              "ytMovementUpUsd": 1608.5594500039304,
+              "ytMovementDownUsd": 43859.945929067915
             },
             "yieldRange": {
               "min": 0.07,
               "max": 0.49999999999999994
             },
-            "aggregatedApy": 0.7333339613031012,
-            "maxBoostedApy": 0.8778611703783529
+            "aggregatedApy": 0.7344561879811767,
+            "maxBoostedApy": 0.8791743019004532
           },
           "isNew": false,
           "isPrime": false,
@@ -2296,22 +2296,22 @@
           "sy": "8453-0x66d32c781a5be5a78ec9e260cad288d75de80295",
           "underlyingAsset": "8453-0x69efa3cd7fc773fe227b9cc4f41132dcde020a29",
           "details": {
-            "liquidity": 8914508.568884224,
-            "pendleApy": 0.05604705928935557,
-            "impliedApy": 0.06286214839709237,
+            "liquidity": 8914077.25018079,
+            "pendleApy": 0.05616914214224391,
+            "impliedApy": 0.06286212836576643,
             "feeRate": 0.0008539999999999104,
             "movement10Percent": {
-              "ptMovementUpUsd": 170822.8949333559,
-              "ptMovementDownUsd": 146436.14769711654,
-              "ytMovementUpUsd": 3517.740090184133,
-              "ytMovementDownUsd": 2767.5959148809375
+              "ptMovementUpUsd": 170821.74994826975,
+              "ptMovementDownUsd": 146436.6239713674,
+              "ytMovementUpUsd": 3517.4975286619037,
+              "ytMovementDownUsd": 2767.4325744088433
             },
             "yieldRange": {
               "min": 0.03500000000000001,
               "max": 0.3
             },
-            "aggregatedApy": 0.08301324584506647,
-            "maxBoostedApy": 0.16708383477909983
+            "aggregatedApy": 0.08311782542329846,
+            "maxBoostedApy": 0.16737153863666432
           },
           "isNew": false,
           "isPrime": false,
@@ -2326,22 +2326,22 @@
           "sy": "8453-0x540e181d4e3c70632e6bb153282bead2886d0768",
           "underlyingAsset": "8453-0x067ae75628177fd257c2b1e500993e1a0babcbd1",
           "details": {
-            "liquidity": 5555866.619213258,
-            "pendleApy": 0.05332587957088121,
-            "impliedApy": 0.027284180552791693,
+            "liquidity": 5555536.588275421,
+            "pendleApy": 0.05344261258202847,
+            "impliedApy": 0.027284163504311287,
             "feeRate": 0.00028999999999990145,
             "movement10Percent": {
-              "ptMovementUpUsd": 72792.1724319458,
-              "ptMovementDownUsd": 69126.860730179,
-              "ytMovementUpUsd": 336.6733073468562,
-              "ytMovementDownUsd": 287.6183752381909
+              "ptMovementUpUsd": 72787.51581907272,
+              "ptMovementDownUsd": 69122.19798131309,
+              "ytMovementUpUsd": 336.6105043938303,
+              "ytMovementDownUsd": 287.56345955259707
             },
             "yieldRange": {
               "min": 0.004999999999999999,
               "max": 0.15
             },
-            "aggregatedApy": 0.08313116729661106,
-            "maxBoostedApy": 0.16311998665293287
+            "aggregatedApy": 0.08325368236620577,
+            "maxBoostedApy": 0.16341760123924848
           },
           "isNew": false,
           "isPrime": false,
@@ -2356,22 +2356,22 @@
           "sy": "8453-0x77d07ab8466a57fb8615aeb75c37abff25c06ebf",
           "underlyingAsset": "8453-0x5ae84075f0e34946821a8015dab5299a00992721",
           "details": {
-            "liquidity": 35564995.37481804,
-            "pendleApy": 0.006525288300133994,
-            "impliedApy": 0.10007732405034386,
+            "liquidity": 35564748.19557662,
+            "pendleApy": 0.006539231064659838,
+            "impliedApy": 0.10007715316814414,
             "feeRate": 0.001250999999999891,
             "movement10Percent": {
-              "ptMovementUpUsd": 1643518.9172577993,
-              "ptMovementDownUsd": 1531491.240813559,
-              "ytMovementUpUsd": 10175.763841832133,
-              "ytMovementDownUsd": 8553.381769048372
+              "ptMovementUpUsd": 1643523.573871685,
+              "ptMovementDownUsd": 1531495.5881989978,
+              "ytMovementUpUsd": 10172.481241452168,
+              "ytMovementDownUsd": 8550.614766578148
             },
             "yieldRange": {
               "min": 0.034999999999999996,
               "max": 0.24999999999999997
             },
-            "aggregatedApy": 0.057038443786221485,
-            "maxBoostedApy": 0.06682637623642249
+            "aggregatedApy": 0.05705234559933174,
+            "maxBoostedApy": 0.0668611921963215
           },
           "isNew": false,
           "isPrime": false,
@@ -2386,22 +2386,22 @@
           "sy": "8453-0x67e64af30e04a7277ab2d4f09ace3f77a15801f9",
           "underlyingAsset": "8453-0x53176cadd446700fa6b89f840357ac586d7e33db",
           "details": {
-            "liquidity": 1737469.7168692772,
-            "pendleApy": 0.04167501167491443,
-            "impliedApy": 0.013134579024830506,
+            "liquidity": 1738950.8984187718,
+            "pendleApy": 0.04172815810966423,
+            "impliedApy": 0.013134574937912591,
             "feeRate": 9.900000000007125e-05,
             "movement10Percent": {
-              "ptMovementUpUsd": 15852.04154253006,
-              "ptMovementDownUsd": 14887.271561411,
-              "ytMovementUpUsd": 70.8052204078038,
-              "ytMovementDownUsd": 59.87725761560067
+              "ptMovementUpUsd": 15852.972865104677,
+              "ptMovementDownUsd": 14888.202923182074,
+              "ytMovementUpUsd": 70.80503113973525,
+              "ytMovementDownUsd": 59.877295577440016
             },
             "yieldRange": {
               "min": 0.01,
               "max": 0.07999999999999999
             },
-            "aggregatedApy": 0.04527298637828305,
-            "maxBoostedApy": 0.10778550389065471
+            "aggregatedApy": 0.045326132443032636,
+            "maxBoostedApy": 0.10791836960752899
           },
           "isNew": true,
           "isPrime": true,
