@@ -15,14 +15,9 @@ sys.path.append(str(Path(__file__).parent.parent))
 
 from pendle.pendle_manager import PendleManager
 from spot.balance_manager import SpotBalanceManager
-from curve.curve_manager import CurveManager
-from equilibria.equilibria_manager import EquilibriaManager
+from curve.balance.balance_manager import CurveBalanceManager
 from shares.supply_reader import SupplyReader
-
-RPC_URLS = {
-    "ethereum": os.getenv('ETHEREUM_RPC'),
-    "base": os.getenv('BASE_RPC'),
-}
+from config.networks import RPC_URLS
 
 class BalanceAggregator:
     """
@@ -31,14 +26,12 @@ class BalanceAggregator:
     - Pendle (Ethereum + Base)
     - Spot (Ethereum + Base)
     - Curve (Base)
-    - Equilibria (Ethereum + Base)
     """
     
     def __init__(self):
         self.pendle_manager = PendleManager(os.getenv('PRODUCTION_ADDRESS'))
         self.spot_manager = SpotBalanceManager()
-        self.curve_manager = CurveManager(os.getenv('PRODUCTION_ADDRESS'))
-        self.equilibria_manager = EquilibriaManager(os.getenv('PRODUCTION_ADDRESS'))
+        self.curve_manager = CurveBalanceManager("base", Web3(Web3.HTTPProvider(RPC_URLS["base"])))
         
     def get_all_balances(self, address: str) -> Dict[str, Any]:
         """
@@ -58,14 +51,16 @@ class BalanceAggregator:
         result = {
             "protocols": {
                 "pendle": {},
-                "curve": {},
-                "equilibria": {}
+                "curve": {}
             },
             "spot": {}
         }
         
         # Get pendle balances
         try:
+            print("\n" + "="*80)
+            print("PENDLE BALANCE MANAGER")
+            print("="*80 + "\n")
             pendle_balances = self.pendle_manager.run()
             if pendle_balances:
                 result["protocols"]["pendle"] = pendle_balances
@@ -75,24 +70,57 @@ class BalanceAggregator:
             
         # Get Curve balances
         try:
-            curve_balances = self.curve_manager.run()
-            if curve_balances:
-                result["protocols"]["curve"] = curve_balances
+            print("\n" + "="*80)
+            print("CURVE BALANCE MANAGER")
+            print("="*80 + "\n")
+            print(f"Checking Curve positions for address: {checksum_address}")
+            curve_data = self.curve_manager.get_pool_data("cbeth-f", checksum_address)
+            if curve_data:
+                result["protocols"]["curve"] = curve_data
                 print("✓ Curve positions fetched successfully")
+                
+                # Add detailed logging
+                if "base" in curve_data and "cbeth-f" in curve_data["base"]:
+                    pool_data = curve_data["base"]["cbeth-f"]
+                    
+                    # Print withdrawable amounts
+                    print("\nWithdrawable amounts:")
+                    for symbol, data in pool_data["tokens"].items():
+                        print(f"\n{symbol}:")
+                        print(f"  Amount: {Decimal(data['amount']) / Decimal(10**data['decimals']):.6f}")
+                        print(f"  Value in WETH: {Decimal(data['value']['WETH']['amount']) / Decimal(10**18):.6f}")
+                        print(f"  Conversion rate: {data['value']['WETH']['conversion_details']['rate']}")
+                        print(f"  Price impact: {data['value']['WETH']['conversion_details']['price_impact']}")
+                        print(f"  Fee: {data['value']['WETH']['conversion_details']['fee_percentage']}")
+                    
+                    # Print rewards if any
+                    if "rewards" in pool_data and pool_data["rewards"]:
+                        print("\nRewards:")
+                        for reward, reward_data in pool_data["rewards"].items():
+                            print(f"\n{reward}:")
+                            print(f"  Amount: {Decimal(reward_data['amount']) / Decimal(10**reward_data['decimals']):.6f}")
+                            print(f"  Value in WETH: {Decimal(reward_data['value']['WETH']['amount']) / Decimal(10**18):.6f}")
+                            print(f"  Conversion rate: {reward_data['value']['WETH']['conversion_details']['rate']}")
+                            print(f"  Price impact: {reward_data['value']['WETH']['conversion_details']['price_impact']}")
+                            print(f"  Fee: {reward_data['value']['WETH']['conversion_details']['fee_percentage']}")
+                    
+                    # Print totals
+                    print("\nTotals:")
+                    print(f"Total value in WETH: {Decimal(pool_data['totals']['wei']) / Decimal(10**18):.6f}")
+                    print(f"Note: {pool_data['totals']['note']}")
         except Exception as e:
             print(f"✗ Error fetching Curve positions: {str(e)}")
-            
-        # Get Equilibria balances
-        try:
-            equilibria_balances = self.equilibria_manager.run()
-            if equilibria_balances:
-                result["protocols"]["equilibria"] = equilibria_balances
-                print("✓ Equilibria positions fetched successfully")
-        except Exception as e:
-            print(f"✗ Error fetching Equilibria positions: {str(e)}")
         
         # Get spot balances
         try:
+            print("\n" + "="*80)
+            print("SPOT BALANCE MANAGER")
+            print("="*80 + "\n")
+            print("Processing method:")
+            print("  - Querying native ETH balance")
+            print("  - Querying balanceOf(address) for each token")
+            print("  - Converting non-WETH tokens to WETH via CoWSwap")
+            
             spot_balances = self.spot_manager.get_balances(checksum_address)
             if spot_balances:
                 result["spot"] = spot_balances
@@ -201,8 +229,33 @@ def build_overview(all_balances: Dict[str, Any], address: str) -> Dict[str, Any]
     
     # Process each protocol's positions
     for protocol_name, protocol_data in all_balances["protocols"].items():
-        # For protocols with direct totals (Pendle, Curve)
-        if "totals" in protocol_data:
+        if protocol_name == "curve":
+            # Handle Curve data structure
+            if "base" in protocol_data:
+                for pool_name, pool_data in protocol_data["base"].items():
+                    if pool_name == "totals":
+                        continue
+                    # Add pool total
+                    if "totals" in pool_data:
+                        key = f"{protocol_name}.base.{pool_name}"
+                        value = f"{Decimal(pool_data['totals']['formatted']):.6f}"
+                        positions[key] = value
+                    # Add pool tokens
+                    if "value" in pool_data:
+                        for token_symbol, token_info in pool_data["value"].items():
+                            if "value" in token_info and "WETH" in token_info["value"]:
+                                key = f"{protocol_name}.base.{pool_name}.{token_symbol}"
+                                value = f"{Decimal(token_info['value']['WETH']['amount']) / Decimal(10**18):.6f}"
+                                positions[key] = value
+                    # Add rewards
+                    if "rewards" in pool_data:
+                        for reward_symbol, reward_info in pool_data["rewards"].items():
+                            if "value" in reward_info and "WETH" in reward_info["value"]:
+                                key = f"{protocol_name}.base.{pool_name}.rewards.{reward_symbol}"
+                                value = f"{Decimal(reward_info['value']['WETH']['amount']) / Decimal(10**18):.6f}"
+                                positions[key] = value
+        else:
+            # Handle other protocols (Pendle)
             for network, network_data in protocol_data.items():
                 if network == "totals":
                     continue
@@ -212,22 +265,6 @@ def build_overview(all_balances: Dict[str, Any], address: str) -> Dict[str, Any]
                             key = f"{protocol_name}.{network}.{token_name}"
                             value = f"{Decimal(token_data['totals']['formatted']):.6f}"
                             positions[key] = value
-                        # For Curve, also include pool tokens and rewards
-                        elif protocol_name == "curve":
-                            # Add pool tokens
-                            if "value" in token_data:
-                                for token_symbol, token_info in token_data["value"].items():
-                                    if "totals" in token_info:
-                                        key = f"{protocol_name}.{network}.{token_name}.{token_symbol}"
-                                        value = f"{Decimal(token_info['totals']['formatted']):.6f}"
-                                        positions[key] = value
-                            # Add rewards
-                            if "rewards" in token_data:
-                                for reward_symbol, reward_info in token_data["rewards"].items():
-                                    if "totals" in reward_info:
-                                        key = f"{protocol_name}.{network}.{token_name}.rewards.{reward_symbol}"
-                                        value = f"{Decimal(reward_info['totals']['formatted']):.6f}"
-                                        positions[key] = value
 
     # Process spot positions
     if "spot" in all_balances:

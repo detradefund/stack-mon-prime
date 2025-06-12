@@ -135,7 +135,7 @@ class CurveRewardManager:
                             "amount": claimable,
                             "decimals": 18,
                             "value": {
-                                "ETH": quote_result
+                                "WETH": quote_result
                             },
                             "totals": {
                                 "wei": eth_value,
@@ -186,7 +186,7 @@ class CurveRewardManager:
                                     "amount": claimable,
                                     "decimals": decimals,
                                     "value": {
-                                        "ETH": quote_result
+                                        "WETH": quote_result
                                     },
                                     "totals": {
                                         "wei": eth_value,

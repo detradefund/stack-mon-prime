@@ -21,6 +21,7 @@ sys.path.append(str(Path(__file__).parent.parent.parent))
 from cowswap.cow_client import get_quote
 from config.networks import NETWORK_TOKENS, RPC_URLS
 from utils.retry import APIRetry
+from curve.balance.reward_manager import CurveRewardManager
 
 # Load environment variables
 load_dotenv()
@@ -66,6 +67,7 @@ class CurveBalanceManager:
         self.w3 = w3
         self.network_tokens = NETWORK_TOKENS
         self.abis_path = Path(__file__).parent.parent / "abis"
+        self.reward_manager = CurveRewardManager(network, w3)
         
     def get_gauge_balance(self, pool_name: str, user_address: str) -> Decimal:
         """
@@ -94,187 +96,26 @@ class CurveBalanceManager:
         ).call()
         
         return Decimal(balance)
-        
-    def get_pool_balance(self, pool_name: str) -> Dict[str, Decimal]:
+
+    def get_pool_data(self, pool_name: str, user_address: str) -> Dict:
         """
-        Get the current balance of tokens in a Curve pool.
-        
-        Args:
-            pool_name: Name of the pool
-            
-        Returns:
-            Dictionary of token balances in the pool
-        """
-        pool_address = get_pool_address(self.network, pool_name)
-        abi_name = get_pool_abi(self.network, pool_name)
-        
-        # Load pool ABI
-        with open(self.abis_path / f"{abi_name}.json") as f:
-            pool_abi = json.load(f)
-            
-        pool_contract = self.w3.eth.contract(
-            address=self.w3.to_checksum_address(pool_address),
-            abi=pool_abi
-        )
-        
-        # For Vyper contracts, we need to get balances one by one
-        balances = {}
-        for i in range(2):  # This pool has 2 tokens
-            balance = pool_contract.functions.balances(i).call()
-            if balance > 0:
-                balances[str(i)] = Decimal(balance)
-                
-        return balances
-        
-    def get_token_price(self, token_address: str, pool_name: str) -> Decimal:
-        """
-        Get the price of a token from a Curve pool.
-        
-        Args:
-            token_address: Address of the token
-            pool_name: Name of the pool to use for price discovery
-            
-        Returns:
-            Token price in USD
-        """
-        pool_address = get_pool_address(self.network, pool_name)
-        abi_name = get_pool_abi(self.network, pool_name)
-        
-        # Load pool ABI
-        with open(self.abis_path / f"{abi_name}.json") as f:
-            pool_abi = json.load(f)
-            
-        pool_contract = self.w3.eth.contract(
-            address=self.w3.to_checksum_address(pool_address),
-            abi=pool_abi
-        )
-        
-        virtual_price = pool_contract.functions.get_virtual_price().call()
-        return Decimal(virtual_price) / Decimal(10**18)
-        
-    def get_lp_token_balance(self, pool_name: str, user_address: str) -> Decimal:
-        """
-        Get the LP token balance for a user in a specific pool.
+        Get all pool data including withdrawable amounts and their WETH values.
         
         Args:
             pool_name: Name of the pool
             user_address: Address of the user
             
         Returns:
-            LP token balance
+            Dictionary containing all pool data
         """
-        lp_token_address = get_lp_token_address(self.network, pool_name)
+        # Get LP token balance (already in wei)
+        lp_balance = self.get_gauge_balance(pool_name, user_address)
         
-        # Load ERC20 ABI
-        with open(self.abis_path / "erc20.json") as f:
-            erc20_abi = json.load(f)
-            
-        lp_token_contract = self.w3.eth.contract(
-            address=self.w3.to_checksum_address(lp_token_address),
-            abi=erc20_abi["abi"]
-        )
-        
-        balance = lp_token_contract.functions.balanceOf(
-            self.w3.to_checksum_address(user_address)
-        ).call()
-        
-        return Decimal(balance)
-        
-    def get_pool_tvl(self, pool_name: str) -> Decimal:
-        """
-        Get the Total Value Locked (TVL) in a Curve pool.
-        
-        Args:
-            pool_name: Name of the pool
-            
-        Returns:
-            TVL in USD
-        """
+        # Get pool contract
         pool_address = get_pool_address(self.network, pool_name)
-        lp_token_address = get_lp_token_address(self.network, pool_name)
-        abi_name = get_pool_abi(self.network, pool_name)
-        
-        # Load pool ABI for virtual price
-        with open(self.abis_path / f"{abi_name}.json") as f:
-            pool_abi = json.load(f)
-            
-        pool_contract = self.w3.eth.contract(
-            address=self.w3.to_checksum_address(pool_address),
-            abi=pool_abi
-        )
-        
-        # Load ERC20 ABI for total supply
-        with open(self.abis_path / "erc20.json") as f:
-            erc20_abi = json.load(f)
-            
-        lp_token_contract = self.w3.eth.contract(
-            address=self.w3.to_checksum_address(lp_token_address),
-            abi=erc20_abi["abi"]
-        )
-        
-        virtual_price = pool_contract.functions.get_virtual_price().call()
-        total_supply = lp_token_contract.functions.totalSupply().call()
-        
-        return (Decimal(virtual_price) * Decimal(total_supply)) / Decimal(10**18)
-
-    def get_lp_token_total_supply(self, pool_name: str) -> Decimal:
-        """
-        Get the total supply of LP tokens for a pool from the Child Liquidity Gauge.
-        
-        Args:
-            pool_name: Name of the pool
-            
-        Returns:
-            Total supply of LP tokens
-        """
         gauge_address = get_gauge_address(self.network, pool_name)
-        
-        # Load Child Liquidity Gauge ABI
-        with open(self.abis_path / "Child Liquidity Gauge.json") as f:
-            gauge_abi = json.load(f)
-            
-        gauge_contract = self.w3.eth.contract(
-            address=self.w3.to_checksum_address(gauge_address),
-            abi=gauge_abi
-        )
-        
-        total_supply = gauge_contract.functions.totalSupply().call()
-        return Decimal(total_supply)
-
-    def get_ownership_percentage(self, pool_name: str, user_address: str) -> Decimal:
-        """
-        Calculate the percentage of LP tokens owned by an address.
-        
-        Args:
-            pool_name: Name of the pool
-            user_address: Address of the user
-            
-        Returns:
-            Percentage of LP tokens owned (0-100) with maximum precision
-        """
-        balance = self.get_gauge_balance(pool_name, user_address)
-        total_supply = self.get_lp_token_total_supply(pool_name)
-        
-        if total_supply == 0:
-            return Decimal('0')
-            
-        # Calculate ownership with maximum precision
-        return (balance / total_supply) * Decimal('100')
-
-    def get_pool_tokens(self, pool_name: str) -> List[Tuple[str, str]]:
-        """
-        Get the tokens in a Curve pool with their symbols.
-        
-        Args:
-            pool_name: Name of the pool
-            
-        Returns:
-            List of tuples containing (token_address, token_symbol)
-        """
-        pool_address = get_pool_address(self.network, pool_name)
         abi_name = get_pool_abi(self.network, pool_name)
         
-        # Load pool ABI
         with open(self.abis_path / f"{abi_name}.json") as f:
             pool_abi = json.load(f)
             
@@ -283,57 +124,42 @@ class CurveBalanceManager:
             abi=pool_abi
         )
         
-        # Get token addresses from pool
-        token_addresses = []
+        # Initialize pool data structure
+        pool_data = {
+            "base": {
+                pool_name: {
+                    "staking_contract": gauge_address,
+                    "amount": str(lp_balance),
+                    "decimals": 18,
+                    "tokens": {},
+                    "rewards": {},
+                    "totals": {
+                        "wei": "0",
+                        "formatted": "0"
+                    }
+                },
+                "totals": {
+                    "wei": "0",
+                    "formatted": "0"
+                }
+            }
+        }
+        
+        # Get token addresses and calculate withdrawable amounts
+        weth_value = Decimal('0')
+        best_method = ""
+        
         for i in range(2):  # This pool has 2 tokens
+            # Get token address
             token_address = pool_contract.functions.coins(i).call()
-            token_addresses.append(token_address)
             
-        # Map addresses to symbols using NETWORK_TOKENS
-        token_info = []
-        for addr in token_addresses:
-            addr_lower = addr.lower()
-            symbol = "UNKNOWN"
+            # Calculate withdrawable amount - lp_balance is already in wei
+            withdrawable = pool_contract.functions.calc_withdraw_one_coin(
+                int(lp_balance),
+                i
+            ).call()
             
-            # Search for token in NETWORK_TOKENS
-            for token_name, token_data in NETWORK_TOKENS[self.network].items():
-                if token_data["address"].lower() == addr_lower:
-                    symbol = token_data["symbol"]
-                    break
-                    
-            token_info.append((addr, symbol))
-            
-        return token_info
-
-    def get_pool_balances(self, pool_name: str) -> List[Tuple[str, str, Decimal]]:
-        """
-        Get the balances of tokens in a Curve pool.
-        
-        Args:
-            pool_name: Name of the pool
-            
-        Returns:
-            List of tuples containing (token_address, token_symbol, balance)
-        """
-        pool_address = get_pool_address(self.network, pool_name)
-        abi_name = get_pool_abi(self.network, pool_name)
-        
-        # Load pool ABI
-        with open(self.abis_path / f"{abi_name}.json") as f:
-            pool_abi = json.load(f)
-            
-        pool_contract = self.w3.eth.contract(
-            address=self.w3.to_checksum_address(pool_address),
-            abi=pool_abi
-        )
-        
-        # Get token addresses and balances
-        token_info = []
-        for i in range(2):  # This pool has 2 tokens
-            token_address = pool_contract.functions.coins(i).call()
-            balance = pool_contract.functions.balances(i).call()
-            
-            # Get token symbol
+            # Get token symbol and decimals
             addr_lower = token_address.lower()
             symbol = "UNKNOWN"
             decimals = 18  # Default to 18 decimals
@@ -345,90 +171,127 @@ class CurveBalanceManager:
                     decimals = token_data["decimals"]
                     break
             
-            token_info.append((token_address, symbol, Decimal(balance) / Decimal(10**decimals)))
-            
-        return token_info
-
-    def get_user_balances(self, pool_name: str, user_address: str) -> List[Tuple[str, str, Decimal]]:
-        """
-        Get the user's share of tokens in a Curve pool based on ownership percentage.
-        Calculates exact token amounts with maximum precision.
+            # If this is WETH, just store the value
+            if symbol == "WETH":
+                weth_value = Decimal(withdrawable)
+                best_method = "Direct WETH withdrawal"
+            else:
+                # Get CowSwap quote for non-WETH token
+                try:
+                    quote = get_quote(
+                        sell_token=token_address,
+                        buy_token=NETWORK_TOKENS[self.network]["WETH"]["address"],
+                        amount=withdrawable,
+                        network=self.network
+                    )
+                    
+                    # Calculate WETH value from quote
+                    token_in_weth = Decimal(quote["quote"]["quote"]["buyAmount"])
+                    
+                    # Add token data with WETH value
+                    pool_data["base"][pool_name]["tokens"][symbol] = {
+                        "amount": str(withdrawable),
+                        "decimals": decimals,
+                        "value": {
+                            "WETH": {
+                                "amount": str(token_in_weth),
+                                "decimals": 18,
+                                "conversion_details": {
+                                    "source": "CoWSwap",
+                                    "price_impact": quote["conversion_details"]["price_impact"],
+                                    "rate": quote["conversion_details"]["rate"],
+                                    "fee_percentage": quote["conversion_details"]["fee_percentage"],
+                                    "fallback": quote["conversion_details"]["fallback"],
+                                    "note": quote["conversion_details"]["note"]
+                                }
+                            }
+                        },
+                        "totals": {
+                            "wei": str(token_in_weth),
+                            "formatted": f"{token_in_weth / Decimal(10**18):.6f}"
+                        }
+                    }
+                    
+                    # Update best method if this gives more WETH
+                    if token_in_weth > weth_value:
+                        weth_value = token_in_weth
+                        best_method = f"Withdraw {symbol} and swap to WETH"
+                    
+                except Exception as e:
+                    print(f"Error getting CowSwap quote for {symbol}: {str(e)}")
         
-        Args:
-            pool_name: Name of the pool
-            user_address: Address of the user
-            
-        Returns:
-            List of tuples containing (token_address, token_symbol, user_balance) with maximum precision
-        """
-        # Get ownership percentage with maximum precision
-        ownership = self.get_ownership_percentage(pool_name, user_address)
-        pool_balances = self.get_pool_balances(pool_name)
+        # Get rewards data
+        rewards_data = self.reward_manager.get_claimable_rewards(pool_name, user_address)
+        rewards_value = Decimal('0')
+        if rewards_data and "curve" in rewards_data and "base" in rewards_data["curve"] and pool_name in rewards_data["curve"]["base"]:
+            pool_data["base"][pool_name]["rewards"] = rewards_data["curve"]["base"][pool_name]["rewards"]
+            # Add rewards value to total
+            for reward_symbol, reward_data in pool_data["base"][pool_name]["rewards"].items():
+                if "value" in reward_data and "WETH" in reward_data["value"]:
+                    rewards_value += Decimal(reward_data["value"]["WETH"]["amount"])
         
-        user_balances = []
-        for addr, symbol, balance in pool_balances:
-            # Calculate user's share with maximum precision
-            # Divide by 100 since ownership is in percentage
-            user_balance = (balance * ownership) / Decimal('100')
-            user_balances.append((addr, symbol, user_balance))
-            
-        return user_balances
+        # Update totals with the best WETH value plus rewards
+        total_value = weth_value + rewards_value
+        pool_data["base"][pool_name]["totals"] = {
+            "wei": str(int(total_value)),
+            "formatted": f"{total_value / Decimal(10**18):.6f}",
+            "note": f"Using {best_method} as it provides the highest WETH value, plus {rewards_value / Decimal(10**18):.6f} WETH in rewards"
+        }
+        
+        # Update network totals
+        pool_data["base"]["totals"] = {
+            "wei": str(int(total_value)),
+            "formatted": f"{total_value / Decimal(10**18):.6f}",
+            "note": f"Using {best_method} as it provides the highest WETH value, plus {rewards_value / Decimal(10**18):.6f} WETH in rewards"
+        }
+        
+        return pool_data
 
 def main():
-    """
-    Main function to test the Curve balance manager.
-    """
+    """Main function to demonstrate usage."""
     # Parse command line arguments
     parser = argparse.ArgumentParser(description='Check Curve gauge balance')
     parser.add_argument('--address', type=str, default=DEFAULT_ADDRESS,
                       help=f'Address to check (default: {DEFAULT_ADDRESS})')
     args = parser.parse_args()
     
-    # Initialize Web3 connection to Base using RPC from .env
+    # Initialize Web3
     w3 = Web3(Web3.HTTPProvider(RPC_URLS["base"]))
     
     if not w3.is_connected():
         print("Failed to connect to Base network")
         return
-        
+    
     # Initialize balance manager
-    manager = CurveBalanceManager("base", w3)
+    balance_manager = CurveBalanceManager("base", w3)
     
     try:
-        print("\n" + "="*80)
-        print("CURVE BALANCE MANAGER")
-        print("="*80)
+        # Get pool data
+        print(f"\nFetching pool data for cbeth-f for address {args.address}...")
+        pool_data = balance_manager.get_pool_data("cbeth-f", args.address)
         
-        # Get gauge balance for cbeth-f pool
-        balance = manager.get_gauge_balance("cbeth-f", args.address)
-        total_supply = manager.get_lp_token_total_supply("cbeth-f")
-        ownership_percentage = manager.get_ownership_percentage("cbeth-f", args.address)
-        pool_tokens = manager.get_pool_tokens("cbeth-f")
-        pool_balances = manager.get_pool_balances("cbeth-f")
-        user_balances = manager.get_user_balances("cbeth-f", args.address)
+        # Print withdrawable amounts
+        print("\nWithdrawable amounts:")
+        for symbol, data in pool_data["base"]["cbeth-f"]["tokens"].items():
+            print(f"\n{symbol}:")
+            print(f"  Amount: {Decimal(data['amount']) / Decimal(10**data['decimals']):.6f}")
+            print(f"  Value in WETH: {Decimal(data['value']['WETH']['amount']) / Decimal(10**18):.6f}")
+            print(f"  Conversion rate: {data['value']['WETH']['conversion_details']['rate']}")
+            print(f"  Price impact: {data['value']['WETH']['conversion_details']['price_impact']}")
+            print(f"  Fee: {data['value']['WETH']['conversion_details']['fee_percentage']}")
         
-        print(f"\nCurve.fi cbeth-f Gauge Balance:")
-        print(f"Address: {args.address}")
-        print(f"Balance: {balance / Decimal(10**18):.6f} LP tokens")
-        print(f"Total Supply: {total_supply / Decimal(10**18):.6f} LP tokens")
-        print(f"Ownership: {ownership_percentage:.6f}%")
+        # Print totals
+        print("\nTotals:")
+        print(f"Total value in WETH: {Decimal(pool_data['base']['cbeth-f']['totals']['wei']) / Decimal(10**18):.6f}")
+        print(f"Note: {pool_data['base']['cbeth-f']['totals']['note']}")
         
-        print("\nPool Tokens:")
-        for addr, symbol in pool_tokens:
-            print(f"- {symbol}: {addr}")
-            
-        print("\nPool Balances:")
-        for addr, symbol, balance in pool_balances:
-            print(f"- {symbol}:")
-            print(f"  Amount: {balance:.6f} {symbol}")
-            
-        print("\nUser Balances:")
-        for addr, symbol, balance in user_balances:
-            print(f"- {symbol}:")
-            print(f"  Amount: {balance:.6f} {symbol}")
+        # Print full JSON structure
+        print("\nFull data structure:")
+        print(json.dumps(pool_data, indent=2))
             
     except Exception as e:
-        print(f"Error: {str(e)}")
+        print(f"\nError: {str(e)}")
+        print("Make sure you're using a valid address with LP tokens staked in the pool.")
 
 if __name__ == "__main__":
     main() 

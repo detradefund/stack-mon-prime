@@ -1,29 +1,29 @@
 {
-  "last_updated": "2025-06-04T18:24:45.390677",
+  "last_updated": "2025-06-12T15:10:10.088309",
   "chain_id": "8453",
   "market_address": "0xeCc2c994aA0C599a7f69a7Cfb9106fe4dfFb4341",
   "data": {
-    "timestamp": "2025-06-04T16:00:00.000Z",
+    "timestamp": "2025-06-12T13:00:00.000Z",
     "liquidity": {
-      "usd": 362017.74132539326,
-      "acc": 136.10691177750056
+      "usd": 296375.72445142834,
+      "acc": 108.04149781207448
     },
     "tradingVolume": {
-      "usd": 677.0009170499119
+      "usd": 1019.3322304844731
     },
-    "underlyingInterestApy": 0.04783121303734661,
+    "underlyingInterestApy": 0.04180960568730607,
     "underlyingRewardApy": 0,
-    "underlyingApy": 0.04783121303734661,
-    "impliedApy": 0.045452835785541046,
-    "ytFloatingApy": 0.021241187783678672,
-    "swapFeeApy": 0.00011798436876242491,
-    "voterApy": 0.0003285895303729495,
-    "ptDiscount": 0.002592770707199099,
-    "pendleApy": 0.03973289023469428,
+    "underlyingApy": 0.04180960568730607,
+    "impliedApy": 0.05001984075178978,
+    "ytFloatingApy": -0.9977677284604003,
+    "swapFeeApy": 2.134613790860662e-05,
+    "voterApy": 0.02214640201354895,
+    "ptDiscount": 0.0017971493448525333,
+    "pendleApy": 0.0003046292511671209,
     "arbApy": 0,
     "lpRewardApy": 0,
-    "aggregatedApy": 0.08750076712773114,
-    "maxBoostedApy": 0.14710010247977257,
+    "aggregatedApy": 0.04292160804484539,
+    "maxBoostedApy": 0.04337855192159607,
     "estimatedDailyPoolRewards": [
       {
         "asset": {
@@ -34,18 +34,18 @@
           "decimals": 18,
           "accentColor": "",
           "price": {
-            "usd": 4.23827582
+            "usd": 4.00948746
           },
-          "priceUpdatedAt": "2025-06-04T16:24:30.041Z",
+          "priceUpdatedAt": "2025-06-12T13:10:00.064Z",
           "name": "PENDLE"
         },
-        "amount": 13.79987441935295
+        "amount": 0.0972350151043104
       }
     ],
-    "totalPt": 10.40336570480233,
-    "totalSy": 118.25241022652474,
-    "totalLp": 66.19807579842832,
-    "totalActiveSupply": 39.43153924972029,
-    "assetPriceUsd": 2659.8042421034297
+    "totalPt": 10.3622399807812,
+    "totalSy": 91.7970971784628,
+    "totalLp": 52.49723069649513,
+    "totalActiveSupply": 33.094708418989306,
+    "assetPriceUsd": 2743.165639622464
   }
 }

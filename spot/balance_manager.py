@@ -106,9 +106,11 @@ class SpotBalanceManager:
             return "0"
 
     def get_balances(self, address: str) -> Dict[str, Any]:
-        print("\n" + "="*80)
-        print("SPOT BALANCE MANAGER")
-        print("="*80)
+        """
+        Get all token balances for an address.
+        """
+        # Remove the title print since it's handled in the aggregator
+        # print("SPOT BALANCE MANAGER")
         
         print("\nProcessing method:")
         print("  - Querying native ETH balance")
