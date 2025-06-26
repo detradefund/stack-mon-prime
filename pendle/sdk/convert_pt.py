@@ -266,11 +266,56 @@ def convert_pt(market_address: str, amount: int, receiver: str = None, slippage:
             }]
         }
     except Exception as e:
-        print(f"✗ Failed with aggregator: {str(e)}")
-        results["with_aggregator"] = {
-            "error": str(e),
-            "steps": []
-        }
+        error_msg = str(e)
+        print(f"✗ Failed with aggregator: {error_msg}")
+        
+        # Check if it's a MarketProportionTooHigh error and retry with doubled slippage
+        if "MarketProportionTooHigh" in error_msg or "Market liquidity is likely insufficient" in error_msg:
+            print(f"⚠️  Detected liquidity issue. Retrying with doubled slippage ({slippage * 2 * 100:.1f}%)...")
+            try:
+                quote_with_aggregator_retry = ConvertPTQuote(
+                    market_address=market_address,
+                    amount_in=amount,
+                    production_address=receiver,
+                    use_aggregator=True,
+                    slippage=slippage * 2  # Double the slippage
+                )
+                output_amt_with_aggregator_retry = quote_with_aggregator_retry.get_amount_out()
+                price_impact_with_aggregator_retry = quote_with_aggregator_retry.get_price_impact()
+                
+                print(f"✓ Retry successful! Output amount: {format_amount(str(output_amt_with_aggregator_retry))} WETH")
+                print(f"Price impact: {price_impact_with_aggregator_retry * 100:.4f}%")
+                
+                results["with_aggregator"] = {
+                    "amount_out": output_amt_with_aggregator_retry,
+                    "price_impact": price_impact_with_aggregator_retry,
+                    "steps": [{
+                        "step": 1,
+                        "from": {
+                            "amount": format_amount(str(amount)),
+                            "token": pt_symbol,
+                            "name": pt_name
+                        },
+                        "to": {
+                            "amount": format_amount(str(output_amt_with_aggregator_retry)),
+                            "token": "WETH",
+                            "name": "Wrapped Ether"
+                        },
+                        "method": "Pendle Aggregator (Retry with 2x slippage)",
+                        "price_impact": f"{price_impact_with_aggregator_retry * 100:.4f}%"
+                    }]
+                }
+            except Exception as retry_e:
+                print(f"✗ Retry also failed: {str(retry_e)}")
+                results["with_aggregator"] = {
+                    "error": f"Original: {error_msg} | Retry: {str(retry_e)}",
+                    "steps": []
+                }
+        else:
+            results["with_aggregator"] = {
+                "error": error_msg,
+                "steps": []
+            }
     
     # Method 2: Without aggregator
     print("\n=== Trying Method 2: Without Aggregator ===")
@@ -384,11 +429,131 @@ def convert_pt(market_address: str, amount: int, receiver: str = None, slippage:
             "steps": steps
         }
     except Exception as e:
-        print(f"✗ Failed without aggregator: {str(e)}")
-        results["without_aggregator"] = {
-            "error": str(e),
-            "steps": []
-        }
+        error_msg = str(e)
+        print(f"✗ Failed without aggregator: {error_msg}")
+        
+        # Check if it's a MarketProportionTooHigh error and retry with doubled slippage
+        if "MarketProportionTooHigh" in error_msg or "Market liquidity is likely insufficient" in error_msg:
+            print(f"⚠️  Detected liquidity issue. Retrying with doubled slippage ({slippage * 2 * 100:.1f}%)...")
+            try:
+                quote_without_aggregator_retry = ConvertPTQuote(
+                    market_address=market_address,
+                    amount_in=amount,
+                    production_address=receiver,
+                    use_aggregator=False,
+                    slippage=slippage * 2  # Double the slippage
+                )
+                output_amt_without_aggregator_retry = quote_without_aggregator_retry.get_amount_out()
+                price_impact_without_aggregator_retry = quote_without_aggregator_retry.get_price_impact()
+                
+                print(f"✓ Retry successful! Output amount: {format_amount(str(output_amt_without_aggregator_retry))} {underlying_symbol}")
+                print(f"Price impact: {price_impact_without_aggregator_retry * 100:.4f}%")
+                
+                # Get CowSwap quote for converting underlying to WETH
+                print("\nGetting CowSwap quote for final conversion...")
+                cowswap_result_retry = get_quote(
+                    network=network,
+                    sell_token=underlying_token,
+                    buy_token=COMMON_TOKENS[network]["WETH"]["address"],
+                    amount=str(output_amt_without_aggregator_retry),
+                    token_decimals=18,
+                    token_symbol=underlying_symbol
+                )
+                
+                steps_retry = [
+                    {
+                        "step": 1,
+                        "from": {
+                            "amount": format_amount(str(amount)),
+                            "token": pt_symbol,
+                            "name": pt_name
+                        },
+                        "to": {
+                            "amount": format_amount(str(output_amt_without_aggregator_retry)),
+                            "token": sy_symbol,
+                            "name": sy_name
+                        },
+                        "method": "Direct Pendle API (Retry with 2x slippage)",
+                        "price_impact": f"{price_impact_without_aggregator_retry * 100:.4f}%"
+                    },
+                    {
+                        "step": 2,
+                        "from": {
+                            "amount": format_amount(str(output_amt_without_aggregator_retry)),
+                            "token": sy_symbol,
+                            "name": sy_name
+                        },
+                        "to": {
+                            "amount": format_amount(str(output_amt_without_aggregator_retry)),
+                            "token": underlying_symbol,
+                            "name": underlying_name
+                        },
+                        "method": "1:1 conversion"
+                    }
+                ]
+                
+                # Add CowSwap step if quote is successful
+                if cowswap_result_retry["quote"]:
+                    weth_amount_retry = int(cowswap_result_retry["quote"]["quote"]["buyAmount"])
+                    cowswap_price_impact_retry = float(cowswap_result_retry["conversion_details"].get("price_impact", "0"))
+                    if isinstance(cowswap_price_impact_retry, str) and cowswap_price_impact_retry == "N/A":
+                        cowswap_price_impact_retry = 0
+                        
+                    print(f"CowSwap quote successful! Output amount: {format_amount(str(weth_amount_retry))} WETH")
+                    print(f"CowSwap price impact: {cowswap_price_impact_retry:.4f}%")
+                        
+                    steps_retry.append({
+                        "step": 3,
+                        "from": {
+                            "amount": format_amount(str(output_amt_without_aggregator_retry)),
+                            "token": underlying_symbol,
+                            "name": underlying_name
+                        },
+                        "to": {
+                            "amount": format_amount(str(weth_amount_retry)),
+                            "token": "WETH",
+                            "name": "Wrapped Ether"
+                        },
+                        "method": "CowSwap",
+                        "price_impact": f"{cowswap_price_impact_retry:.4f}%",
+                        "status": "success"
+                    })
+                    # Update final amount to WETH amount
+                    output_amt_without_aggregator_retry = weth_amount_retry
+                else:
+                    print(f"✗ CowSwap quote failed: {cowswap_result_retry['conversion_details']['note']}")
+                    steps_retry.append({
+                        "step": 3,
+                        "from": {
+                            "amount": format_amount(str(output_amt_without_aggregator_retry)),
+                            "token": underlying_symbol,
+                            "name": underlying_name
+                        },
+                        "to": {
+                            "token": "WETH",
+                            "name": "Wrapped Ether"
+                        },
+                        "method": "CowSwap",
+                        "status": "failed",
+                        "error": cowswap_result_retry["conversion_details"]["note"]
+                    })
+                
+                results["without_aggregator"] = {
+                    "amount_out": output_amt_without_aggregator_retry,
+                    "price_impact": price_impact_without_aggregator_retry,
+                    "steps": steps_retry
+                }
+            except Exception as retry_e:
+                print(f"✗ Retry also failed: {str(retry_e)}")
+                results["without_aggregator"] = {
+                    "error": f"Original: {error_msg} | Retry: {str(retry_e)}",
+                    "steps": []
+                }
+        else:
+            results["without_aggregator"] = {
+                "error": error_msg,
+                "steps": []
+            }
     
     # Determine best result
     print("\n=== Determining Best Result ===")

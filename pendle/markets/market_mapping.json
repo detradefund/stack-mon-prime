@@ -1,89 +1,39 @@
 {
-  "last_updated": "2025-06-12T15:10:11.345262",
+  "last_updated": "2025-06-26T14:49:36.797396",
   "markets": {
     "0x58612beb0e8a126735b19bb222cbc7fc2c162d2a": {
       "name": "pufETH",
       "address": "0x58612beb0e8a126735b19bb222cbc7fc2c162d2a",
       "network": "ethereum",
       "chain_id": "1",
-      "total_supply": 394.6146775046407,
-      "total_assets": 906.8010690933501,
-      "apy": 0.030976627067111216,
-      "implied_apy": 0.05530800349812015,
-      "utilization_rate": 0.43517226760571603,
-      "total_volume_24h": 2796.021556226195,
-      "tvl": 5194714.709725872,
-      "price": 2733.3004022987166,
-      "underlying_price": 2733.3004022987166,
-      "pt_price": 0.001982241911160365,
-      "yt_price": -1,
-      "expiry": "2025-06-26T00:00:00.000Z",
-      "tokens": {
-        "pt": "1-0x9cfc9917c171a384c7168d3529fc7e851a2e0d6d",
-        "yt": "1-0x784a0bb8208c70290cac6bcbc3650ceb9227813e",
-        "sy": "1-0x253008ba4ae2f3e6488dc998a5321d4eb1a0c905",
-        "underlyingAsset": "1-0xd9a442856c234a39a81a089c06451ebaa4306a72"
-      },
-      "details": {
-        "liquidity": 5194714.709725872,
-        "pendleApy": 0.0016126909563983951,
-        "impliedApy": 0.05582062110424668,
-        "feeRate": 0.0004999999993486881,
-        "movement10Percent": {
-          "ptMovementUpUsd": 611227.9370427132,
-          "ptMovementDownUsd": 613702.9764357179,
-          "ytMovementUpUsd": 1374.0833045945596,
-          "ytMovementDownUsd": 1218.0027391705578
-        },
-        "yieldRange": {
-          "min": 0.03155402137136303,
-          "max": 0.08162925186754992
-        },
-        "aggregatedApy": 0.031232224913563516,
-        "maxBoostedApy": 0.03365126134816111
-      }
+      "total_supply": 367.6326577621946,
+      "total_assets": 68.62454365334796,
+      "apy": 0.09365462778102249,
+      "implied_apy": 0.09499850496869278,
+      "utilization_rate": 5.3571599633400115,
+      "total_volume_24h": 1344.1889326206742,
+      "tvl": 4331216.159971668,
+      "price": 2409.425128906777,
+      "underlying_price": 2409.425128906777,
+      "pt_price": 8.633272333691266e-07,
+      "yt_price": -1
     },
     "0xeCc2c994aA0C599a7f69a7Cfb9106fe4dfFb4341": {
       "name": "wsuperOETHb",
       "address": "0xeCc2c994aA0C599a7f69a7Cfb9106fe4dfFb4341",
       "network": "base",
       "chain_id": "8453",
-      "total_supply": 33.094708418989306,
-      "total_assets": 91.7970971784628,
-      "apy": 0.04292160804484539,
-      "implied_apy": 0.05001984075178978,
-      "utilization_rate": 0.3605202063704679,
-      "total_volume_24h": 1019.3322304844731,
-      "tvl": 296375.72445142834,
-      "price": 2743.165639622464,
-      "underlying_price": 2743.165639622464,
-      "pt_price": 0.0017971493448525333,
-      "yt_price": -0.9977677284604003,
-      "expiry": "2025-06-26T00:00:00.000Z",
-      "tokens": {
-        "pt": "8453-0x25d2b7e3b71f4edcc366e79134570704a079923a",
-        "yt": "8453-0x1188331820daa0a8af69c0779334d53cb4a9cef1",
-        "sy": "8453-0x67507f3e26e7e2fd0a42c48fbc85069ccfcbd2ff",
-        "underlyingAsset": "8453-0x7fcd174e80f264448ebee8c88a7c4476aaf58ea6"
-      },
-      "details": {
-        "liquidity": 296375.72445142834,
-        "pendleApy": 0.0003046292511671209,
-        "impliedApy": 0.05001984075178978,
-        "feeRate": 0.000999999999916401,
-        "movement10Percent": {
-          "ptMovementUpUsd": 7757.917046546935,
-          "ptMovementDownUsd": 6257.957606169377,
-          "ytMovementUpUsd": 15.619176292272405,
-          "ytMovementDownUsd": 11.26990167411401
-        },
-        "yieldRange": {
-          "min": 0.050642207533795364,
-          "max": 0.1306909757702026
-        },
-        "aggregatedApy": 0.04292160804484539,
-        "maxBoostedApy": 0.04337855192159607
-      }
+      "total_supply": 23.293994403662044,
+      "total_assets": 59.937799220864974,
+      "apy": 0.045845426434540024,
+      "implied_apy": 0.06133594872531023,
+      "utilization_rate": 0.38863613123040996,
+      "total_volume_24h": 1591.231948014598,
+      "tvl": 183890.5232740712,
+      "price": 2418.565012825506,
+      "underlying_price": 2418.565012825506,
+      "pt_price": 2.265161218595324e-07,
+      "yt_price": -1
     }
   }
 }

@@ -7,13 +7,11 @@ import sys
 # Load environment variables
 load_dotenv()
 
-def delete_documents(database_name: str, doc_ids: list) -> None:
+def delete_documents(database_name: str, collection_name: str, doc_ids: list) -> None:
     """Delete multiple documents from MongoDB by their _ids"""
     try:
         # Get MongoDB URI from .env
         mongo_uri = os.getenv('MONGO_URI')
-        # Hardcoded collection name
-        collection_name = "oracle"
         
         print("\nConnecting to MongoDB...")
         print(f"Database: {database_name}")
@@ -81,14 +79,15 @@ def delete_documents(database_name: str, doc_ids: list) -> None:
 
 def main():
     """CLI entry point for document deletion"""
-    if len(sys.argv) < 3:
-        print("Usage: python -m mongo.delete_document <database_name> <document_id1> [document_id2 ...]")
-        print("Example: python -m mongo.delete_document detrade-core-usdc 6808a235759fa6a5b09dcc63 6808a235759fa6a5b09dcc64")
+    if len(sys.argv) < 4:
+        print("Usage: python -m mongo.delete_document <database_name> <collection_name> <document_id1> [document_id2 ...]")
+        print("Example: python -m mongo.delete_document detrade-core-usdc oracle 6808a235759fa6a5b09dcc63 6808a235759fa6a5b09dcc64")
         sys.exit(1)
         
     database_name = sys.argv[1]
-    doc_ids = sys.argv[2:]
-    delete_documents(database_name, doc_ids)
+    collection_name = sys.argv[2]
+    doc_ids = sys.argv[3:]
+    delete_documents(database_name, collection_name, doc_ids)
 
 if __name__ == "__main__":
     main() 

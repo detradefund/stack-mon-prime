@@ -35,6 +35,12 @@ NETWORK_TOKENS = {
             "name": "Lido Staked Ether",
             "symbol": "stETH"
         },
+        "pufETH": {
+            "address": "0xd9a442856c234a39a81a089c06451ebaa4306a72",
+            "decimals": 18,
+            "name": "Puffer Finance ETH",
+            "symbol": "pufETH"
+        },
         "PENDLE": {
             "address": "0x808507121B80c02388fAd14726482e061B8da827",
             "decimals": 18,
