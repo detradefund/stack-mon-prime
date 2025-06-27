@@ -41,6 +41,12 @@ NETWORK_TOKENS = {
             "name": "Puffer Finance ETH",
             "symbol": "pufETH"
         },
+        "wstETH": {
+            "address": "0x7f39c581f595b53c5cb19bd0b3f8da6c935e2ca0",
+            "decimals": 18,
+            "name": "Wrapped Staked Ether",
+            "symbol": "wstETH"
+        },
         "PENDLE": {
             "address": "0x808507121B80c02388fAd14726482e061B8da827",
             "decimals": 18,
