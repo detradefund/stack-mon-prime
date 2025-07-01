@@ -16,6 +16,7 @@ sys.path.append(str(Path(__file__).parent.parent))
 from pendle.pendle_manager import PendleManager
 from spot.balance_manager import SpotBalanceManager
 from curve.balance.balance_manager import CurveBalanceManager
+from convex.balance_manager import ConvexBalanceManager
 from shares.supply_reader import SupplyReader
 from config.networks import RPC_URLS
 
@@ -26,12 +27,14 @@ class BalanceAggregator:
     - Pendle (Ethereum + Base)
     - Spot (Ethereum + Base)
     - Curve (Base)
+    - Convex (Ethereum)
     """
     
     def __init__(self):
         self.pendle_manager = PendleManager(os.getenv('PRODUCTION_ADDRESS'))
         self.spot_manager = SpotBalanceManager()
         self.curve_manager = CurveBalanceManager("base", Web3(Web3.HTTPProvider(RPC_URLS["base"])))
+        self.convex_manager = ConvexBalanceManager()
         
     def get_all_balances(self, address: str) -> Dict[str, Any]:
         """
@@ -49,10 +52,7 @@ class BalanceAggregator:
         
         # Initialize result structure
         result = {
-            "protocols": {
-                "pendle": {},
-                "curve": {}
-            },
+            "protocols": {},
             "spot": {}
         }
         
@@ -110,6 +110,47 @@ class BalanceAggregator:
                     print(f"Note: {pool_data['totals']['note']}")
         except Exception as e:
             print(f"✗ Error fetching Curve positions: {str(e)}")
+        
+        # Get Convex balances
+        try:
+            print("\n" + "="*80)
+            print("CONVEX BALANCE MANAGER")
+            print("="*80 + "\n")
+            print(f"Checking Convex positions for address: {checksum_address}")
+            convex_balances = self.convex_manager.get_balances(checksum_address)
+            if convex_balances and convex_balances["convex"]["ethereum"]:
+                result["protocols"]["convex"] = convex_balances["convex"]
+                print("✓ Convex positions fetched successfully")
+                
+                # Add detailed logging for Convex
+                if "ethereum" in convex_balances["convex"]:
+                    for pool_name, pool_data in convex_balances["convex"]["ethereum"].items():
+                        if pool_name == "totals":
+                            continue
+                        print(f"\nPool: {pool_name}")
+                        
+                        # Print LP tokens
+                        if "value" in pool_data:
+                            for token_symbol, token_data in pool_data["value"].items():
+                                if "totals" in token_data:
+                                    amount = Decimal(token_data["totals"]["wei"]) / Decimal(10**18)
+                                    print(f"  {token_symbol}: {amount:.6f} WETH")
+                        
+                        # Print rewards
+                        if "rewards" in pool_data and pool_data["rewards"]:
+                            for reward_symbol, reward_data in pool_data["rewards"].items():
+                                if "value" in reward_data and "WETH" in reward_data["value"]:
+                                    amount = Decimal(reward_data["value"]["WETH"]["amount"]) / Decimal(10**18)
+                                    print(f"  Rewards {reward_symbol}: {amount:.6f} WETH")
+                        
+                        # Print total
+                        if "totals" in pool_data:
+                            total = Decimal(pool_data["totals"]["wei"]) / Decimal(10**18)
+                            print(f"  Total: {total:.6f} WETH")
+            else:
+                print("✓ No Convex positions found")
+        except Exception as e:
+            print(f"✗ Error fetching Convex positions: {str(e)}")
         
         # Get spot balances
         try:
@@ -254,17 +295,30 @@ def build_overview(all_balances: Dict[str, Any], address: str) -> Dict[str, Any]
                                 key = f"{protocol_name}.base.{pool_name}.rewards.{reward_symbol}"
                                 value = f"{Decimal(reward_info['value']['WETH']['amount']) / Decimal(10**18):.6f}"
                                 positions[key] = value
+        elif protocol_name == "convex":
+            # Handle Convex data structure
+            if "ethereum" in protocol_data:
+                for pool_name, pool_data in protocol_data["ethereum"].items():
+                    if pool_name == "totals":
+                        continue
+                    # Add pool total only (not individual components)
+                    if "totals" in pool_data:
+                        key = f"{protocol_name}.ethereum.{pool_name}"
+                        value = f"{Decimal(pool_data['totals']['formatted']):.6f}"
+                        positions[key] = value
         else:
             # Handle other protocols (Pendle)
-            for network, network_data in protocol_data.items():
-                if network == "totals":
-                    continue
-                for token_name, token_data in network_data.items():
-                    if token_name != "totals" and isinstance(token_data, dict):
-                        if "totals" in token_data:
-                            key = f"{protocol_name}.{network}.{token_name}"
-                            value = f"{Decimal(token_data['totals']['formatted']):.6f}"
-                            positions[key] = value
+            # Only process if protocol_data is not empty
+            if protocol_data:
+                for network, network_data in protocol_data.items():
+                    if network == "totals":
+                        continue
+                    for token_name, token_data in network_data.items():
+                        if token_name != "totals" and isinstance(token_data, dict):
+                            if "totals" in token_data:
+                                key = f"{protocol_name}.{network}.{token_name}"
+                                value = f"{Decimal(token_data['totals']['formatted']):.6f}"
+                                positions[key] = value
 
     # Process spot positions
     if "spot" in all_balances:

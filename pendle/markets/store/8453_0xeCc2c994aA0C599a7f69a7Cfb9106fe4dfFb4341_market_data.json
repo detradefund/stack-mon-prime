@@ -1,5 +1,5 @@
 {
-  "last_updated": "2025-06-27T17:17:04.246811",
+  "last_updated": "2025-07-01T13:58:06.269221",
   "chain_id": "8453",
   "market_address": "0xeCc2c994aA0C599a7f69a7Cfb9106fe4dfFb4341",
   "data": {
@@ -34,9 +34,9 @@
           "decimals": 18,
           "accentColor": "",
           "price": {
-            "usd": 3.39449512
+            "usd": 3.43756713
           },
-          "priceUpdatedAt": "2025-06-27T15:16:45.004Z",
+          "priceUpdatedAt": "2025-07-01T11:58:00.146Z",
           "name": "PENDLE"
         },
         "amount": 0.09633166323001921
