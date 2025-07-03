@@ -58,6 +58,12 @@ NETWORK_TOKENS = {
             "decimals": 18,
             "name": "Tokemak",
             "symbol": "TOKE"
+        },
+        "CRV": {
+            "address": "0xD533a949740bb3306d119CC777fa900bA034cd52",
+            "decimals": 18,
+            "name": "Curve DAO Token",
+            "symbol": "CRV"
         }
     },
     "base": {
@@ -94,6 +100,12 @@ NETWORK_TOKENS = {
             "decimals": 18,
             "name": "Pendle",
             "symbol": "PENDLE"
+        },
+        "CRV": {
+            "address": "0x8Ee73c484A26e0A5df2Ee2a4960B789967dd0415",
+            "decimals": 18,
+            "name": "Curve DAO Token",
+            "symbol": "CRV"
         }
     }
 }

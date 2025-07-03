@@ -276,25 +276,19 @@ def build_overview(all_balances: Dict[str, Any], address: str) -> Dict[str, Any]
                 for pool_name, pool_data in protocol_data["base"].items():
                     if pool_name == "totals":
                         continue
-                    # Add pool total
+                    # Add pool total (includes rewards)
                     if "totals" in pool_data:
                         key = f"{protocol_name}.base.{pool_name}"
                         value = f"{Decimal(pool_data['totals']['formatted']):.6f}"
                         positions[key] = value
-                    # Add pool tokens
+                    # Add pool tokens (optional - for detailed breakdown)
                     if "value" in pool_data:
                         for token_symbol, token_info in pool_data["value"].items():
                             if "value" in token_info and "WETH" in token_info["value"]:
                                 key = f"{protocol_name}.base.{pool_name}.{token_symbol}"
                                 value = f"{Decimal(token_info['value']['WETH']['amount']) / Decimal(10**18):.6f}"
                                 positions[key] = value
-                    # Add rewards
-                    if "rewards" in pool_data:
-                        for reward_symbol, reward_info in pool_data["rewards"].items():
-                            if "value" in reward_info and "WETH" in reward_info["value"]:
-                                key = f"{protocol_name}.base.{pool_name}.rewards.{reward_symbol}"
-                                value = f"{Decimal(reward_info['value']['WETH']['amount']) / Decimal(10**18):.6f}"
-                                positions[key] = value
+                    # Note: Rewards are now included in the pool total, not listed separately
         elif protocol_name == "convex":
             # Handle Convex data structure
             if "ethereum" in protocol_data:

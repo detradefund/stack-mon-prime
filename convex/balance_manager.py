@@ -380,13 +380,26 @@ class ConvexBalanceManager:
         """
         Gets WETH conversion quote for tokens.
         Uses the centralized quote logic from cow_client.py
+        Forces Base network for CRV tokens due to Ethereum API issues
         """
         print(f"\nAttempting to get quote for {symbol}:")
         
+        # Force Base network for CRV tokens due to Ethereum API issues
+        if symbol == "CRV":
+            print(f"  Using Base network for CRV (Ethereum API has issues)")
+            network = "base"
+            # Use Base network CRV address instead of Ethereum address
+            sell_token = self.network_tokens["base"]["CRV"]["address"]
+            buy_token = self.network_tokens["base"]["WETH"]["address"]
+        else:
+            network = "ethereum"
+            sell_token = token_address
+            buy_token = self.network_tokens["ethereum"]["WETH"]["address"]
+        
         result = get_quote(
-            network="ethereum",
-            sell_token=token_address,
-            buy_token=self.network_tokens["ethereum"]["WETH"]["address"],
+            network=network,
+            sell_token=sell_token,
+            buy_token=buy_token,
             amount=str(int(amount)),
             token_decimals=decimals,
             token_symbol=symbol
