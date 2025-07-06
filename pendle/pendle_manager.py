@@ -114,13 +114,13 @@ class PendleManager:
             
         print("\n=== Processing Positions ===")
         
-        # Structure de données pour stocker tous les résultats
+        # Data structure to store all results
         results = {
             "ethereum": {},
             "base": {}
         }
         
-        # Traiter chaque position
+        # Process each position
         for market_address, position_data in self.positions.items():
             network = "ethereum" if market_address.startswith("0x") else "base"
             print(f"\nProcessing market: {market_address}")
@@ -135,7 +135,7 @@ class PendleManager:
                         slippage=slippage
                     )
                     
-                    # Extraire les détails de conversion
+                    # Extract conversion details
                     conversion_details = None
                     weth_amount = "0"
                     if pt_result["best_amount"]:
@@ -155,7 +155,7 @@ class PendleManager:
                                 "note": "Direct Conversion using Pendle SDK"
                             }
                     
-                    # Créer l'entrée pour ce marché
+                    # Create entry for this market
                     token_symbol = position_data["pt"]["token"]["symbol"]
                     results[network][token_symbol] = {
                         "amount": str(int(position_data["pt"]["balance"] * Decimal('1e18'))),
@@ -195,7 +195,7 @@ class PendleManager:
                 except Exception as e:
                     print(f"✗ Error removing liquidity: {str(e)}")
         
-        # Calculer les totaux à la fin
+        # Calculate totals at the end
         network_totals = {}
         global_total = Decimal('0')
         
@@ -213,7 +213,7 @@ class PendleManager:
                     }
                     global_total += network_total
         
-        # Ajouter les totaux au résultat
+        # Add totals to result
         for network, total in network_totals.items():
             results[network]["totals"] = total
         
@@ -223,7 +223,7 @@ class PendleManager:
                 "formatted": format_amount(str(global_total))
             }
         
-        # Nettoyer les réseaux vides
+        # Clean up empty networks
         for network in ["ethereum", "base"]:
             if network in results and not results[network]:
                 del results[network]
@@ -266,7 +266,7 @@ def main():
         manager = PendleManager(production_address)
         results = manager.run()
 
-        # Afficher les résultats
+        # Display results
         print("\n=== Results ===")
         print(json.dumps(results, indent=2))
         

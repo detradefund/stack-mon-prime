@@ -94,7 +94,7 @@ class ConvertPTQuote:
                 "enableAggregator": "true",
                 "amountIn": str(self.amount_in),
                 "tokenIn": self.pt_token,
-                "tokenOut": weth_address  # Spécifier WETH comme token de sortie
+                "tokenOut": weth_address  # Specify WETH as output token
             }
         else:
             # Convert to SY first

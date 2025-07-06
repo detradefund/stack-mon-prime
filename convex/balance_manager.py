@@ -26,7 +26,10 @@ class ConvexBalanceManager:
     Handles LP token valuation and reward token conversion to WETH.
     """
     
-    def __init__(self):
+    def __init__(self, network: str = "ethereum"):
+        # Set network
+        self.network = network
+        
         # Load contract interfaces
         with open(Path(__file__).parent / 'abis/CurveStableSwapNG.json', 'r') as file:
             self.curve_abi = json.load(file)
@@ -41,11 +44,18 @@ class ConvexBalanceManager:
         self.network_tokens = NETWORK_TOKENS
         
     def get_rpc_url(self) -> str:
-        """Retrieves Ethereum RPC URL from environment variables"""
+        """Retrieves RPC URL from environment variables based on network"""
         from dotenv import load_dotenv
         import os
         load_dotenv()
-        return os.getenv('ETHEREUM_RPC')
+        
+        # Get RPC URL based on network
+        if self.network == "ethereum":
+            return os.getenv('ETHEREUM_RPC')
+        elif self.network == "base":
+            return os.getenv('BASE_RPC')
+        else:
+            raise ValueError(f"Unsupported network: {self.network}")
         
     def get_balances(self, address: str) -> Dict[str, Any]:
         """Get Convex balances and rewards for address"""
@@ -54,7 +64,7 @@ class ConvexBalanceManager:
         print("="*80)
         
         checksum_address = Web3.to_checksum_address(address)
-        result = {"convex": {"ethereum": {}}}
+        result = {"convex": {self.network: {}}}
         total_weth_wei = 0
         network_total = 0
 
@@ -62,17 +72,17 @@ class ConvexBalanceManager:
         print("\nProcessing WETH/tacETH pool")
         weth_taceth_result = self._process_weth_taceth_pool(checksum_address)
         if weth_taceth_result:
-            result["convex"]["ethereum"]["WETH/tacETH"] = weth_taceth_result["convex"]["ethereum"]["WETH/tacETH"]
-            position_total = int(result["convex"]["ethereum"]["WETH/tacETH"]["totals"]["wei"])
+            result["convex"][self.network]["WETH/tacETH"] = weth_taceth_result["convex"][self.network]["WETH/tacETH"]
+            position_total = int(result["convex"][self.network]["WETH/tacETH"]["totals"]["wei"])
             network_total += position_total
 
         # Add network total
         if network_total > 0:
-            result["convex"]["ethereum"]["totals"] = {
+            result["convex"][self.network]["totals"] = {
                 "wei": network_total,
                 "formatted": f"{network_total/1e18:.6f}"
             }
-            # Add protocol total (same as network total for now since we only have ethereum)
+            # Add protocol total (same as network total for now since we only have one network)
             result["convex"]["totals"] = {
                 "wei": network_total,
                 "formatted": f"{network_total/1e18:.6f}"
@@ -357,7 +367,7 @@ class ConvexBalanceManager:
 
             return {
                 "convex": {
-                    "ethereum": {
+                    self.network: {
                         pool_name: {
                             "amount": str(lp_balance),
                             "decimals": 18,
@@ -380,21 +390,12 @@ class ConvexBalanceManager:
         """
         Gets WETH conversion quote for tokens.
         Uses the centralized quote logic from cow_client.py
-        Forces Base network for CRV tokens due to Ethereum API issues
         """
         print(f"\nAttempting to get quote for {symbol}:")
         
-        # Force Base network for CRV tokens due to Ethereum API issues
-        if symbol == "CRV":
-            print(f"  Using Base network for CRV (Ethereum API has issues)")
-            network = "base"
-            # Use Base network CRV address instead of Ethereum address
-            sell_token = self.network_tokens["base"]["CRV"]["address"]
-            buy_token = self.network_tokens["base"]["WETH"]["address"]
-        else:
-            network = "ethereum"
-            sell_token = token_address
-            buy_token = self.network_tokens["ethereum"]["WETH"]["address"]
+        network = self.network
+        sell_token = token_address
+        buy_token = self.network_tokens[self.network]["WETH"]["address"]
         
         result = get_quote(
             network=network,

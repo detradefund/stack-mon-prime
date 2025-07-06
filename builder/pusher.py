@@ -164,7 +164,7 @@ class BalancePusher:
             else:
                 raise Exception("Document verification failed")
 
-            # 6. Print summary avec la durée de collection
+            # 6. Print summary with collection duration
             collection_duration = (push_timestamp - collection_timestamp).total_seconds()
             logger.info("="*80)
             logger.info("SUMMARY")
