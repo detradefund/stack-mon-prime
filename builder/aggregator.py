@@ -19,6 +19,8 @@ from curve.balance.balance_manager import CurveBalanceManager
 from convex.balance_manager import ConvexBalanceManager
 from shares.supply_reader import SupplyReader
 from config.networks import RPC_URLS
+from aave.check_contracts import get_aave_balances
+from vault.vault_reader import VaultReader
 
 class BalanceAggregator:
     """
@@ -28,6 +30,8 @@ class BalanceAggregator:
     - Spot (Ethereum + Base)
     - Curve (Base)
     - Convex (Ethereum)
+    - Aave (Base)
+    - Vault (Base)
     """
     
     def __init__(self):
@@ -35,6 +39,7 @@ class BalanceAggregator:
         self.spot_manager = SpotBalanceManager()
         self.curve_manager = CurveBalanceManager("base", Web3(Web3.HTTPProvider(RPC_URLS["base"])))
         self.convex_manager = ConvexBalanceManager()
+        self.vault_reader = VaultReader()
         
     def get_all_balances(self, address: str) -> Dict[str, Any]:
         """
@@ -151,6 +156,75 @@ class BalanceAggregator:
                 print("✓ No Convex positions found")
         except Exception as e:
             print(f"✗ Error fetching Convex positions: {str(e)}")
+        
+        # Get Aave balances
+        try:
+            print("\n" + "="*80)
+            print("AAVE BALANCE MANAGER")
+            print("="*80 + "\n")
+            print(f"Checking Aave positions for address: {checksum_address}")
+            aave_balances = get_aave_balances()
+            if aave_balances and aave_balances.get("aave"):
+                # Extract the data without the double "aave" key
+                result["protocols"]["aave"] = {
+                    "positions": aave_balances["aave"],
+                    "net_position": aave_balances["net_position"]
+                }
+                print("✓ Aave positions fetched successfully")
+                
+                # Add detailed logging for Aave
+                print("\nAave positions:")
+                for position in aave_balances["aave"]:
+                    print(f"\nContract: {position['contract']}")
+                    print(f"  Symbol: {position['symbol']}")
+                    print(f"  Balance: {Decimal(position['raw_balance']) / Decimal(10**position['decimals']):.6f}")
+                    print(f"  Underlying: {position['underlying_symbol']}")
+                    
+                    if position.get("weth_conversion"):
+                        weth_value = Decimal(position["weth_conversion"]["weth_value"]) / Decimal(10**18)
+                        print(f"  Value in WETH: {weth_value:.6f}")
+                        print(f"  Conversion rate: {position['weth_conversion']['conversion_rate']}")
+                        print(f"  Source: {position['weth_conversion']['conversion_source']}")
+                
+                # Print net position
+                if "net_position" in aave_balances:
+                    net_pos = aave_balances["net_position"]
+                    print(f"\nNet position:")
+                    print(f"  Total supply: {Decimal(net_pos['total_supply_weth']) / Decimal(10**18):.6f} WETH")
+                    print(f"  Total debt: {Decimal(net_pos['total_debt_weth']) / Decimal(10**18):.6f} WETH")
+                    print(f"  Net position: {Decimal(net_pos['net_position_weth']) / Decimal(10**18):.6f} WETH")
+            else:
+                print("✓ No Aave positions found")
+        except Exception as e:
+            print(f"✗ Error fetching Aave positions: {str(e)}")
+        
+        # Get Vault balances
+        try:
+            print("\n" + "="*80)
+            print("VAULT BALANCE MANAGER")
+            print("="*80 + "\n")
+            print(f"Checking Vault positions for address: {checksum_address}")
+            vault_balances = self.vault_reader.get_vault_data()
+            if vault_balances:
+                result["protocols"]["vault"] = vault_balances
+                print("✓ Vault positions fetched successfully")
+                
+                # Add detailed logging for Vault
+                for protocol_name, protocol_data in vault_balances.items():
+                    print(f"\nVault: {protocol_name}")
+                    print(f"  Shares: {Decimal(protocol_data['shares']) / Decimal(10**18):.6f}")
+                    print(f"  Share price: {Decimal(protocol_data['share_price']) / Decimal(10**6):.6f} USDC")
+                    print(f"  USDC value: {Decimal(protocol_data['usdc_value']) / Decimal(10**6):.6f}")
+                    
+                    if protocol_data.get("weth_value"):
+                        weth_value = Decimal(protocol_data["weth_value"]) / Decimal(10**18)
+                        print(f"  WETH value: {weth_value:.6f}")
+                        print(f"  Conversion rate: {protocol_data.get('conversion_rate', 'N/A')}")
+                        print(f"  Source: {protocol_data.get('conversion_source', 'N/A')}")
+            else:
+                print("✓ No Vault positions found")
+        except Exception as e:
+            print(f"✗ Error fetching Vault positions: {str(e)}")
         
         # Get spot balances
         try:
@@ -299,6 +373,24 @@ def build_overview(all_balances: Dict[str, Any], address: str) -> Dict[str, Any]
                     if "totals" in pool_data:
                         key = f"{protocol_name}.ethereum.{pool_name}"
                         value = f"{Decimal(pool_data['totals']['formatted']):.6f}"
+                        positions[key] = value
+        elif protocol_name == "aave":
+            # Handle Aave data structure
+            if "net_position" in protocol_data:
+                net_pos = protocol_data["net_position"]
+                net_value = Decimal(net_pos["net_position_weth"]) / Decimal(10**18)
+                if net_value != 0:
+                    key = f"{protocol_name}.base.net_position"
+                    value = f"{net_value:.6f}"
+                    positions[key] = value
+        elif protocol_name == "vault":
+            # Handle Vault data structure
+            if isinstance(protocol_data, dict):
+                for vault_name, vault_data in protocol_data.items():
+                    if isinstance(vault_data, dict) and vault_data.get("weth_value"):
+                        weth_value = Decimal(vault_data["weth_value"]) / Decimal(10**18)
+                        key = f"{protocol_name}.base.{vault_name}"
+                        value = f"{weth_value:.6f}"
                         positions[key] = value
         else:
             # Handle other protocols (Pendle)
