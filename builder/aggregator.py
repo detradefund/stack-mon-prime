@@ -21,6 +21,7 @@ from shares.supply_reader import SupplyReader
 from config.networks import RPC_URLS
 from aave.check_contracts import get_aave_balances
 from vault.vault_reader import VaultReader
+from euler.rpc_vault_client import EulerRPCClient
 
 class BalanceAggregator:
     """
@@ -32,6 +33,7 @@ class BalanceAggregator:
     - Convex (Ethereum)
     - Aave (Base)
     - Vault (Base)
+    - Euler (Ethereum)
     """
     
     def __init__(self):
@@ -40,6 +42,7 @@ class BalanceAggregator:
         self.curve_manager = CurveBalanceManager("base", Web3(Web3.HTTPProvider(RPC_URLS["base"])))
         self.convex_manager = ConvexBalanceManager()
         self.vault_reader = VaultReader()
+        self.euler_client = EulerRPCClient()
         
     def get_all_balances(self, address: str) -> Dict[str, Any]:
         """
@@ -226,6 +229,55 @@ class BalanceAggregator:
         except Exception as e:
             print(f"✗ Error fetching Vault positions: {str(e)}")
         
+        # Get Euler balances
+        try:
+            print("\n" + "="*80)
+            print("EULER BALANCE MANAGER")
+            print("="*80 + "\n")
+            print(f"Checking Euler positions for address: {checksum_address}")
+            euler_balances = self.euler_client.get_balances(checksum_address)
+            if euler_balances and euler_balances.get("euler") and euler_balances["euler"].get("ethereum"):
+                result["protocols"]["euler"] = euler_balances["euler"]
+                print("✓ Euler positions fetched successfully")
+                
+                # Add detailed logging for Euler
+                euler_data = euler_balances["euler"]["ethereum"]
+                if "net_position" in euler_data:
+                    net_pos = euler_data["net_position"]
+                    
+                    # Print deposits
+                    if net_pos.get("deposits"):
+                        print("\nDeposits:")
+                        for token_symbol, deposit_data in net_pos["deposits"].items():
+                            if "value" in deposit_data and "WETH" in deposit_data["value"]:
+                                amount = Decimal(deposit_data["value"]["WETH"]["amount"]) / Decimal(10**18)
+                                print(f"  {token_symbol}: {amount:.6f} WETH")
+                                print(f"    Conversion rate: {deposit_data['value']['WETH']['conversion_details']['rate']}")
+                                print(f"    Source: {deposit_data['value']['WETH']['conversion_details']['source']}")
+                    
+                    # Print borrows
+                    if net_pos.get("borrows"):
+                        print("\nBorrows:")
+                        for token_symbol, borrow_data in net_pos["borrows"].items():
+                            if "value" in borrow_data and "WETH" in borrow_data["value"]:
+                                amount = Decimal(borrow_data["value"]["WETH"]["amount"]) / Decimal(10**18)
+                                print(f"  {token_symbol}: {amount:.6f} WETH")
+                    
+                    # Print net position
+                    if "totals" in net_pos:
+                        net_total = net_pos["totals"]["formatted"]
+                        print(f"\nNet position: {net_total} ETH")
+                    
+                    # Print subaccounts
+                    if net_pos.get("subaccounts"):
+                        print("\nSubaccounts:")
+                        for subaccount_addr, subaccount_data in net_pos["subaccounts"].items():
+                            print(f"  {subaccount_addr}: {subaccount_data['net_eth']} ETH")
+            else:
+                print("✓ No Euler positions found")
+        except Exception as e:
+            print(f"✗ Error fetching Euler positions: {str(e)}")
+        
         # Get spot balances
         try:
             print("\n" + "="*80)
@@ -392,6 +444,18 @@ def build_overview(all_balances: Dict[str, Any], address: str) -> Dict[str, Any]
                         key = f"{protocol_name}.base.{vault_name}"
                         value = f"{weth_value:.6f}"
                         positions[key] = value
+        elif protocol_name == "euler":
+            # Handle Euler data structure
+            if "ethereum" in protocol_data:
+                ethereum_data = protocol_data["ethereum"]
+                if "net_position" in ethereum_data:
+                    net_pos = ethereum_data["net_position"]
+                    if "totals" in net_pos:
+                        net_value = Decimal(net_pos["totals"]["wei"]) / Decimal(10**18)
+                        if net_value != 0:
+                            key = f"{protocol_name}.ethereum.net_position"
+                            value = f"{net_value:.6f}"
+                            positions[key] = value
         else:
             # Handle other protocols (Pendle)
             # Only process if protocol_data is not empty

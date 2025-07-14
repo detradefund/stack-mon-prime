@@ -425,12 +425,12 @@ class PendleManager:
                     if pt_result["best_amount"]:
                         weth_amount = str(int(float(pt_result["best_amount"].replace(",", "")) * 1e18))
                         conversion_details = pt_result.get("conversion_details", {
-                            "source": "Pendle SDK",
+                                "source": "Pendle SDK",
                             "price_impact": "0.0000",
-                            "rate": str(Decimal(weth_amount) / (position_data["pt"]["balance"] * Decimal('1e18'))),
-                            "fee_percentage": "0.0000%",
-                            "fallback": False,
-                            "note": "Direct Conversion using Pendle SDK"
+                                "rate": str(Decimal(weth_amount) / (position_data["pt"]["balance"] * Decimal('1e18'))),
+                                "fee_percentage": "0.0000%",
+                                "fallback": False,
+                                "note": "Direct Conversion using Pendle SDK"
                         })
                     
                     # Create entry for this market
