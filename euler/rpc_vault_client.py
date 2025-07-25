@@ -735,14 +735,15 @@ class EulerRPCClient:
         try:
             print(f"      🔄 Conversion de {pufeth_amount} pufETH en WETH...")
             
-            # Utiliser cow_client pour obtenir le quote
+            # Utiliser cow_client pour obtenir le quote (Euler utilise toujours les prix du marché)
             quote_result = get_quote(
                 network="ethereum",
                 sell_token=PUFETH_ADDRESS,
                 buy_token=WETH_ADDRESS,
                 amount=pufeth_amount,
                 token_decimals=18,  # pufETH a 18 decimales
-                token_symbol="pufETH"
+                token_symbol="pufETH",
+                context="euler"
             )
             
             if quote_result.get('quote') and quote_result['quote'].get('quote'):

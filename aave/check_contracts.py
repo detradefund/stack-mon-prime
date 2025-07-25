@@ -22,12 +22,13 @@ ERC20_ABI = [
     {"constant": True, "inputs": [], "name": "UNDERLYING_ASSET_ADDRESS", "outputs": [{"name": "", "type": "address"}], "type": "function"}
 ]
 
-# Les 4 contrats à vérifier
+# Les 5 contrats à vérifier
 CONTRACTS = [
     "0x90DA57E0A6C0d166Bf15764E03b83745Dc90025B",
     "0x38e59ADE183BbEb94583d44213c8f3297e9933e9",
     "0x067ae75628177FD257c2B1e500993e1a0baBcBd1",  # Aave Base GHO (aBasGHO)
-    "0xcf3D55c10DB69f28fD1A75Bd73f3D8A2d9c595ad"   # Aave Base cbETH (aBascbETH)
+    "0xcf3D55c10DB69f28fD1A75Bd73f3D8A2d9c595ad",  # Aave Base cbETH (aBascbETH)
+    "0xD4a0e0b9149BCee3C920d2E00b5dE09138fd8bb7"   # Aave Base WETH (aBasWETH)
 ]
 
 # WETH address sur Base
@@ -68,7 +69,8 @@ def convert_to_weth(underlying_address, underlying_decimals, raw_balance):
             sell_token=underlying_address,
             buy_token=WETH_ADDRESS,
             amount=raw_balance,
-            token_decimals=underlying_decimals
+            token_decimals=underlying_decimals,
+            context="spot"
         )
         
         if result["quote"] and 'quote' in result["quote"]:

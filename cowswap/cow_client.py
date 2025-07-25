@@ -19,6 +19,13 @@ sys.path.append(str(Path(__file__).parent.parent))
 
 from config.networks import NETWORK_TOKENS
 from utils.retry import APIRetry
+from utils.wsteth_converter import (
+    convert_wsteth_to_weth, 
+    convert_pufeth_to_weth,
+    is_wsteth, 
+    is_pufeth,
+    should_use_native_conversion
+)
 
 # Load environment variables
 load_dotenv()
@@ -32,10 +39,11 @@ def get_quote(
     buy_token: str,
     amount: str,
     token_decimals: int = 18,
-    token_symbol: str = None
+    token_symbol: str = None,
+    context: str = "spot"
 ) -> dict:
     """
-    Get a quote from CowSwap.
+    Get a quote from CowSwap or use native conversion for supported tokens.
     
     Args:
         network: The network to use (ethereum, base)
@@ -44,10 +52,27 @@ def get_quote(
         amount: The amount to sell in wei
         token_decimals: The number of decimals for the token
         token_symbol: The symbol of the token (optional)
+        context: Context of the conversion ("spot" or "euler")
         
     Returns:
         dict: The quote response
     """
+    # Check if we should use native conversion and if target is WETH
+    if (network == "ethereum" and 
+        buy_token.lower() == NETWORK_TOKENS[network]["WETH"]["address"].lower() and
+        should_use_native_conversion(sell_token, network, context)):
+        
+        # Use native wstETH conversion (currently disabled for spot, not available for euler)
+        if is_wsteth(sell_token, network):
+            print(f"🔄 Detected wstETH → WETH conversion, using native stEthPerToken() function")
+            return convert_wsteth_to_weth(amount, network)
+        
+        # Use native pufETH conversion (only for spot context)
+        elif is_pufeth(sell_token, network):
+            print(f"🔄 Detected pufETH → WETH conversion (context: {context}), using native convertToAssets() function")
+            return convert_pufeth_to_weth(amount, network)
+    
+    # Fallback to CowSwap for all other cases
     # WETH always has 18 decimals
     buy_decimals = 18
     

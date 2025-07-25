@@ -403,7 +403,8 @@ class ConvexBalanceManager:
             buy_token=buy_token,
             amount=str(int(amount)),
             token_decimals=decimals,
-            token_symbol=symbol
+            token_symbol=symbol,
+            context="spot"
         )
 
         if result["quote"]:

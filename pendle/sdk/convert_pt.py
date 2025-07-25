@@ -342,7 +342,8 @@ def convert_pt(market_address: str, amount: int, receiver: str = None, slippage:
             buy_token=COMMON_TOKENS[network]["WETH"]["address"],
             amount=str(output_amt_without_aggregator),
             token_decimals=18,
-            token_symbol=underlying_symbol
+            token_symbol=underlying_symbol,
+            context="spot"
         )
         
         steps = [
@@ -457,7 +458,8 @@ def convert_pt(market_address: str, amount: int, receiver: str = None, slippage:
                     buy_token=COMMON_TOKENS[network]["WETH"]["address"],
                     amount=str(output_amt_without_aggregator_retry),
                     token_decimals=18,
-                    token_symbol=underlying_symbol
+                    token_symbol=underlying_symbol,
+                    context="spot"
                 )
                 
                 steps_retry = [

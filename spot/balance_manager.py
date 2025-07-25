@@ -72,14 +72,15 @@ class SpotBalanceManager:
             token_address = NETWORK_TOKENS[network][token_symbol]["address"]
             token_decimals = NETWORK_TOKENS[network][token_symbol]["decimals"]
 
-            # Get quote from CoW Protocol
+            # Get quote from CoW Protocol (conversion to USDC)
             result = get_quote(
                 network=network,
                 sell_token=token_address,
                 buy_token=NETWORK_TOKENS[network]["USDC"]["address"],
                 amount=amount,
                 token_decimals=token_decimals,
-                token_symbol=token_symbol
+                token_symbol=token_symbol,
+                context="spot"
             )
 
             if result["quote"]:
@@ -250,14 +251,15 @@ class SpotBalanceManager:
             token_address = NETWORK_TOKENS[network][token_symbol]["address"]
             token_decimals = NETWORK_TOKENS[network][token_symbol]["decimals"]
 
-            # Get quote from CoW Protocol
+            # Get quote from CoW Protocol (or native conversion for spot)
             result = get_quote(
                 network=network,
                 sell_token=token_address,
                 buy_token=NETWORK_TOKENS[network]["WETH"]["address"],
                 amount=amount,
                 token_decimals=token_decimals,
-                token_symbol=token_symbol
+                token_symbol=token_symbol,
+                context="spot"
             )
 
             if result["quote"]:

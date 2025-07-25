@@ -145,7 +145,8 @@ class VaultReader:
                 sell_token=NETWORK_TOKENS["base"]["USDC"]["address"],
                 buy_token=COMMON_TOKENS["base"]["WETH"]["address"],
                 amount=usdc_value_wei,
-                token_decimals=6
+                token_decimals=6,
+                context="spot"
             )
             
             if quote_result["quote"] and 'quote' in quote_result["quote"]:

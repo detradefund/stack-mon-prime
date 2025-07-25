@@ -260,7 +260,8 @@ def remove_liquidity(market_address: str, amount: int, receiver: str = None, sli
             buy_token=COMMON_TOKENS[network]["WETH"]["address"],
             amount=str(actual_underlying_amount),
             token_decimals=18,
-            token_symbol=actual_asset_name
+            token_symbol=actual_asset_name,
+            context="spot"
         )
         
         if cowswap_result["quote"]:

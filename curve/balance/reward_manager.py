@@ -254,7 +254,8 @@ class CurveRewardManager:
             buy_token=self.network_tokens["base"]["WETH"]["address"],
             amount=str(int(amount)),
             token_decimals=decimals,
-            token_symbol=symbol
+            token_symbol=symbol,
+            context="spot"
         )
 
         if result["quote"]:

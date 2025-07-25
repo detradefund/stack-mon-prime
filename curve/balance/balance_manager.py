@@ -182,7 +182,8 @@ class CurveBalanceManager:
                         sell_token=token_address,
                         buy_token=NETWORK_TOKENS[self.network]["WETH"]["address"],
                         amount=withdrawable,
-                        network=self.network
+                        network=self.network,
+                        context="spot"
                     )
                     
                     # Calculate WETH value from quote
