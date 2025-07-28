@@ -22,17 +22,26 @@ ERC20_ABI = [
     {"constant": True, "inputs": [], "name": "UNDERLYING_ASSET_ADDRESS", "outputs": [{"name": "", "type": "address"}], "type": "function"}
 ]
 
-# Les 5 contrats à vérifier
-CONTRACTS = [
-    "0x90DA57E0A6C0d166Bf15764E03b83745Dc90025B",
-    "0x38e59ADE183BbEb94583d44213c8f3297e9933e9",
-    "0x067ae75628177FD257c2B1e500993e1a0baBcBd1",  # Aave Base GHO (aBasGHO)
-    "0xcf3D55c10DB69f28fD1A75Bd73f3D8A2d9c595ad",  # Aave Base cbETH (aBascbETH)
-    "0xD4a0e0b9149BCee3C920d2E00b5dE09138fd8bb7"   # Aave Base WETH (aBasWETH)
-]
+# Contrats par réseau
+CONTRACTS_BY_NETWORK = {
+    "base": [
+        "0x90DA57E0A6C0d166Bf15764E03b83745Dc90025B",
+        "0x38e59ADE183BbEb94583d44213c8f3297e9933e9",
+        "0x067ae75628177FD257c2B1e500993e1a0baBcBd1",  # Aave Base GHO (aBasGHO)
+        "0xcf3D55c10DB69f28fD1A75Bd73f3D8A2d9c595ad",  # Aave Base cbETH (aBascbETH)
+        "0xD4a0e0b9149BCee3C920d2E00b5dE09138fd8bb7",  # Aave Base WETH (aBasWETH)
+        "0x59dca05b6c26dbd64b5381374aAaC5CD05644C28"   # Aave Base Variable Debt USDC
+    ],
+    "ethereum": [
+        "0x4d5F47FA6A74757f35C14fD3a6Ef8E3C9BC514E8"   # aWETH Aave Ethereum WETH
+    ]
+}
 
-# WETH address sur Base
-WETH_ADDRESS = "0x4200000000000000000000000000000000000006"
+# WETH addresses par réseau
+WETH_ADDRESSES = {
+    "base": "0x4200000000000000000000000000000000000006",
+    "ethereum": "0xC02aaA39b223FE8d0A0e5C4F27eAD9083C756Cc2"
+}
 
 # Récupérer l'adresse de production depuis .env
 PRODUCTION_ADDRESS = os.getenv('PRODUCTION_ADDRESS')
@@ -52,11 +61,13 @@ def get_underlying_decimals(w3, underlying_address):
     except:
         return None, None
 
-def convert_to_weth(underlying_address, underlying_decimals, raw_balance):
+def convert_to_weth(network, underlying_address, underlying_decimals, raw_balance):
     """Convertit un montant en WETH via cow_client"""
     try:
+        weth_address = WETH_ADDRESSES[network]
+        
         # Si c'est déjà WETH, pas besoin de conversion
-        if underlying_address.lower() == WETH_ADDRESS.lower():
+        if underlying_address.lower() == weth_address.lower():
             return {
                 "weth_value": raw_balance,
                 "conversion_rate": "1.0",
@@ -65,9 +76,9 @@ def convert_to_weth(underlying_address, underlying_decimals, raw_balance):
         
         # Sinon, faire la conversion via cow_client
         result = get_quote(
-            network="base",
+            network=network,
             sell_token=underlying_address,
-            buy_token=WETH_ADDRESS,
+            buy_token=weth_address,
             amount=raw_balance,
             token_decimals=underlying_decimals,
             context="spot"
@@ -96,7 +107,7 @@ def convert_to_weth(underlying_address, underlying_decimals, raw_balance):
             "conversion_source": f"Error: {str(e)[:50]}"
         }
 
-def check_balance(w3, contract_address, wallet_address):
+def check_balance(w3, network, contract_address, wallet_address):
     """Vérifie la balance d'un contrat pour une adresse"""
     try:
         contract = w3.eth.contract(address=contract_address, abi=ERC20_ABI)
@@ -117,7 +128,7 @@ def check_balance(w3, contract_address, wallet_address):
         # Convertir en WETH si nécessaire
         weth_conversion = None
         if underlying_address != "Unknown" and underlying_decimals is not None:
-            weth_conversion = convert_to_weth(underlying_address, underlying_decimals, str(balance_raw))
+            weth_conversion = convert_to_weth(network, underlying_address, underlying_decimals, str(balance_raw))
         
         return {
             "symbol": symbol,
@@ -157,21 +168,21 @@ def calculate_net_position(aave_data):
         "net_position_weth": str(net_position)
     }
 
-def get_aave_balances():
-    """Récupère les balances Aave et retourne un dictionnaire"""
-    # Connect to Base
-    rpc_url = RPC_URLS.get("base")
+def get_aave_balances_for_network(network):
+    """Récupère les balances Aave pour un réseau spécifique"""
+    rpc_url = RPC_URLS.get(network)
     if not rpc_url:
-        return {"aave": []}
+        return {"aave": [], "net_position": None}
     
     w3 = Web3(Web3.HTTPProvider(rpc_url))
     if not w3.is_connected():
-        return {"aave": []}
+        return {"aave": [], "net_position": None}
     
     aave_data = []
+    contracts = CONTRACTS_BY_NETWORK.get(network, [])
     
-    for contract_address in CONTRACTS:
-        result = check_balance(w3, contract_address, PRODUCTION_ADDRESS)
+    for contract_address in contracts:
+        result = check_balance(w3, network, contract_address, PRODUCTION_ADDRESS)
         
         if result and int(result["raw_balance"]) > 0:
             aave_data.append({
@@ -192,6 +203,17 @@ def get_aave_balances():
         "aave": aave_data,
         "net_position": net_position
     }
+
+def get_aave_balances():
+    """Récupère les balances Aave pour tous les réseaux et retourne un dictionnaire"""
+    result = {}
+    
+    # Récupérer les données pour chaque réseau
+    for network in CONTRACTS_BY_NETWORK.keys():
+        network_data = get_aave_balances_for_network(network)
+        result[network] = network_data
+    
+    return result
 
 def main():
     result = get_aave_balances()

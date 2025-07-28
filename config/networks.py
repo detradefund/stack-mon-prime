@@ -64,6 +64,12 @@ NETWORK_TOKENS = {
             "decimals": 18,
             "name": "Curve DAO Token",
             "symbol": "CRV"
+        },
+        "CVX": {
+            "address": "0x4e3fbd56cd56c3e72c1403e103b45db9da5b9d2b",
+            "decimals": 18,
+            "name": "Convex Token",
+            "symbol": "CVX"
         }
     },
     "base": {
@@ -86,8 +92,7 @@ NETWORK_TOKENS = {
             "address": "0x2Ae3F1Ec7F1F5012CFEab0185bfc7aa3cf0DEc22",
             "decimals": 18,
             "name": "Coinbase Wrapped Staked ETH",
-            "symbol": "cbETH",
-            "type": "yield-bearing"
+            "symbol": "cbETH"
         },
         "superOETHb": {
             "address": "0xDBFeFD2e8460a6Ee4955A68582F85708BAEA60A3",

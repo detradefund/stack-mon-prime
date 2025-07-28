@@ -167,35 +167,46 @@ class BalanceAggregator:
             print("="*80 + "\n")
             print(f"Checking Aave positions for address: {checksum_address}")
             aave_balances = get_aave_balances()
-            if aave_balances and aave_balances.get("aave"):
-                # Extract the data without the double "aave" key
-                result["protocols"]["aave"] = {
-                    "positions": aave_balances["aave"],
-                    "net_position": aave_balances["net_position"]
-                }
-                print("✓ Aave positions fetched successfully")
-                
-                # Add detailed logging for Aave
-                print("\nAave positions:")
-                for position in aave_balances["aave"]:
-                    print(f"\nContract: {position['contract']}")
-                    print(f"  Symbol: {position['symbol']}")
-                    print(f"  Balance: {Decimal(position['raw_balance']) / Decimal(10**position['decimals']):.6f}")
-                    print(f"  Underlying: {position['underlying_symbol']}")
+            
+            # Check if we have any positions across all networks
+            has_positions = False
+            aave_result = {}
+            
+            for network, network_data in aave_balances.items():
+                if network_data.get("aave"):  # If there are positions on this network
+                    has_positions = True
+                    aave_result[network] = {
+                        "positions": network_data["aave"],
+                        "net_position": network_data["net_position"]
+                    }
                     
-                    if position.get("weth_conversion"):
-                        weth_value = Decimal(position["weth_conversion"]["weth_value"]) / Decimal(10**18)
-                        print(f"  Value in WETH: {weth_value:.6f}")
-                        print(f"  Conversion rate: {position['weth_conversion']['conversion_rate']}")
-                        print(f"  Source: {position['weth_conversion']['conversion_source']}")
-                
-                # Print net position
-                if "net_position" in aave_balances:
-                    net_pos = aave_balances["net_position"]
-                    print(f"\nNet position:")
-                    print(f"  Total supply: {Decimal(net_pos['total_supply_weth']) / Decimal(10**18):.6f} WETH")
-                    print(f"  Total debt: {Decimal(net_pos['total_debt_weth']) / Decimal(10**18):.6f} WETH")
-                    print(f"  Net position: {Decimal(net_pos['net_position_weth']) / Decimal(10**18):.6f} WETH")
+                    print(f"\n✓ Aave positions found on {network}")
+                    
+                    # Add detailed logging for Aave
+                    print(f"\nAave positions on {network}:")
+                    for position in network_data["aave"]:
+                        print(f"\nContract: {position['contract']}")
+                        print(f"  Symbol: {position['symbol']}")
+                        print(f"  Balance: {Decimal(position['raw_balance']) / Decimal(10**position['decimals']):.6f}")
+                        print(f"  Underlying: {position['underlying_symbol']}")
+                        
+                        if position.get("weth_conversion"):
+                            weth_value = Decimal(position["weth_conversion"]["weth_value"]) / Decimal(10**18)
+                            print(f"  Value in WETH: {weth_value:.6f}")
+                            print(f"  Conversion rate: {position['weth_conversion']['conversion_rate']}")
+                            print(f"  Source: {position['weth_conversion']['conversion_source']}")
+                    
+                    # Print net position
+                    if "net_position" in network_data:
+                        net_pos = network_data["net_position"]
+                        print(f"\nNet position on {network}:")
+                        print(f"  Total supply: {Decimal(net_pos['total_supply_weth']) / Decimal(10**18):.6f} WETH")
+                        print(f"  Total debt: {Decimal(net_pos['total_debt_weth']) / Decimal(10**18):.6f} WETH")
+                        print(f"  Net position: {Decimal(net_pos['net_position_weth']) / Decimal(10**18):.6f} WETH")
+            
+            if has_positions:
+                result["protocols"]["aave"] = aave_result
+                print("✓ Aave positions fetched successfully")
             else:
                 print("✓ No Aave positions found")
         except Exception as e:
@@ -427,14 +438,15 @@ def build_overview(all_balances: Dict[str, Any], address: str) -> Dict[str, Any]
                         value = f"{Decimal(pool_data['totals']['formatted']):.6f}"
                         positions[key] = value
         elif protocol_name == "aave":
-            # Handle Aave data structure
-            if "net_position" in protocol_data:
-                net_pos = protocol_data["net_position"]
-                net_value = Decimal(net_pos["net_position_weth"]) / Decimal(10**18)
-                if net_value != 0:
-                    key = f"{protocol_name}.base.net_position"
-                    value = f"{net_value:.6f}"
-                    positions[key] = value
+            # Handle Aave data structure (now organized by network)
+            for network, network_data in protocol_data.items():
+                if "net_position" in network_data:
+                    net_pos = network_data["net_position"]
+                    net_value = Decimal(net_pos["net_position_weth"]) / Decimal(10**18)
+                    if net_value != 0:
+                        key = f"{protocol_name}.{network}.net_position"
+                        value = f"{net_value:.6f}"
+                        positions[key] = value
         elif protocol_name == "vault":
             # Handle Vault data structure
             if isinstance(protocol_data, dict):
