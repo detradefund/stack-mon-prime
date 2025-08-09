@@ -30,7 +30,8 @@ CONTRACTS_BY_NETWORK = {
         "0x067ae75628177FD257c2B1e500993e1a0baBcBd1",  # Aave Base GHO (aBasGHO)
         "0xcf3D55c10DB69f28fD1A75Bd73f3D8A2d9c595ad",  # Aave Base cbETH (aBascbETH)
         "0xD4a0e0b9149BCee3C920d2E00b5dE09138fd8bb7",  # Aave Base WETH (aBasWETH)
-        "0x59dca05b6c26dbd64b5381374aAaC5CD05644C28"   # Aave Base Variable Debt USDC
+        "0x59dca05b6c26dbd64b5381374aAaC5CD05644C28",  # Aave Base Variable Debt USDC
+        "0x99CBC45ea5bb7eF3a5BC08FB1B7E56bB2442Ef0D"   # Aave Base wstETH (aBaswstETH)
     ],
     "ethereum": [
         "0x4d5F47FA6A74757f35C14fD3a6Ef8E3C9BC514E8"   # aWETH Aave Ethereum WETH

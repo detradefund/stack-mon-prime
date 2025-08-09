@@ -79,6 +79,12 @@ NETWORK_TOKENS = {
             "name": "Wrapped Ether",
             "symbol": "WETH"
         },
+        "wstETH": {
+            "address": "0xc1CBa3fCea344f92D9239c08C0568f6F2F0ee452",
+            "decimals": 18,
+            "name": "Wrapped liquid staked Ether 2.0",
+            "symbol": "wstETH"
+        },
         "baseETH": {
             "address": "0xAADf01DD90aE0A6Bb9Eb908294658037096E0404",
             "decimals": 18,
