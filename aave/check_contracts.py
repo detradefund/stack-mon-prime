@@ -44,6 +44,18 @@ WETH_ADDRESSES = {
     "ethereum": "0xC02aaA39b223FE8d0A0e5C4F27eAD9083C756Cc2"
 }
 
+# GHO addresses par réseau
+GHO_ADDRESSES = {
+    "base": "0x6Bb7a212910682DCFdbd5BCBb3e28FB4E8da10Ee",  # GHO on Base
+    "ethereum": "0x40D16FC0246aD3160Ccc09B8D0D3A2cD28aE6C2f"  # GHO on Ethereum
+}
+
+# USDC addresses par réseau
+USDC_ADDRESSES = {
+    "base": "0x833589fCD6eDb6E08f4c7C32D4f71b54bdA02913",  # USDC on Base
+    "ethereum": "0xA0b86991c6218b36c1d19D4a2e9Eb0cE3606eB48"  # USDC on Ethereum
+}
+
 # Récupérer l'adresse de production depuis .env
 PRODUCTION_ADDRESS = os.getenv('PRODUCTION_ADDRESS')
 
@@ -62,6 +74,12 @@ def get_underlying_decimals(w3, underlying_address):
     except:
         return None, None
 
+def is_gho_token(network, address):
+    """Vérifie si l'adresse correspond à GHO sur le réseau spécifié"""
+    if network not in GHO_ADDRESSES:
+        return False
+    return address.lower() == GHO_ADDRESSES[network].lower()
+
 def convert_to_weth(network, underlying_address, underlying_decimals, raw_balance):
     """Convertit un montant en WETH via cow_client"""
     try:
@@ -75,7 +93,7 @@ def convert_to_weth(network, underlying_address, underlying_decimals, raw_balanc
                 "conversion_source": "Direct WETH"
             }
         
-        # Sinon, faire la conversion via cow_client
+        # Essayer d'abord la conversion sur le réseau actuel
         result = get_quote(
             network=network,
             sell_token=underlying_address,
@@ -85,6 +103,26 @@ def convert_to_weth(network, underlying_address, underlying_decimals, raw_balanc
             context="spot"
         )
         
+        # Si la conversion a échoué et que c'est GHO sur Base, essayer sur Ethereum
+        if (not result["quote"] or 'quote' not in result["quote"]) and network == "base" and is_gho_token(network, underlying_address):
+            # Convertir directement GHO en WETH sur Ethereum
+            eth_result = get_quote(
+                network="ethereum",
+                sell_token=GHO_ADDRESSES["ethereum"],
+                buy_token=WETH_ADDRESSES["ethereum"],
+                amount=raw_balance,
+                token_decimals=underlying_decimals,
+                context="spot"
+            )
+            
+            if eth_result["quote"] and 'quote' in eth_result["quote"]:
+                return {
+                    "weth_value": eth_result["quote"]["quote"]["buyAmount"],
+                    "conversion_rate": eth_result["conversion_details"]["rate"],
+                    "conversion_source": f"Fallback: GHO->WETH(ETH) via {eth_result['conversion_details']['source']}"
+                }
+        
+        # Retourner le résultat de la conversion directe si elle a réussi
         if result["quote"] and 'quote' in result["quote"]:
             weth_amount = result["quote"]["quote"]["buyAmount"]
             conversion_rate = result["conversion_details"]["rate"]
@@ -95,12 +133,13 @@ def convert_to_weth(network, underlying_address, underlying_decimals, raw_balanc
                 "conversion_rate": conversion_rate,
                 "conversion_source": conversion_source
             }
-        else:
-            return {
-                "weth_value": "0",
-                "conversion_rate": "0",
-                "conversion_source": "Failed"
-            }
+        
+        return {
+            "weth_value": "0",
+            "conversion_rate": "0",
+            "conversion_source": "Failed - No fallback available"
+        }
+        
     except Exception as e:
         return {
             "weth_value": "0",
