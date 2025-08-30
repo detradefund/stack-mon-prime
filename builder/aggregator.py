@@ -524,9 +524,10 @@ def build_overview(all_balances: Dict[str, Any], address: str) -> Dict[str, Any]
     
     return {
         "nav": {
-            "weth": f"{total_value:.6f}",
-            "share_price": f"{share_price:.6f}",
-            "total_supply": total_supply
+            "total_assets": f"{total_value:.6f}",
+            "price_per_share": f"{share_price:.6f}",
+            "total_supply": total_supply,
+            "total_assets_wei": str(int(total_value * Decimal(10**18)))
         },
         "positions": sorted_positions
     }
