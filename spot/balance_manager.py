@@ -1,7 +1,7 @@
 from web3 import Web3
 import sys
 from pathlib import Path
-from typing import Dict, Any
+from typing import Dict, Any, Optional
 from decimal import Decimal
 import time
 
@@ -10,24 +10,44 @@ root_path = str(Path(__file__).parent.parent)
 sys.path.append(root_path)
 
 from config.networks import NETWORK_TOKENS, RPC_URLS
-from cowswap.cow_client import get_quote
-from utils.retry import Web3Retry, APIRetry
+from utils.retry import Web3Retry
+from crystal.price_indexer import CrystalPriceIndexer
 
 # Production address
-PRODUCTION_ADDRESS = "0x66DbceE7feA3287B3356227d6F3DfF3CeFbC6F3C"
+PRODUCTION_ADDRESS = "0x2EAc9dF8299e544b9d374Db06ad57AD96C7527c0"
 
 class SpotBalanceManager:
-    """Manages spot token balances across networks"""
+    """Unified Spot Balance Manager - Handles raw balances and price conversions"""
     
-    def __init__(self):
+    def __init__(self, enable_prices: bool = True, verbose: bool = False):
+        """
+        Initialize the balance manager
+        
+        Args:
+            enable_prices: Whether to enable price conversions using Crystal Price Indexer
+            verbose: Whether to enable verbose output
+        """
+        self.enable_prices = enable_prices
+        self.verbose = verbose
+        
         # Initialize Web3 connections for each network
         self.connections = {
-            "ethereum": Web3(Web3.HTTPProvider(RPC_URLS['ethereum'])),
-            "base": Web3(Web3.HTTPProvider(RPC_URLS['base']))
+            "monad-testnet": Web3(Web3.HTTPProvider(RPC_URLS['monad-testnet']))
         }
         
         # Initialize contracts for each network
         self.contracts = self._init_contracts()
+        
+        # Initialize Crystal Price Indexer if prices are enabled
+        self.price_indexer = None
+        if self.enable_prices:
+            try:
+                self.price_indexer = CrystalPriceIndexer("monad-testnet")
+                if self.verbose:
+                    print(f"Crystal Price Indexer initialized - {len(self.price_indexer.crystal_pools)} pools")
+            except Exception as e:
+                print(f"Warning: Could not initialize Crystal Price Indexer: {str(e)}")
+                self.enable_prices = False
 
     def _init_contracts(self) -> Dict[str, Any]:
         """Initialize contracts for all supported tokens"""
@@ -62,110 +82,205 @@ class SpotBalanceManager:
                 
         return contracts
 
-    def _get_usdc_value(self, network: str, token_symbol: str, amount: str) -> tuple[str, dict]:
+    def convert_token_to_mon_and_usdc(self, amount: Decimal, token_symbol: str) -> tuple[Decimal, Decimal, Dict[str, Any]]:
         """
-        Get USDC value for a given token amount using CoWSwap
-        Returns (usdc_amount, conversion_details)
+        Convert token amount to MON and USDC using Crystal Price Indexer
+        Returns (mon_amount, usdc_amount, conversion_details)
         """
+        if not self.enable_prices or not self.price_indexer:
+            return Decimal("0"), Decimal("0"), {
+                "source": "Disabled",
+                "mon_price": "0",
+                "usdc_price": "0",
+                "conversion_type": "disabled",
+                "route_mon": "Prices disabled",
+                "route_usdc": "Prices disabled",
+                "note": "Price conversions are disabled"
+            }
+        
         try:
-            # Get token contract address and decimals
-            token_address = NETWORK_TOKENS[network][token_symbol]["address"]
-            token_decimals = NETWORK_TOKENS[network][token_symbol]["decimals"]
-
-            # Get quote from CoW Protocol (conversion to USDC)
-            result = get_quote(
-                network=network,
-                sell_token=token_address,
-                buy_token=NETWORK_TOKENS[network]["USDC"]["address"],
-                amount=amount,
-                token_decimals=token_decimals,
-                token_symbol=token_symbol,
-                context="spot"
-            )
-
-            if result["quote"]:
-                return result["quote"]["quote"]["buyAmount"], result["conversion_details"]
-
-            return "0", result["conversion_details"]
-
+            if token_symbol == "MON":
+                # MON is already in MON, convert to USDC
+                mon_usdc_price = self.price_indexer.get_mon_usdc_price()
+                if mon_usdc_price and mon_usdc_price > 0:
+                    usdc_amount = amount * mon_usdc_price
+                else:
+                    usdc_amount = Decimal("0")
+                
+                return amount, usdc_amount, {
+                    "source": "Direct",
+                    "mon_price": "1.000000",
+                    "usdc_price": str(usdc_amount / amount) if amount > 0 else "0",
+                    "conversion_type": "direct",
+                    "route_mon": "MON -> MON (direct)",
+                    "route_usdc": "MON -> USDC (1 step)",
+                    "note": "Direct 1:1 conversion (MON)"
+                }
+            
+            if token_symbol == "WMON":
+                # WMON is equivalent to MON (1:1), convert to USDC
+                mon_usdc_price = self.price_indexer.get_mon_usdc_price()
+                if mon_usdc_price and mon_usdc_price > 0:
+                    usdc_amount = amount * mon_usdc_price
+                else:
+                    usdc_amount = Decimal("0")
+                
+                return amount, usdc_amount, {
+                    "source": "Direct",
+                    "mon_price": "1.000000",
+                    "usdc_price": str(usdc_amount / amount) if amount > 0 else "0",
+                    "conversion_type": "direct",
+                    "route_mon": "WMON -> MON (1:1) -> MON (direct)",
+                    "route_usdc": "WMON -> MON (1:1) -> USDC (1 step)",
+                    "note": "WMON treated as MON equivalent (1:1 conversion)"
+                }
+            
+            # Use Crystal Price Indexer to get conversion rates
+            if token_symbol == "WMON":
+                # WMON to MON conversion (1:1)
+                mon_amount = amount
+                # WMON to USDC conversion via MON
+                mon_usdc_price = self.price_indexer.get_mon_usdc_price()
+                if mon_usdc_price and mon_usdc_price > 0:
+                    usdc_amount = amount * mon_usdc_price
+                else:
+                    usdc_amount = Decimal("0")
+            elif token_symbol == "USDC":
+                # USDC to MON conversion
+                mon_usdc_price = self.price_indexer.get_mon_usdc_price()
+                if mon_usdc_price and mon_usdc_price > 0:
+                    mon_amount = amount / mon_usdc_price
+                else:
+                    mon_amount = Decimal("0")
+                # USDC to USDC is direct
+                usdc_amount = amount
+            else:
+                # Other tokens - try to get price in MON
+                token_price_in_mon = self.price_indexer.get_token_price_in_mon(token_symbol)
+                if token_price_in_mon and token_price_in_mon > 0:
+                    mon_amount = amount * token_price_in_mon
+                    # Convert MON to USDC
+                    mon_usdc_price = self.price_indexer.get_mon_usdc_price()
+                    if mon_usdc_price and mon_usdc_price > 0:
+                        usdc_amount = mon_amount * mon_usdc_price
+                    else:
+                        usdc_amount = Decimal("0")
+                else:
+                    mon_amount = Decimal("0")
+                    usdc_amount = Decimal("0")
+            
+            if mon_amount is None:
+                mon_amount = Decimal("0")
+            if usdc_amount is None:
+                usdc_amount = Decimal("0")
+            
+            # Calculate prices
+            mon_price = mon_amount / amount if amount > 0 else Decimal("0")
+            usdc_price = usdc_amount / amount if amount > 0 else Decimal("0")
+            
+            # Determine routes based on token type - always shortest route
+            if token_symbol == "USDC":
+                route_mon = f"{token_symbol} -> MON (1 step)"
+                route_usdc = f"{token_symbol} -> USDC (direct)"
+            elif token_symbol in ["PINGU", "aprMON", "sMON", "shMON"]:
+                # For these tokens, check if direct USDC pool exists
+                direct_usdc_pool = f"{token_symbol}/USDC"
+                if direct_usdc_pool in self.price_indexer.crystal_pools:
+                    route_mon = f"{token_symbol} -> MON (1 step)"
+                    route_usdc = f"{token_symbol} -> USDC (1 step)"
+                else:
+                    route_mon = f"{token_symbol} -> MON (1 step)"
+                    route_usdc = f"{token_symbol} -> MON -> USDC (2 steps)"
+            else:
+                route_mon = f"{token_symbol} -> MON (1 step)"
+                route_usdc = f"{token_symbol} -> USDC (1 step)"
+            
+            return mon_amount, usdc_amount, {
+                "source": "Crystal",
+                "mon_price": str(mon_price),
+                "usdc_price": str(usdc_price),
+                "conversion_type": "crystal_swap",
+                "route_mon": route_mon,
+                "route_usdc": route_usdc,
+                "note": f"Converted via Crystal Price Indexer"
+            }
+            
         except Exception as e:
-            return "0", {
+            return Decimal("0"), Decimal("0"), {
                 "source": "Error",
-                "price_impact": "N/A",
-                "rate": "0",
-                "fee_percentage": "N/A",
-                "fallback": True,
+                "mon_price": "0",
+                "usdc_price": "0",
+                "conversion_type": "error",
+                "route_mon": "Error",
+                "route_usdc": "Error",
                 "note": f"Technical error: {str(e)[:200]}"
             }
 
-    def _convert_to_usdc(self, amount_18_decimals: str) -> str:
-        """Convert amount from 18 decimals to 6 decimals (USDC)"""
-        try:
-            amount = Decimal(amount_18_decimals) / Decimal(10 ** 18)
-            return str(int((amount * Decimal(10 ** 6)).quantize(Decimal('1.'))))
-        except:
-            return "0"
-
     def get_balances(self, address: str) -> Dict[str, Any]:
         """
-        Get all token balances for an address.
+        Get all token balances for an address with optional price conversions.
         """
-        # Remove the title print since it's handled in the aggregator
-        # print("SPOT BALANCE MANAGER")
-        
-        print("\nProcessing method:")
-        print("  - Querying native ETH balance")
-        print("  - Querying balanceOf(address) for each token")
-        print("  - Converting non-WETH tokens to WETH via CoWSwap")
+        if self.enable_prices:
+            print("\nProcessing method:")
+            print("  - Querying native MON balance (excluded from totals - gas reserve)")
+            print("  - Querying balanceOf(address) for each token")
+            print("  - Converting all tokens to MON and USDC using Crystal Price Indexer")
+        else:
+            print("\nProcessing method:")
+            print("  - Querying native MON balance (excluded from totals - gas reserve)")
+            print("  - Querying balanceOf(address) for each token")
+            print("  - Returning raw balances (no conversions)")
         
         checksum_address = Web3.to_checksum_address(address)
         result = {}
-        total_weth_wei = 0
+        total_mon = Decimal("0")
+        total_usdc = Decimal("0")
         
         try:
             # Process each network
             for network in self.get_supported_networks():
                 print(f"\nProcessing network: {network}")
-                network_total = 0
+                network_total_mon = Decimal("0")
+                network_total_usdc = Decimal("0")
                 
                 # Initialize network structure
                 network_result = {}
                 
                 try:
-                    # Check native ETH balance first
+                    # Check native MON balance first
                     native_balance = self.connections[network].eth.get_balance(checksum_address)
                     
-                    print(f"\nProcessing native ETH:")
-                    print(f"  Amount: {Decimal(native_balance) / Decimal(10**18):.6f} ETH")
+                    print(f"\nProcessing native MON:")
+                    print(f"  Amount: {Decimal(native_balance) / Decimal(10**18):.6f} MON")
                     
                     if native_balance > 0:
-                        # Native ETH is already in WETH terms
-                        network_total += native_balance
-                        total_weth_wei += native_balance
+                        # Native MON is already in MON terms
+                        mon_amount = Decimal(native_balance) / Decimal(10**18)
                         
-                        # Add native ETH data
-                        network_result["ETH"] = {
-                            "amount": str(native_balance),
-                            "decimals": 18,
-                            "value": {
-                                "WETH": {
-                                    "amount": str(native_balance),
-                                    "decimals": 18,
-                                    "conversion_details": {
-                                        "source": "Direct",
-                                        "price_impact": "0.0000%",
-                                        "rate": "1.000000",
-                                        "fee_percentage": "0.0000%",
-                                        "fallback": False,
-                                        "note": "Direct 1:1 conversion (ETH = WETH)"
-                                    }
-                                }
-                            }
-                        }
+                        if self.enable_prices and self.price_indexer:
+                            mon_usdc_price = self.price_indexer.get_mon_usdc_price()
+                            if mon_usdc_price and mon_usdc_price > 0:
+                                usdc_amount = mon_amount * mon_usdc_price
+                            else:
+                                usdc_amount = Decimal("0")
+                            
+                            # Note: Native MON excluded from totals (reserved for gas fees)
+                            # network_total_mon += mon_amount
+                            # network_total_usdc += usdc_amount
+                            # total_mon += mon_amount
+                            # total_usdc += usdc_amount
+                            
+                            print(f"  → Converted to: {mon_amount:.6f} MON / {usdc_amount:.2f} USDC (excluded from totals - gas reserve)")
+                            
+                            # Don't add native MON to network_result - completely excluded
+                            # network_result["MON"] = { ... }
+                        else:
+                            # Raw balance only - don't add native MON to results
+                            pass
                     else:
                         print("  → Balance is 0, skipping")
                 except Exception as e:
-                    print(f"Error checking native ETH balance: {str(e)}")
+                    print(f"Error checking native MON balance: {str(e)}")
                 
                 # Process each token type
                 for token_type, network_contracts in self.contracts.items():
@@ -185,150 +300,132 @@ class SpotBalanceManager:
                     print(f"  Amount: {balance_normalized:.6f} {token_symbol}")
                     
                     if balance > 0:
-                        if token_symbol == "WETH":
-                            # WETH is already in WETH terms
-                            weth_amount = balance
-                            conversion_details = {
-                                "source": "Direct",
-                                "price_impact": "0.0000%",
-                                "rate": "1.000000",
-                                "fee_percentage": "0.0000%",
-                                "fallback": False,
-                                "note": "Direct 1:1 conversion (WETH)"
+                        if self.enable_prices and self.price_indexer:
+                            # Convert token to MON and USDC
+                            mon_amount, usdc_amount, conversion_details = self.convert_token_to_mon_and_usdc(balance_normalized, token_symbol)
+                            
+                            network_total_mon += mon_amount
+                            network_total_usdc += usdc_amount
+                            total_mon += mon_amount
+                            total_usdc += usdc_amount
+                            
+                            print(f"  → Converted to: {mon_amount:.6f} MON / {usdc_amount:.2f} USDC")
+                            
+                            # Add token data with conversions
+                            network_result[token_symbol] = {
+                                "amount": str(balance),
+                                "decimals": decimals,
+                                "formatted": f"{balance_normalized:.6f}",
+                                "address": NETWORK_TOKENS[network][token_symbol]["address"],
+                                "value_mon": str(mon_amount),
+                                "value_usdc": str(usdc_amount),
+                                "conversion_details": conversion_details
                             }
                         else:
-                            # Convert other tokens to WETH via CoWSwap
-                            weth_amount, conversion_details = self._get_weth_value(network, token_symbol, str(balance))
-                        
-                        network_total += int(weth_amount)
-                        total_weth_wei += int(weth_amount)
-                        
-                        # Add token data
-                        network_result[token_symbol] = {
-                            "amount": str(balance),
-                            "decimals": decimals,
-                            "value": {
-                                "WETH": {
-                                    "amount": str(weth_amount),
-                                    "decimals": 18,
-                                    "conversion_details": conversion_details
-                                }
+                            # Raw balance only
+                            network_result[token_symbol] = {
+                                "amount": str(balance),
+                                "decimals": decimals,
+                                "formatted": f"{balance_normalized:.6f}",
+                                "address": NETWORK_TOKENS[network][token_symbol]["address"]
                             }
-                        }
                     else:
                         print("  → Balance is 0, skipping")
                 
                 # Add network totals only if there are balances
-                if network_total > 0:
-                    network_result["totals"] = {
-                        "wei": network_total,
-                        "formatted": f"{network_total/1e18:.6f}"
-                    }
+                if network_result:
+                    if self.enable_prices and self.price_indexer:
+                        network_result["totals"] = {
+                            "mon": str(network_total_mon),
+                            "usdc": str(network_total_usdc),
+                            "formatted_mon": f"{network_total_mon:.6f}",
+                            "formatted_usdc": f"{network_total_usdc:.6f}",
+                            "note": "Native MON excluded (gas reserve)"
+                        }
                     # Only add network to result if it has balances
                     result[network] = network_result
             
             # Add protocol total only if there are balances
-            if total_weth_wei > 0:
+            if total_mon > 0 and self.enable_prices and self.price_indexer:
                 result["totals"] = {
-                    "wei": total_weth_wei,
-                    "formatted": f"{total_weth_wei/1e18:.6f}"
+                    "mon": str(total_mon),
+                    "usdc": str(total_usdc),
+                    "formatted_mon": f"{total_mon:.6f}",
+                    "formatted_usdc": f"{total_usdc:.6f}",
+                    "note": "Native MON excluded (gas reserve)"
                 }
 
-            print("\n[Spot] Calculation complete")
+            if self.enable_prices and self.price_indexer:
+                print(f"\n[Spot] Calculation complete - Total: {total_mon:.6f} MON / {total_usdc:.2f} USDC")
+            else:
+                print(f"\n[Spot] Balance fetch complete")
             return result
             
         except Exception as e:
             print(f"\nError processing spot balances: {str(e)}")
             return result
 
-    def _get_weth_value(self, network: str, token_symbol: str, amount: str) -> tuple[str, dict]:
+    def get_balances_simple(self, address: str) -> Dict[str, Any]:
         """
-        Get WETH value for a given token amount using CoWSwap
-        Returns (weth_amount, conversion_details)
+        Get raw balances only (without price conversions)
         """
+        # Temporarily disable prices
+        original_enable_prices = self.enable_prices
+        self.enable_prices = False
+        
         try:
-            # Get token contract address and decimals
-            token_address = NETWORK_TOKENS[network][token_symbol]["address"]
-            token_decimals = NETWORK_TOKENS[network][token_symbol]["decimals"]
-
-            # Get quote from CoW Protocol (or native conversion for spot)
-            result = get_quote(
-                network=network,
-                sell_token=token_address,
-                buy_token=NETWORK_TOKENS[network]["WETH"]["address"],
-                amount=amount,
-                token_decimals=token_decimals,
-                token_symbol=token_symbol,
-                context="spot"
-            )
-
-            if result["quote"]:
-                return result["quote"]["quote"]["buyAmount"], result["conversion_details"]
-
-            return "0", result["conversion_details"]
-
-        except Exception as e:
-            return "0", {
-                "source": "Error",
-                "price_impact": "N/A",
-                "rate": "0",
-                "fee_percentage": "N/A",
-                "fallback": True,
-                "note": f"Technical error: {str(e)[:200]}"
-            }
+            result = self.get_balances(address)
+            return result
+        finally:
+            # Restore original setting
+            self.enable_prices = original_enable_prices
 
     def format_balance(self, balance: int, decimals: int) -> str:
         """Format raw balance to human readable format"""
         return str(Decimal(balance) / Decimal(10**decimals))
 
     def get_supported_networks(self) -> list:
-        """Implementation of abstract method"""
+        """Get supported networks"""
         return list(self.connections.keys())
     
     def get_protocol_info(self) -> dict:
-        """Implementation of abstract method"""
-        return {
-            "name": "Spot Tokens",
-            "tokens": {
-                "USDC": {
-                    network: NETWORK_TOKENS[network]["USDC"]
-                    for network in self.get_supported_networks()
-                },
-                "USR": {
-                    "ethereum": NETWORK_TOKENS["ethereum"]["USR"],
-                    "base": NETWORK_TOKENS["base"]["PT-USR-24APR2025"]["underlying"]["USR"]
-                },
-                "crvUSD": {
-                    "ethereum": NETWORK_TOKENS["ethereum"]["crvUSD"]
-                },
-                "GHO": {
-                    "ethereum": NETWORK_TOKENS["ethereum"]["GHO"]
-                },
-                "fxUSD": {
-                    "ethereum": NETWORK_TOKENS["ethereum"]["fxUSD"]
-                },
-                "scrvUSD": {
-                    "ethereum": NETWORK_TOKENS["ethereum"]["scrvUSD"]
-                },
-                "CVX": {
-                    "ethereum": NETWORK_TOKENS["ethereum"]["CVX"]
-                },
-                "CRV": {
-                    "ethereum": NETWORK_TOKENS["ethereum"]["CRV"]
-                },
-                "PENDLE": {  # Add PENDLE token
-                    "ethereum": NETWORK_TOKENS["ethereum"]["PENDLE"]
-                }
+        """Get protocol information"""
+        if self.enable_prices:
+            return {
+                "name": "Spot Tokens with MON Conversion",
+                "description": "Token balances converted to MON using Crystal Price Indexer"
             }
-        }
+        else:
+            return {
+                "name": "Spot Tokens (Simple)",
+                "description": "Raw token balances without price conversions"
+            }
 
 def main():
     import json
     
+    # Parse command line arguments
+    enable_prices = True
+    verbose = False
+    
+    # Check for flags
+    if "--no-prices" in sys.argv:
+        enable_prices = False
+        sys.argv.remove("--no-prices")
+    
+    if "--verbose" in sys.argv:
+        verbose = True
+        sys.argv.remove("--verbose")
+    
     # Use command line argument if provided, otherwise use production address
     test_address = sys.argv[1] if len(sys.argv) > 1 else PRODUCTION_ADDRESS
     
-    manager = SpotBalanceManager()
+    print(f"=== Spot Balance Manager ===")
+    print(f"Address: {test_address}")
+    print(f"Price conversions: {'Enabled' if enable_prices else 'Disabled'}")
+    print(f"Verbose: {'Yes' if verbose else 'No'}")
+    
+    manager = SpotBalanceManager(enable_prices=enable_prices, verbose=verbose)
     balances = manager.get_balances(test_address)
     
     print("\n" + "="*80)

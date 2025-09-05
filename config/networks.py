@@ -6,143 +6,168 @@ load_dotenv()
 
 # RPC endpoints for supported networks
 RPC_URLS = {
-    "ethereum": os.getenv('ETHEREUM_RPC'),
-    "base": os.getenv('BASE_RPC'),
+    "monad-testnet": os.getenv('TESTNET_MONAD_RPC'),
 }
 
 # Chain IDs for network identification
 CHAIN_IDS = {
-    "ethereum": "1",
-    "base": "8453"
+    "monad-testnet": "1337"
 }
 
-# Complete network token configuration
-# Tokens are organized in categories:
-# 1. Yield-bearing tokens (with underlying assets and protocol info)
-# 2. Base stablecoins
-# 3. Other tokens (governance, rewards, etc.)
+# Complete network token configuration for Monad
 NETWORK_TOKENS = {
-    "ethereum": {
-        "WETH": {
-            "address": "0xC02aaA39b223FE8D0A0e5C4F27eAD9083C756Cc2",
+    "monad-testnet": {
+        "WMON": {
+            "address": "0x760AfE86e5de5fa0Ee542fc7B7B713e1c5425701",
             "decimals": 18,
-            "name": "Wrapped Ether",
-            "symbol": "WETH"
-        },
-        "stETH": {
-            "address": "0xae7ab96520de3a18e5e111b5eaab095312d7fe84",
-            "decimals": 18,
-            "name": "Lido Staked Ether",
-            "symbol": "stETH"
-        },
-        "pufETH": {
-            "address": "0xd9a442856c234a39a81a089c06451ebaa4306a72",
-            "decimals": 18,
-            "name": "Puffer Finance ETH",
-            "symbol": "pufETH"
-        },
-        "wstETH": {
-            "address": "0x7f39c581f595b53c5cb19bd0b3f8da6c935e2ca0",
-            "decimals": 18,
-            "name": "Wrapped Staked Ether",
-            "symbol": "wstETH"
-        },
-        "PENDLE": {
-            "address": "0x808507121B80c02388fAd14726482e061B8da827",
-            "decimals": 18,
-            "name": "Pendle",
-            "symbol": "PENDLE"
-        },
-        "TOKE": {
-            "address": "0x2e9d63788249371f1DFC918a52f8d799F4a38C94",
-            "decimals": 18,
-            "name": "Tokemak",
-            "symbol": "TOKE"
-        },
-        "CRV": {
-            "address": "0xD533a949740bb3306d119CC777fa900bA034cd52",
-            "decimals": 18,
-            "name": "Curve DAO Token",
-            "symbol": "CRV"
-        },
-        "CVX": {
-            "address": "0x4e3fbd56cd56c3e72c1403e103b45db9da5b9d2b",
-            "decimals": 18,
-            "name": "Convex Token",
-            "symbol": "CVX"
-        }
-    },
-    "base": {
-        "WETH": {
-            "address": "0x4200000000000000000000000000000000000006",
-            "decimals": 18,
-            "name": "Wrapped Ether",
-            "symbol": "WETH"
-        },
-        "wstETH": {
-            "address": "0xc1CBa3fCea344f92D9239c08C0568f6F2F0ee452",
-            "decimals": 18,
-            "name": "Wrapped liquid staked Ether 2.0",
-            "symbol": "wstETH"
-        },
-        "baseETH": {
-            "address": "0xAADf01DD90aE0A6Bb9Eb908294658037096E0404",
-            "decimals": 18,
-            "name": "Tokemak baseETH",
-            "symbol": "baseETH",
-            "protocol": "tokemak",
-            "type": "yield-bearing",
-            "rewarder": "0xb592c1539AC22EdD9784eA4d6a22199C16314498"
-        },
-        "cbETH": {
-            "address": "0x2Ae3F1Ec7F1F5012CFEab0185bfc7aa3cf0DEc22",
-            "decimals": 18,
-            "name": "Coinbase Wrapped Staked ETH",
-            "symbol": "cbETH"
-        },
-        "superOETHb": {
-            "address": "0xDBFeFD2e8460a6Ee4955A68582F85708BAEA60A3",
-            "decimals": 18,
-            "name": "Super OETHb",
-            "symbol": "superOETHb"
-        },
-        "PENDLE": {
-            "address": "0xA99F6e6785Da0F5d6fB42495Fe424BCE029Eeb3E",
-            "decimals": 18,
-            "name": "Pendle",
-            "symbol": "PENDLE"
-        },
-        "CRV": {
-            "address": "0x8Ee73c484A26e0A5df2Ee2a4960B789967dd0415",
-            "decimals": 18,
-            "name": "Curve DAO Token",
-            "symbol": "CRV"
+            "name": "Wrapped Monad",
+            "symbol": "WMON"
         },
         "USDC": {
-            "address": "0x833589fCD6eDb6E08f4c7C32D4f71b54bdA02913",
+            "address": "0xf817257fed379853cDe0fa4F97AB987181B1E5Ea",
             "decimals": 6,
             "name": "USD Coin",
             "symbol": "USDC"
-        }
+        },
+        "WETH": {
+            "address": "0xB5a30b0FDc5EA94A52fDc42e3E9760Cb8449Fb37",
+            "decimals": 18,
+            "name": "Wrapped Ether",
+            "symbol": "WETH"
+        },
+        "WBTC": {
+            "address": "0xcf5a6076cfa32686c0Df13aBaDa2b40dec133F1d",
+            "decimals": 8,
+            "name": "Wrapped Bitcoin",
+            "symbol": "WBTC"
+        },
+        "SOL": {
+            "address": "0x5387C85A4965769f6B0Df430638a1388493486F1",
+            "decimals": 9,
+            "name": "Solana",
+            "symbol": "SOL"
+        },
+        "USDT": {
+            "address": "0x88b8E2161DEDC77EF4ab7585569D2415a1C1055D",
+            "decimals": 6,
+            "name": "Tether USD",
+            "symbol": "USDT"
+        },
+        "PINGU": {
+            "address": "0xA2426cD97583939E79Cfc12aC6E9121e37D0904d",
+            "decimals": 18,
+            "name": "Pingu Token",
+            "symbol": "PINGU"
+        },
+        "aprMON": {
+            "address": "0xb2f82D0f38dc453D596Ad40A37799446Cc89274A",
+            "decimals": 18,
+            "name": "aprMON",
+            "symbol": "aprMON"
+        },
+        "sMON": {
+            "address": "0xe1d2439b75fb9746E7Bc6cB777Ae10AA7f7ef9c5",
+            "decimals": 18,
+            "name": "sMON",
+            "symbol": "sMON"
+        },
+        "shMON": {
+            "address": "0x3a98250F98Dd388C211206983453837C8365BDc1",
+            "decimals": 18,
+            "name": "shMON",
+            "symbol": "shMON"
+        },
+
     }
 }
 
 # Common tokens used across networks
 COMMON_TOKENS = {
-    "ethereum": {
-        "WETH": {
-            "address": "0xC02aaA39b223FE8D0A0e5C4F27eAD9083C756Cc2",
+    "monad-testnet": {
+        "WMON": {
+            "address": "0x760AfE86e5de5fa0Ee542fc7B7B713e1c5425701",
             "decimals": 18,
-            "name": "Wrapped Ether",
-            "symbol": "WETH"
+            "name": "Wrapped Monad",
+            "symbol": "WMON"
         }
-    },
-    "base": {
-        "WETH": {
-            "address": "0x4200000000000000000000000000000000000006",
-            "decimals": 18,
-            "name": "Wrapped Ether",
-            "symbol": "WETH"
-        }
+    }
+}
+
+# Crystal pool configurations with specific scaling factors
+CRYSTAL_POOLS = {
+    "monad-testnet": {
+        "MON/USDC": {
+            "pool_address": "0xCd5455B24f3622A1CfEce944615AE5Bc8f36Ee18",
+            "quote_address": "0xf817257fed379853cDe0fa4F97AB987181B1E5Ea",  # USDC
+            "base_address": "0x760AfE86e5de5fa0Ee542fc7B7B713e1c5425701",   # WMON
+            "scaling_factor": 10**3,
+            "max_price": 100000,
+            "description": "MON/USDC Crystal Pool"
+        },
+        "WETH/USDC": {
+            "pool_address": "0x9fA48CFB43829A932A227E4d7996e310ccf40E9C",
+            "quote_address": "0xf817257fed379853cDe0fa4F97AB987181B1E5Ea",  # USDC
+            "base_address": "0xB5a30b0FDc5EA94A52fDc42e3E9760Cb8449Fb37",   # WETH
+            "scaling_factor": 10**1,
+            "max_price": 1000000,
+            "description": "WETH/USDC Crystal Pool"
+        },
+        "WBTC/USDC": {
+            "pool_address": "0x45f7db719367bbf9E508D3CeA401EBC62fc732A9",
+            "quote_address": "0xf817257fed379853cDe0fa4F97AB987181B1E5Ea",  # USDC
+            "base_address": "0xcf5a6076cfa32686c0Df13aBaDa2b40dec133F1d",   # WBTC
+            "scaling_factor": 1,
+            "max_price": 1000000,
+            "description": "WBTC/USDC Crystal Pool"
+        },
+        "SOL/USDC": {
+            "pool_address": "0x5a6f296032AaAE6737ed5896bC09D01dc2d42507",
+            "quote_address": "0xf817257fed379853cDe0fa4F97AB987181B1E5Ea",  # USDC
+            "base_address": "0x5387C85A4965769f6B0Df430638a1388493486F1",   # SOL
+            "scaling_factor": 10**2,
+            "max_price": 100000,
+            "description": "SOL/USDC Crystal Pool"
+        },
+        "USDT/USDC": {
+            "pool_address": "0xCF16582dC82c4C17fA5b54966ee67b74FD715fB5",
+            "quote_address": "0xf817257fed379853cDe0fa4F97AB987181B1E5Ea",  # USDC
+            "base_address": "0x88b8E2161DEDC77EF4ab7585569D2415a1C1055D",   # USDT
+            "scaling_factor": 10**3,
+            "max_price": 10000,
+            "description": "USDT/USDC Crystal Pool"
+        },
+        "PINGU/MON": {
+            "pool_address": "0x3829EdA9aA5Bb9077d31F995327886309712BBA2",
+            "quote_address": "0x760AfE86e5de5fa0Ee542fc7B7B713e1c5425701",  # WMON
+            "base_address": "0xA2426cD97583939E79Cfc12aC6E9121e37D0904d",   # PINGU
+            "scaling_factor": 10**5,
+            "max_price": 100000,
+            "description": "PINGU/MON Crystal Pool"
+        },
+        "aprMON/MON": {
+            "pool_address": "0x33C5Dc9091952870BD1fF47c89fA53D63f9729b6",
+            "quote_address": "0x760AfE86e5de5fa0Ee542fc7B7B713e1c5425701",  # WMON
+            "base_address": "0xb2f82D0f38dc453D596Ad40A37799446Cc89274A",   # aprMON
+            "scaling_factor": 10**4,
+            "max_price": 100000,
+            "description": "aprMON/MON Crystal Pool"
+        },
+        "sMON/MON": {
+            "pool_address": "0x97fa0031E2C9a21F0727bcaB884E15c090eC3ee3",
+            "quote_address": "0x760AfE86e5de5fa0Ee542fc7B7B713e1c5425701",  # WMON
+            "base_address": "0xe1d2439b75fb9746E7Bc6cB777Ae10AA7f7ef9c5",   # sMON
+            "scaling_factor": 10**4,
+            "max_price": 100000,
+            "description": "sMON/MON Crystal Pool"
+        },
+        "shMON/MON": {
+            "pool_address": "0xcB5ec6D6d0E49478119525E4013ff333Fc46B742",
+            "quote_address": "0x760AfE86e5de5fa0Ee542fc7B7B713e1c5425701",  # WMON
+            "base_address": "0x3a98250F98Dd388C211206983453837C8365BDc1",   # shMON
+            "scaling_factor": 10**4,
+            "max_price": 100000,
+            "description": "shMON/MON Crystal Pool"
+        },
+
     }
 }

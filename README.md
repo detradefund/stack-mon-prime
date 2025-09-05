@@ -144,7 +144,7 @@ on:
       target_address:
         description: 'Wallet address to process'
         required: true
-        default: '0x66DbceE7feA3287B3356227d6F3DfF3CeFbC6F3C'
+        default: '0x2EAc9dF8299e544b9d374Db06ad57AD96C7527c0'
 ```
 
 ### External API Integration
@@ -177,7 +177,7 @@ DATABASE_NAME=detrade-core-eth
 COLLECTION_NAME=oracle
 
 # Wallet
-PRODUCTION_ADDRESS=0x66DbceE7feA3287B3356227d6F3DfF3CeFbC6F3C
+PRODUCTION_ADDRESS=0x2EAc9dF8299e544b9d374Db06ad57AD96C7527c0
 ```
 
 ### Basic Usage
@@ -185,7 +185,7 @@ PRODUCTION_ADDRESS=0x66DbceE7feA3287B3356227d6F3DfF3CeFbC6F3C
 #### Run Complete Oracle Update
 ```bash
 # Full pipeline execution
-python -m builder.aggregator 0x66DbceE7feA3287B3356227d6F3DfF3CeFbC6F3C
+python -m builder.aggregator 0x2EAc9dF8299e544b9d374Db06ad57AD96C7527c0
 
 # Push to MongoDB
 python -m builder.pusher

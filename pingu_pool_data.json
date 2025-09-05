@@ -1,0 +1,132 @@
+{
+  "pool_address": "0x75F2948bfF7D6D6bb6133cc5FE3c710656c2A939",
+  "network": "monad-testnet",
+  "timestamp": 1756681839,
+  "assets": {
+    "MON": {
+      "amount": "101.07533507599926",
+      "decimals": 18,
+      "formatted": "101.075335",
+      "value_mon": "101.07533507599926",
+      "value_usdc": "388.23036202691315766",
+      "conversion_details": {
+        "source": "Direct",
+        "mon_price": "1.000000",
+        "usdc_price": "3.841",
+        "conversion_type": "direct",
+        "route_mon": "MON -> MON (direct)",
+        "route_usdc": "MON -> USDC (1 step)",
+        "note": "Direct 1:1 conversion (MON)"
+      }
+    },
+    "USDC": {
+      "amount": "50000.123456",
+      "decimals": 6,
+      "formatted": "50000.12",
+      "address": "0xf817257fed379853cDe0fa4F97AB987181B1E5Ea",
+      "value_mon": "13017.47551575110648268680031",
+      "value_usdc": "50000.123456",
+      "conversion_details": {
+        "source": "Crystal",
+        "mon_price": "0.2603488674824264514449362145",
+        "usdc_price": "1.000000",
+        "conversion_type": "crystal_swap",
+        "route_mon": "USDC -> MON (1 step)",
+        "route_usdc": "USDC -> USDC (direct)",
+        "note": "Converted via Crystal Price Indexer"
+      }
+    },
+    "PINGU": {
+      "amount": "10000.000000",
+      "decimals": 18,
+      "formatted": "10000.000000",
+      "address": "0xA2426cD97583939E79Cfc12aC6E9121e37D0904d",
+      "value_mon": "342.80000000000",
+      "value_usdc": "1316.69480000000000",
+      "conversion_details": {
+        "source": "Crystal",
+        "mon_price": "0.03428",
+        "usdc_price": "0.13166948",
+        "conversion_type": "crystal_swap",
+        "route_mon": "PINGU -> MON (1 step)",
+        "route_usdc": "PINGU -> MON -> USDC (2 steps)",
+        "note": "Converted via Crystal Price Indexer"
+      }
+    },
+    "WETH": {
+      "amount": "50.5",
+      "decimals": 18,
+      "formatted": "50.500000",
+      "address": "0xB5a30b0FDc5EA94A52fDc42e3E9760Cb8449Fb37",
+      "value_mon": "0",
+      "value_usdc": "223482.70",
+      "conversion_details": {
+        "source": "Crystal",
+        "mon_price": "0E+1",
+        "usdc_price": "4425.4",
+        "conversion_type": "crystal_swap",
+        "route_mon": "WETH -> MON (1 step)",
+        "route_usdc": "WETH -> USDC (1 step)",
+        "note": "Converted via Crystal Price Indexer"
+      }
+    },
+    "WBTC": {
+      "amount": "2.5",
+      "decimals": 8,
+      "formatted": "2.500000",
+      "address": "0xcf5a6076cfa32686c0Df13aBaDa2b40dec133F1d",
+      "value_mon": "0",
+      "value_usdc": "272377.5",
+      "conversion_details": {
+        "source": "Crystal",
+        "mon_price": "0E+1",
+        "usdc_price": "108951",
+        "conversion_type": "crystal_swap",
+        "route_mon": "WBTC -> MON (1 step)",
+        "route_usdc": "WBTC -> USDC (1 step)",
+        "note": "Converted via Crystal Price Indexer"
+      }
+    },
+    "SOL": {
+      "amount": "100.0",
+      "decimals": 9,
+      "formatted": "100.000000",
+      "address": "0x5387C85A4965769f6B0Df430638a1388493486F1",
+      "value_mon": "0",
+      "value_usdc": "19951.000",
+      "conversion_details": {
+        "source": "Crystal",
+        "mon_price": "0E+1",
+        "usdc_price": "199.51",
+        "conversion_type": "crystal_swap",
+        "route_mon": "SOL -> MON (1 step)",
+        "route_usdc": "SOL -> USDC (1 step)",
+        "note": "Converted via Crystal Price Indexer"
+      }
+    },
+    "USDT": {
+      "amount": "25000.0",
+      "decimals": 6,
+      "formatted": "25000.000000",
+      "address": "0x88b8E2161DEDC77EF4ab7585569D2415a1C1055D",
+      "value_mon": "0",
+      "value_usdc": "24875.0000",
+      "conversion_details": {
+        "source": "Crystal",
+        "mon_price": "0E+1",
+        "usdc_price": "0.995",
+        "conversion_type": "crystal_swap",
+        "route_mon": "USDT -> MON (1 step)",
+        "route_usdc": "USDT -> USDC (1 step)",
+        "note": "Converted via Crystal Price Indexer"
+      }
+    }
+  },
+  "totals": {
+    "mon": "13461.35085082710574268680031",
+    "usdc": "592391.24861802691315766",
+    "formatted_mon": "13461.350851",
+    "formatted_usdc": "592391.25"
+  },
+  "conversion_details": {}
+}

@@ -1,0 +1,62 @@
+{
+  "protocols": {
+    "pingu": {
+      "monad-testnet": {
+        "MON": {
+          "amount": "101.07533507599926",
+          "decimals": 18,
+          "value": {
+            "WMON": {
+              "amount": "101.07533507599926",
+              "decimals": 18,
+              "conversion_details": {
+                "source": "Direct",
+                "price_impact": "0.000000",
+                "rate": "1.000000",
+                "fee_percentage": "0.0000%",
+                "fallback": false,
+                "note": "Direct conversion: 1 MON = 1 WMON"
+              }
+            }
+          }
+        },
+        "USDC": {
+          "amount": "50000.123456",
+          "decimals": 18,
+          "value": {
+            "WMON": {
+              "amount": "0",
+              "decimals": 18,
+              "conversion_details": {
+                "source": "Manual",
+                "price_impact": "0.000000",
+                "rate": "0.000000",
+                "fee_percentage": "0.0000%",
+                "fallback": true,
+                "note": "Manual input for USDC - conversion not implemented"
+              }
+            }
+          }
+        },
+        "PINGU": {
+          "amount": "10000.000000",
+          "decimals": 18,
+          "value": {
+            "WMON": {
+              "amount": "0",
+              "decimals": 18,
+              "conversion_details": {
+                "source": "Manual",
+                "price_impact": "0.000000",
+                "rate": "0.000000",
+                "fee_percentage": "0.0000%",
+                "fallback": true,
+                "note": "Manual input for PINGU - conversion not implemented"
+              }
+            }
+          }
+        }
+      }
+    }
+  }
+}

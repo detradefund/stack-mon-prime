@@ -32,8 +32,8 @@ sys.path.append(root_path)
 from config.networks import RPC_URLS
 
 # Contract configuration
-CONTRACT_ADDRESS = "0x9b97BFDfE44D1B113ECD4BF2f243ed36acA34523"
-CONTRACT_NAME = "dtWETH"
+CONTRACT_ADDRESS = "0xFBDb57EE93a86C22c8307AbbaF694f365229242a"
+CONTRACT_NAME = "dtShares"
 
 class SupplyReader:
     """
@@ -44,7 +44,7 @@ class SupplyReader:
         logger.info("\n=== Supply Reader Initialization ===")
         
         # Use provided address or default to production address
-        self.user_address = address or '0x66DbceE7feA3287B3356227d6F3DfF3CeFbC6F3C'
+        self.user_address = address or '0x2EAc9dF8299e544b9d374Db06ad57AD96C7527c0'
         logger.info(f"User Address: {self.user_address}")
         
         # Use contract configuration
@@ -53,7 +53,7 @@ class SupplyReader:
         logger.info(f"Contract: {self.contract_name} ({self.contract_address})")
         
         # Initialize Web3 connection
-        rpc_url = rpc_url or RPC_URLS['base']
+        rpc_url = rpc_url or RPC_URLS['monad-testnet']
         self.w3 = Web3(Web3.HTTPProvider(rpc_url))
         if not self.w3.is_connected():
             raise ConnectionError("Failed to connect to RPC endpoint")

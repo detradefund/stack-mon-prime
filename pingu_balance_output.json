@@ -1,0 +1,33 @@
+{
+  "protocols": {
+    "pingu": {
+      "MON": {
+        "amount": "604065067413903204986",
+        "decimals": 18,
+        "formatted": "604.065067",
+        "value": {
+          "WMON": {
+            "amount": "604065067413903204986",
+            "conversion_details": {
+              "rate": "1.000000",
+              "source": "Manual"
+            }
+          },
+          "USDC": {
+            "amount": "2321422054",
+            "conversion_details": {
+              "rate": "3.843000",
+              "source": "Manual"
+            }
+          }
+        }
+      },
+      "totals": {
+        "mon": "604065067413903204986",
+        "usdc": "2321422054",
+        "formatted_mon": "604.065067",
+        "formatted_usdc": "2321.42"
+      }
+    }
+  }
+}

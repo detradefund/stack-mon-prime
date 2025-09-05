@@ -1,0 +1,41 @@
+{
+  "protocol": "pingu",
+  "address": "0x2EAc9dF8299e544b9d374Db06ad57AD96C7527c0",
+  "pool_address": "0x75F2948bfF7D6D6bb6133cc5FE3c710656c2A939",
+  "network": "monad-testnet",
+  "timestamp": 1756681945,
+  "data_source": "manual_input",
+  "assets": {
+    "MON": {
+      "amount": "101.07533507599926",
+      "decimals": 18,
+      "formatted": "101.075335",
+      "address": null,
+      "token_symbol": "MON"
+    },
+    "USDC": {
+      "amount": "50000.123456",
+      "decimals": 6,
+      "formatted": "50000.12",
+      "address": "0xf817257fed379853cDe0fa4F97AB987181B1E5Ea",
+      "token_symbol": "USDC"
+    },
+    "PINGU": {
+      "amount": "10000.000000",
+      "decimals": 18,
+      "formatted": "10000.000000",
+      "address": "0xA2426cD97583939E79Cfc12aC6E9121e37D0904d",
+      "token_symbol": "PINGU"
+    }
+  },
+  "totals": {},
+  "metadata": {
+    "protocol_info": {
+      "name": "Pingu Pool (Simple)",
+      "description": "Raw pool balances without price conversions",
+      "pool_address": "0x75F2948bfF7D6D6bb6133cc5FE3c710656c2A939"
+    },
+    "calculation_method": "Raw balances only",
+    "pool_type": "liquidity_pool"
+  }
+}

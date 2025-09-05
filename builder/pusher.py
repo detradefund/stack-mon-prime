@@ -7,10 +7,12 @@ from pymongo import MongoClient
 from typing import Dict, Any
 import logging
 import os
-from builder.aggregator import BalanceAggregator, build_overview
 
 # Add parent directory to Python path
 sys.path.append(str(Path(__file__).parent.parent))
+
+# Import after adding to path
+from builder.aggregator import BalanceAggregator, build_overview
 
 # Add parent directory to PYTHONPATH and load environment variables
 root_path = str(Path(__file__).parent.parent)
@@ -196,8 +198,8 @@ def main():
     # Configuration for multiple addresses and databases
     configurations = [
         {
-            'address': '0x66DbceE7feA3287B3356227d6F3DfF3CeFbC6F3C',
-            'database_name': 'detrade-core-eth',
+            'address': '0x2EAc9dF8299e544b9d374Db06ad57AD96C7527c0',
+            'database_name': 'stack-mon-prime',
             'collection_name': 'oracle'
         }
     ]
