@@ -4,8 +4,8 @@ on:
   push:
     branches:
       - main
-  # schedule:
-  #   - cron: '0 * * * *'  # Runs every hour
+  schedule:
+    - cron: '0 */4 * * *'  # Runs every 4 hours
   workflow_dispatch:  # Allows manual triggering
 
 jobs:
@@ -14,6 +14,7 @@ jobs:
     env:
       ETHEREUM_RPC: ${{ secrets.ETHEREUM_RPC }}
       BASE_RPC: ${{ secrets.BASE_RPC }}
+      TESTNET_MONAD_RPC: ${{ secrets.TESTNET_MONAD_RPC }}
     
     steps:
     - uses: actions/checkout@v3
@@ -40,6 +41,7 @@ jobs:
         echo "Checking environment variables:"
         echo "ETHEREUM_RPC exists: ${{ env.ETHEREUM_RPC != '' }}"
         echo "BASE_RPC exists: ${{ env.BASE_RPC != '' }}"
+        echo "TESTNET_MONAD_RPC exists: ${{ env.TESTNET_MONAD_RPC != '' }}"
         echo "MONGO_URI exists: ${{ secrets.MONGO_URI != '' }}"
         echo "DATABASE_NAME exists: ${{ secrets.DATABASE_NAME != '' }}"
         echo "COLLECTION_NAME exists: ${{ secrets.COLLECTION_NAME != '' }}"
@@ -50,6 +52,7 @@ jobs:
         DATABASE_NAME: ${{ secrets.DATABASE_NAME }}
         COLLECTION_NAME: ${{ secrets.COLLECTION_NAME }}
         PRODUCTION_ADDRESS: ${{ secrets.PRODUCTION_ADDRESS }}
+        TESTNET_MONAD_RPC: ${{ secrets.TESTNET_MONAD_RPC }}
       run: |
         echo "Running pusher with Python version:"
         python --version
