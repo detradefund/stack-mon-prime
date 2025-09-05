@@ -14,7 +14,9 @@ def check_mongodb():
         mongo_uri = os.getenv('MONGO_URI')
         # Hardcoded configuration
         databases = ["detrade-core-usdc", "dev-detrade-core-usdc"]
-        collection_name = "oracle"
+        collection_name = os.getenv('COLLECTION_NAME')
+        if not collection_name:
+            raise ValueError("Missing COLLECTION_NAME in environment")
         
         # Connect to MongoDB
         client = MongoClient(mongo_uri)

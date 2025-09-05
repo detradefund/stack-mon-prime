@@ -7,6 +7,7 @@ from web3 import Web3
 from datetime import datetime, timezone
 import time
 import os
+from dotenv import load_dotenv
 
 # Add parent directory and project root to PYTHONPATH
 root_path = str(Path(__file__).parent.parent)
@@ -180,8 +181,13 @@ def main():
     Main function to aggregate Spot and Pingu balance data.
     Uses command line argument if provided, otherwise uses default address.
     """
+    # Load environment variables
+    load_dotenv()
     # Default address from .env
-    DEFAULT_ADDRESS = os.getenv('PRODUCTION_ADDRESS', '0x2EAc9dF8299e544b9d374Db06ad57AD96C7527c0')
+    DEFAULT_ADDRESS = os.getenv('PRODUCTION_ADDRESS')
+    if not DEFAULT_ADDRESS:
+        print("Error: Missing PRODUCTION_ADDRESS in environment")
+        return None
     
     # Get address from command line argument if provided
     address = sys.argv[1] if len(sys.argv) > 1 else DEFAULT_ADDRESS

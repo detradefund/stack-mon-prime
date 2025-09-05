@@ -25,6 +25,9 @@ handler.setFormatter(CustomFormatter())
 logger.addHandler(handler)
 logger.setLevel(logging.INFO)
 
+# Load environment variables
+load_dotenv()
+
 # Add parent directory to PYTHONPATH
 root_path = str(Path(__file__).parent.parent)
 sys.path.append(root_path)
@@ -43,8 +46,11 @@ class SupplyReader:
     def __init__(self, address: str = None, rpc_url: str = None):
         logger.info("\n=== Supply Reader Initialization ===")
         
-        # Use provided address or default to production address
-        self.user_address = address or '0x2EAc9dF8299e544b9d374Db06ad57AD96C7527c0'
+        # Use provided address or default to production address from environment
+        env_address = os.getenv('PRODUCTION_ADDRESS')
+        self.user_address = address or env_address
+        if not self.user_address:
+            raise ValueError("Missing PRODUCTION_ADDRESS in environment and no address provided")
         logger.info(f"User Address: {self.user_address}")
         
         # Use contract configuration

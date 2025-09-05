@@ -26,7 +26,9 @@ def get_pingu_balance_from_contract() -> str:
     
     # Contract configuration
     POOL_STORE_ADDRESS = "0xD849497f08180d3f1a79397EF8ae4DBD05EC1a5c"
-    PRODUCTION_ADDRESS = os.getenv('PRODUCTION_ADDRESS', '0x2EAc9dF8299e544b9d374Db06ad57AD96C7527c0')
+    PRODUCTION_ADDRESS = os.getenv('PRODUCTION_ADDRESS')
+    if not PRODUCTION_ADDRESS:
+        raise ValueError("Missing PRODUCTION_ADDRESS in environment")
     MON_ASSET_ADDRESS = "0x0000000000000000000000000000000000000000"  # Native MON
     
     # Initialize Web3 connection

@@ -195,20 +195,19 @@ class BalancePusher:
 
 def main():
     """CLI entry point for testing balance pushing functionality."""
-    # Configuration for multiple addresses and databases
+    # Resolve production address from environment
+    address = os.getenv('PRODUCTION_ADDRESS')
+    if not address:
+        raise ValueError("Missing PRODUCTION_ADDRESS in environment")
+    # Configuration for multiple addresses
     configurations = [
         {
-            'address': '0x2EAc9dF8299e544b9d374Db06ad57AD96C7527c0',
-            'database_name': 'stack-mon-prime',
-            'collection_name': 'oracle'
+            'address': address,
         }
     ]
     
     for config in configurations:
-        pusher = BalancePusher(
-            database_name=config['database_name'],
-            collection_name=config['collection_name']
-        )
+        pusher = BalancePusher()
         try:
             pusher.push_balance_data(config['address'])
         finally:

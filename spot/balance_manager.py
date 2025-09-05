@@ -4,6 +4,8 @@ from pathlib import Path
 from typing import Dict, Any, Optional
 from decimal import Decimal
 import time
+import os
+from dotenv import load_dotenv
 
 # Add parent directory to PYTHONPATH
 root_path = str(Path(__file__).parent.parent)
@@ -13,8 +15,10 @@ from config.networks import NETWORK_TOKENS, RPC_URLS
 from utils.retry import Web3Retry
 from crystal.price_indexer import CrystalPriceIndexer
 
-# Production address
-PRODUCTION_ADDRESS = "0x2EAc9dF8299e544b9d374Db06ad57AD96C7527c0"
+# Load environment variables
+load_dotenv()
+# Production address from environment
+PRODUCTION_ADDRESS = os.getenv('PRODUCTION_ADDRESS')
 
 class SpotBalanceManager:
     """Unified Spot Balance Manager - Handles raw balances and price conversions"""

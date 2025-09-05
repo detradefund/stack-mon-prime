@@ -13,8 +13,10 @@ def delete_documents_after_date(database_name: str, cutoff_date: str) -> None:
     try:
         # Get MongoDB URI from .env
         mongo_uri = os.getenv('MONGO_URI')
-        # Hardcoded collection name
-        collection_name = "oracle"
+        # Collection name from .env
+        collection_name = os.getenv('COLLECTION_NAME')
+        if not collection_name:
+            raise ValueError("Missing COLLECTION_NAME in environment")
         
         print("\nConnecting to MongoDB...")
         print(f"Database: {database_name}")
